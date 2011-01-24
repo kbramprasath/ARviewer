@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    
+
+    <!-- Used in route preferences -->
+    <string-array name="location_methods">
+        <item>GPS</item>
+        <item>Wi-Fi</item>
+    </string-array>
+    
+   
+    <string-array name="valueslocation_methods">
+        <item>gps</item>
+        <item>network</item>
+    </string-array>
+    
+    <string-array name="location_periodic">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>  
+        <item>30</item>       
+    </string-array>
+    
+    <string-array name="location_units">
+    	<item>Seconds</item>
+    	<item>Minutes</item>
+    </string-array>
+    
+    <string-array name="valueslocation_units">
+    	<item>1</item>
+    	<item>60</item>
+    </string-array>
+    
+    <string-array name="values_minimumdistance">
+    	<item>0</item>
+    	<item>1</item>
+    	<item>5</item>
+    	<item>10</item>
+    	<item>20</item>
+    	<item>50</item>
+    	<item>100</item>
+    </string-array>
+    
+    <string-array name="draw_name_options">
+    	<item>No names</item>
+    	<item>Central names</item>
+    	<item>All names</item>
+    </string-array>
+    
+    <string-array name="values_draw_name_options">
+    	<item>No_names</item>
+    	<item>Central_names</item>
+    	<item>All_names</item>
+    </string-array>
+    
+        <string-array name="height_options">
+    	<item>No heights</item>
+    	<item>Existing heights</item>
+    	<item>All heights</item>
+    </string-array>
+    
+    <string-array name="values_height_options">
+    	<item>No_heights</item>
+    	<item>Existing_heights</item>
+    	<item>All_heights</item>
+    </string-array>
+    
+</resources>

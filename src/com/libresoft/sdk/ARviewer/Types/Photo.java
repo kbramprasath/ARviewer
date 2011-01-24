@@ -99,26 +99,33 @@ public class Photo extends GeoNode implements Serializable {
 	{
 		mPhotoPath = path;
 	}
+	
+	public boolean isBitmapPhoto()
+	{
+		return mByteBitMapImageThumb != null;
+	}
 
 	public Bitmap getBitmapPhoto ()
 	{
-		
-		Bitmap bitmapImage = null;
-		
-		if (mPhotoUrl != null)
-			bitmapImage = BitmapUtils.loadBitmap(mPhotoUrl);
-		
-		else if (mPhotoPath != null)
-			bitmapImage = BitmapUtils.loadBitMapFromFile(mPhotoPath);
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+		if (mByteBitMapImageThumb != null)
 		{
-			Log.e("getBitmapImageThumb","Error: Don't compress de image");
-			return null;
+			Bitmap bitmapImage = null;
+
+			if (mPhotoUrl != null)
+				bitmapImage = BitmapUtils.loadBitmap(mPhotoUrl);
+
+			else if (mPhotoPath != null)
+				bitmapImage = BitmapUtils.loadBitMapFromFile(mPhotoPath);
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+			{
+				Log.e("getBitmapImageThumb","Error: Don't compress de image");
+				return null;
+			}
+			
+			mByteBitMapImageThumb = baos.toByteArray();
 		}
-		
-		mByteBitMapImageThumb = baos.toByteArray();
 		
 		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapImageThumb) );
 	}
