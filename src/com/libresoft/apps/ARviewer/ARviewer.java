@@ -24,7 +24,6 @@ package com.libresoft.apps.ARviewer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
 import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
 import com.libresoft.apps.ARviewer.Overlays.CamPreview;
@@ -33,6 +32,7 @@ import com.libresoft.apps.ARviewer.Overlays.DrawFocus;
 import com.libresoft.apps.ARviewer.Overlays.DrawParameters;
 import com.libresoft.apps.ARviewer.Overlays.DrawRadar;
 import com.libresoft.apps.ARviewer.Overlays.DrawResource;
+import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
 import com.libresoft.apps.ARviewer.ScreenCapture.ScreenshotManager;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
@@ -91,6 +91,7 @@ public class ARviewer extends ARActivity{
     private DrawParameters mParameters;
     private DrawFocus mFocus;
     private DrawRadar mRadar;
+	private DrawUserStatus mUserStatus;
     
     //FIXME Open GL part
 //    private GLSurfaceView opengl;
@@ -193,9 +194,14 @@ public class ARviewer extends ARActivity{
 			float[] location = {(float) loc.getLatitude(), (float) loc.getLongitude(), 0};
 			setLocation(location);
 			
+			if(mUserStatus != null)
+				mUserStatus.setLocationServiceActive(true);
+			
 			if(AltitudeManager.isLocationServiceAltitude()){
 				cam_altitude = (float) loc.getAltitude();
 				LocationUtils.setUserHeight(cam_altitude);
+				if(mUserStatus != null)
+					mUserStatus.setAltitudeLoaded(true);
 			}else
 				if(tagManager.getSavingType() == -1)
 					requestAltitudeInfo();
@@ -239,9 +245,11 @@ public class ARviewer extends ARActivity{
 			
 			mFocus = new DrawFocus(this);
 			mRadar = new DrawRadar(this);
+			mUserStatus = new DrawUserStatus(this);
 			
 			getLayers().addInfoElement(mRadar, null);
 			getLayers().addInfoElement(mFocus, null);
+			getLayers().addInfoElement(mUserStatus, null);
 			
 			loadConfig(false);
 			
@@ -370,7 +378,7 @@ public class ARviewer extends ARActivity{
 	
     protected void onPause(){
     	super.onPause();
-    	
+//    	orListener.stopAudio();
     	getLayers().removeBaseElement(mPreview);
     	compassManager.unregisterListeners();
     	if(!(idGPS<0))
@@ -436,18 +444,6 @@ public class ARviewer extends ARActivity{
     		return super.onOptionsItemSelected(item);
     	
     	if(showMenu){
-    		//FIXME testing line
-//    		TestingManager.setInitTime();
-//    		if(tagManager != null){
-//    			tagManager.setUserLocation(getLocation());
-//    			tagManager.setCamAltitude(cam_altitude);
-//    			if(tagManager.onOptionsItemSelected(item)){
-//    				showMenu = false;
-//    				return super.onOptionsItemSelected(item);
-//    			}
-//    		}
-    			
-    		
     		switch (item.getItemId()) {
 
     		case MENU_DISTANCE_FILTER:
@@ -459,11 +455,15 @@ public class ARviewer extends ARActivity{
     			break;
     			
     		case MENU_SERVICE_LOCATION:
-    			if(idGPS==-1)
+    			if(idGPS==-1){
+					if(mUserStatus != null)
+						mUserStatus.setLocationServiceOnProgress();
     				idGPS = LocationService.registerLocationListener(locationListener);
-    			else{
+    			}else{
     				LocationService.unRegisterLocationListener(idGPS);
     				idGPS = -1;
+					if(mUserStatus != null)
+						mUserStatus.setLocationServiceActive(false);
     			}
     			if(tagManager != null)
     				tagManager.setLocationServiceOn(idGPS);
@@ -617,18 +617,16 @@ public class ARviewer extends ARActivity{
 	
 	private synchronized void requestAltitudeInfo(){
 		Log.i("ARView", "Request altitude");
-		Toast.makeText(getBaseContext(), 
-				"Getting altitude", 
-				Toast.LENGTH_SHORT).show();
+		if(mUserStatus != null)
+			mUserStatus.setAltitudeLoaded(false);
 		final Handler altHandler = new Handler(){
 			@Override
 			public void handleMessage(Message msg) {
 				if(isFinishing())
 					return;
 				Log.i("ARView", "Altitude received");
-				Toast.makeText(getBaseContext(), 
-						"Altitude received", 
-						Toast.LENGTH_SHORT).show();
+				if((msg.what == 0) && (mUserStatus != null))
+					mUserStatus.setAltitudeLoaded(true);
 			}
 		};
 		

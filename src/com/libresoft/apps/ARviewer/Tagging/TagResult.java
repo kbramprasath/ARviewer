@@ -23,7 +23,6 @@ package com.libresoft.apps.ARviewer.Tagging;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.location.Location;
@@ -37,40 +36,18 @@ import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.libresoft.apps.ARviewer.R;
+import com.libresoft.apps.ARviewer.Maps.Overlays.ResourceOverlay;
 
 public class TagResult extends MapActivity{
-	
-	private static final int MENU_TAKE_SAMPLE = Menu.FIRST + 1;
-	
-	
-//	private ContentUpload contentUpload;
 	
 	private static Location res_location;
 	
 	private static String distance;
 	private static String height;
 	
-	private Integer layerId;
-	
-//	private OnUploadListener onUploadListener = new OnUploadListener() {
-//		
-//		@Override
-//		public void onSuccess(boolean isSuccess) {
-//			if(isSuccess){
-//				setResult(Activity.RESULT_OK);
-//				finish();
-//			}
-//		}
-//	};
-	
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tag_data);
-        
-        layerId = getIntent().getExtras().getInt("LAYER_ID");
-
-//        contentUpload = new ContentUpload(this, layerId);
-//        contentUpload.setOnUploadListener(onUploadListener);
         
         TextView tvDistance = (TextView) findViewById (R.id.tagDistance);
 		TextView tvHeight = (TextView) findViewById (R.id.tagHeight);
@@ -83,8 +60,6 @@ public class TagResult extends MapActivity{
         res_location.setLatitude(getIntent().getExtras().getDouble("LATITUDE"));
         res_location.setLongitude(getIntent().getExtras().getDouble("LONGITUDE"));
         res_location.setAltitude(getIntent().getExtras().getDouble("ALTITUDE"));
-        
-//        contentUpload.setResourceLocation(res_location, false);
         
         tvDistance.setText("Distance: " + distance + " m.");
         tvHeight.setText("Height: " + height + " m.");
@@ -120,26 +95,11 @@ public class TagResult extends MapActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	
-//    	contentUpload.onCreateOptionsMenu(menu);
-//    	menu.add(0, MENU_TAKE_SAMPLE, 0, "Save test");
-    	
         super.onCreateOptionsMenu(menu);        
         return true;
     }
 
     public boolean onOptionsItemSelected (MenuItem item) {
-    	
-//    	if(!contentUpload.onOptionsItemSelected(item))	
-//    		switch (item.getItemId()) {
-//
-//    		case MENU_TAKE_SAMPLE:
-//    			Intent i = new Intent(this, TestingSamples.class);
-//
-//    			i.putExtra("DISTANCE", distance);
-//    			i.putExtra("HEIGHT", height);
-//
-//    			startActivity(i);
-//    		}
     		
         return super.onOptionsItemSelected(item);
     }
@@ -147,16 +107,13 @@ public class TagResult extends MapActivity{
     @Override
     protected Dialog onCreateDialog(int id) {       
     	
-//    	Dialog d = contentUpload.onCreateDialog(id);
-//    	if(d != null)
-//    		return d;
     	
 		return null;
     
 	}
     
     protected void onActivityResult (int requestCode, int resultCode, Intent data) { 
-//    	contentUpload.onActivityResult(requestCode, resultCode, data);
+    	
     }
     
 	@Override

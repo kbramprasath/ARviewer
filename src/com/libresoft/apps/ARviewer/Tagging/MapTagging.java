@@ -46,6 +46,8 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
 import com.libresoft.apps.ARviewer.ARUtils;
 import com.libresoft.apps.ARviewer.R;
+import com.libresoft.apps.ARviewer.Maps.Overlays.ResourceOverlay;
+import com.libresoft.apps.ARviewer.Utils.MapUtils;
 
 
 public class MapTagging extends MapActivity {
