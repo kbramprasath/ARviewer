@@ -3,4 +3,19 @@
     <string name="app_name">ARviewer</string>
     
 	<string name="map_key">0Tp7WsIDiyqoDmSF9LMprvDzte-hj_A6r-qxbow</string>
+	
+	<!-- User's altitude preferences -->
+	<string name="pref_user_altitude_title">User\'s altitude preferences</string>
+	<string name="pref_useGPS_title">Location service altitude</string>
+	<string name="pref_useGPS_summary_on">Location service altitude enabled</string>
+	<string name="pref_useGPS_summary_off">Location service altitude disabled</string>
+	<string name="pref_userHeight_title">User\'s tall</string>
+	<string name="pref_useFloor_title">Location floor info</string>
+	<string name="pref_useFloor_summary_on">Location floor info enabled</string>
+	<string name="pref_useFloor_summary_off">Location floor info disabled</string>
+	<string name="pref_floor_title">Floor number</string>
+	
+	<!-- GUI messages -->
+	<string name="ok">Ok</string>
+	<string name="cancel">Cancel</string>
 </resources>
