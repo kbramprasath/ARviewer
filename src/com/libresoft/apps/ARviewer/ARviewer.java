@@ -414,7 +414,8 @@ public class ARviewer extends ARActivity{
     }
     
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+    	menu.clear();
     	
     	if((getMyLayer().getWriteable()) & (LibreGeoSocial.getInstance().isLogged())){
     		tagManager.onCreateOptionsMenu(menu);

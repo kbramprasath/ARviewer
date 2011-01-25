@@ -21,22 +21,31 @@
 
 package com.libresoft.apps.ARviewer.Utils.GeoNames;
 
-import android.content.Intent;
+import com.libresoft.apps.ARviewer.R;
+import com.libresoft.apps.ARviewer.Location.ARLocationManager;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
-public class AltitudePreferences extends PreferenceActivity implements OnSharedPreferenceChangeListener {
+public class AltitudePreferences extends PreferenceActivity implements OnSharedPreferenceChangeListener, OnPreferenceClickListener {
 
+	private static final int DIALOG_SELECT_TALL = 1;
+	private static final int DIALOG_SELECT_FLOOR = 2;
 
 	public static final String KEY_USER_HEIGHT			= "userHeight";
 	public static final String KEY_FLOOR				= "floor";
@@ -50,111 +59,147 @@ public class AltitudePreferences extends PreferenceActivity implements OnSharedP
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-	    setPreferenceScreen(createPreferenceHierarchy());
+		addPreferencesFromResource(R.xml.altitude_preferences);
+	    initPreferences();
 	      
 	    // Set up a listener whenever a key changes            
 	    getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 	}
 
-	private PreferenceScreen createPreferenceHierarchy() {
-	    // Root
-	    PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
-	    
-	    /* Height Properties */
-	    PreferenceCategory dialogBasedPrefCat = new PreferenceCategory(this);
-	    dialogBasedPrefCat.setTitle("User's altitude properties");
-	    root.addPreference(dialogBasedPrefCat);
-	    
-
-	    // GPS height active
-	    CheckBoxPreference gpsHeightPref = new CheckBoxPreference(this);
-	    gpsHeightPref.setKey(KEY_GPS);
-	    gpsHeightPref.setTitle("Active location service altitude");
-	    gpsHeightPref.setSummary("Take altitude data from the current location service");
-	    dialogBasedPrefCat.addPreference(gpsHeightPref);
-	    
-	    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-	    
-		// User height 
-		String height = sharedPreferences.getString(KEY_USER_HEIGHT, null); 
-		 
-		if (height == null)
-			height = "1.75";
-			     
-		EditTextPreference userHeightTestPref2 = new EditTextPreference(this);
-        userHeightTestPref2.setDialogTitle("User tall (meters)");
-        userHeightTestPref2.setKey(KEY_USER_HEIGHT);
-        userHeightTestPref2.setTitle("User tall");
-        userHeightTestPref2.setSummary(height);
-        dialogBasedPrefCat.addPreference(userHeightTestPref2);
-        
-        
-        CheckBoxPreference useFloorPref = new CheckBoxPreference(this);
-        useFloorPref.setKey(KEY_USE_FLOOR);
-        useFloorPref.setDefaultValue(false);
-        useFloorPref.setTitle("Active floor info");
-        useFloorPref.setSummary("Use floor number");
-	    dialogBasedPrefCat.addPreference(useFloorPref);
-	    
-        // actual floor
-        String floor = sharedPreferences.getString(KEY_FLOOR, null);
-		if (floor == null)
-			floor = "0";
+	private void initPreferences() {
+		getPreferenceScreen().findPreference(KEY_USER_HEIGHT).setOnPreferenceClickListener(this);
+		getPreferenceScreen().findPreference(KEY_FLOOR).setOnPreferenceClickListener(this);
 		
-		boolean is_enabled = sharedPreferences.getBoolean(KEY_USE_FLOOR, false);
-        
-		EditTextPreference floorTestPref = new EditTextPreference(this);
-		floorTestPref.setEnabled(is_enabled);
-        floorTestPref.setDialogTitle("Number of Floor");
-        floorTestPref.setKey(KEY_FLOOR);
-        floorTestPref.setTitle("Floor");
-        floorTestPref.setSummary(floor);
-        dialogBasedPrefCat.addPreference(floorTestPref);
-        
-	    return root;
-	        
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		Float period = ((float) sharedPreferences.getInt(KEY_USER_HEIGHT, 175)) / 100;
+		getPreferenceScreen().findPreference(KEY_USER_HEIGHT).setSummary(Float.toString(period) + " m.");
+
+		getPreferenceScreen().findPreference(KEY_FLOOR).setSummary(Integer.toString(sharedPreferences.getInt(KEY_FLOOR, 0)));
 	}
 
 	public void onSharedPreferenceChanged (SharedPreferences sharedPreferences, String key) 
 	{
-		if (key.equals(KEY_GPS)){
-			AltitudeManager.setLocationServiceAltitude(sharedPreferences.getBoolean(key, false));
-			if(AltitudeManager.isLocationServiceAltitude()){
-				stopService(new Intent(this,LocationService.class));
-				startService(new Intent(this,LocationService.class));
-			}
-		}else if (key.equals(KEY_USER_HEIGHT)) {
-
+		if (key.equals(KEY_GPS))
+			ARLocationManager.getInstance().setLocationServiceAltitude(sharedPreferences.getBoolean(key, false));
+		
+		else if (key.equals(KEY_USER_HEIGHT)) {
 			Preference pref = this.findPreference(key);
 			if(pref == null) 
 				return;
-			String height = sharedPreferences.getString(key, "");
-			if(height.contains(",")){
-				height = height.replace(",", ".");
-
-				Editor editor = sharedPreferences.edit();
-				editor.putString(KEY_USER_HEIGHT, height);
-				editor.commit();
-			}
-			
-			pref.setSummary(height);
-		}else if (key.equals(KEY_USE_FLOOR)) {
-
-			Preference pref = this.findPreference(KEY_FLOOR);
-			if(pref == null) 
-				return;
-			
-			pref.setEnabled(sharedPreferences.getBoolean(key, false));
+			Float height = ((float)sharedPreferences.getInt(key, 175)) / 100;
+			pref.setSummary(Float.toString(height) + " m.");
 			
 		}else if (key.equals(KEY_FLOOR)) {
-
 			Preference pref = this.findPreference(key);
 			if(pref == null) 
 				return;
-			
-			pref.setSummary(sharedPreferences.getString(key, ""));
+			pref.setSummary(Integer.toString(sharedPreferences.getInt(key, 0)));
 		}
 	    
+	}
+
+	@Override
+	public boolean onPreferenceClick(Preference preference) {
+		if(preference.getKey().equals(KEY_USER_HEIGHT)){
+			showDialog(DIALOG_SELECT_TALL);
+			return true;
+		}else if(preference.getKey().equals(KEY_FLOOR)){
+			showDialog(DIALOG_SELECT_FLOOR);
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+    protected void onPrepareDialog(int id, Dialog dialog) { 
+		
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		switch(id){
+		case DIALOG_SELECT_TALL:
+			configureSeekbarDiag(dialog, KEY_USER_HEIGHT, sharedPreferences.getInt(KEY_USER_HEIGHT, 175), 300, " m.", 100, sharedPreferences);
+			break;
+		case DIALOG_SELECT_FLOOR:
+			configureSeekbarDiag(dialog, KEY_FLOOR, sharedPreferences.getInt(KEY_FLOOR, 0), 150, "", 1, sharedPreferences);
+			break;
+		}
+	}
+	
+	@Override
+    protected Dialog onCreateDialog(int id) {  
+		
+		switch(id){
+		case DIALOG_SELECT_TALL:
+		case DIALOG_SELECT_FLOOR:
+			LayoutInflater factory = LayoutInflater.from(this);
+			View view = factory.inflate(R.layout.seekbar_num, null);
+			
+			return new AlertDialog.Builder(this)	    
+			.setView(view)
+			.setCancelable(true)
+			.setPositiveButton(R.string.ok, null)
+			.create();
+		}
+		
+		return null;
+	}
+	
+	private void configureSeekbarDiag(final Dialog dialog,
+			final String key,
+			int progress, 
+			int max,
+			final String units,
+			final int divider,
+			final SharedPreferences sharedPreferences){
+		
+		final TextView tv = (TextView)dialog.findViewById(R.id.tv_sb_text);
+		
+		String text = "";
+		if(divider > 1)
+			text += Float.toString(((float)progress)/divider);
+		else
+			text += Integer.toString(progress);
+		tv.setText(text + units);
+		
+		final SeekBar sb = (SeekBar)dialog.findViewById(R.id.sb_bar); 
+		sb.setMax(max);
+		sb.setProgress(progress);
+		sb.setKeyProgressIncrement(1);
+		sb.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				String text = "";
+				if(divider > 1)
+					text += Float.toString(((float)progress)/divider);
+				else
+					text += Integer.toString(progress);
+				tv.setText(text + units);
+				
+//				if(progress > 70)
+//				tv.setAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.push_left_in));
+			}
+		});
+		sb.invalidate();
+		
+		Button bt_ok = ((AlertDialog)dialog).getButton(Dialog.BUTTON_POSITIVE);
+		bt_ok.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Editor edit = sharedPreferences.edit();
+				edit.putInt(key, sb.getProgress());
+				edit.commit();
+				dialog.dismiss();
+			}
+		});
+		bt_ok.invalidate();
 	}
 	
 }

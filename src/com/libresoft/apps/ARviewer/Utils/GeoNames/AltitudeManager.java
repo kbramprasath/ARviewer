@@ -50,16 +50,6 @@ public class AltitudeManager{
 	private static final String URL = "http://ws.geonames.org/astergdem";
 	private static final String URL_B="http://www.geonames.org/gtopo30";
 	
-	private static boolean isLocationServiceAltitude = false;
-	
-	public static void setLocationServiceAltitude(boolean isLocationServiceAltitude){
-		AltitudeManager.isLocationServiceAltitude = isLocationServiceAltitude;
-	}
-	
-	public static boolean isLocationServiceAltitude(){
-		return isLocationServiceAltitude;
-	}
-	
 	public static double getAltitudeFromLatLong(float latitude, float longitude){
 		double altitude = AltitudeManager.NO_ALTITUDE_VALUE;
 		
@@ -151,12 +141,10 @@ public class AltitudeManager{
 				SharedPreferences sharedPreferences = 
 					PreferenceManager.getDefaultSharedPreferences(context);
 
-				float user_height = 
-					Float.parseFloat(sharedPreferences.getString(AltitudePreferences.KEY_USER_HEIGHT, "1.75"));
+				float user_height = sharedPreferences.getFloat(AltitudePreferences.KEY_USER_HEIGHT, 1.75f);
 
 				if(is_floor && sharedPreferences.getBoolean(AltitudePreferences.KEY_USE_FLOOR, false)){
-					int floor_number = 
-						Integer.parseInt(sharedPreferences.getString(AltitudePreferences.KEY_FLOOR, "0"));
+					int floor_number = sharedPreferences.getInt(AltitudePreferences.KEY_FLOOR, 0);
 
 					altitude = (float) (base_altitude + user_height + floor_number * 3); // 3 meters per room
 					Log.d("AltitudeManager", "Using floor");
