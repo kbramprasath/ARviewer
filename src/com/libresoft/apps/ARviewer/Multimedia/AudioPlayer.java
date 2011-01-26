@@ -40,16 +40,16 @@ public class AudioPlayer{
 	}
 	
 	public void play(Audio audio){
-//		aManager = new AudioManager(mContext);
-//		if(aManager.isPlaying())
-//			return;
-//		// Downloading
-//		InputStream is = LibreGeoSocial.getInstance().getStream(audio.getUrl());
-//
-//		aManager.saveAudio (is,"tmpaudio");
-//
-//		// Playing audio    		
-//		aManager.startPlayer();
+		aManager = new AudioManager(mContext);
+		if(aManager.isPlaying())
+			return;
+		// Downloading
+		InputStream is = audio.getAudio();
+
+		aManager.saveAudio (is,"tmpaudio");
+
+		// Playing audio    		
+		aManager.startPlayer();
 	}
 	
 	public void stop(){
