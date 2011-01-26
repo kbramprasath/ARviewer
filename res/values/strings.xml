@@ -15,7 +15,17 @@
 	<string name="pref_useFloor_summary_off">Location floor info disabled</string>
 	<string name="pref_floor_title">Floor number</string>
 	
+	<!-- Location Ways -->
+	<string name="lw_not_found">Address not found</string>
+	<string name="lw_toggle_sat">Toggle satellite view</string>
+	<string name="lw_update">Location updated</string>
+	<string name="lw_fail">Location update failed</string>
+	<string name="lw_empty_address">Empty address</string>
+	<string name="lw_insert_address">Where are you?</string>
+	
+	
 	<!-- GUI messages -->
 	<string name="ok">Ok</string>
 	<string name="cancel">Cancel</string>
+	<string name="search">Search</string>
 </resources>
