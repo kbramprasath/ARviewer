@@ -4,6 +4,17 @@
     
 	<string name="map_key">0Tp7WsIDiyqoDmSF9LMprvDzte-hj_A6r-qxbow</string>
 	
+	<!-- Location preferences -->
+	<string name="pref_location_title">Location</string>
+	<string name="pref_location_provider_title">Provider</string>
+	<string name="pref_location_provider_summary">Choose the provider for your location</string>
+	<string name="pref_location_tunits_title">Time units</string>
+	<string name="pref_location_tunits_summary">Choose the time unit</string>
+	<string name="pref_location_period_title">Time period</string>
+	<string name="pref_location_period_summary">Choose the time period</string>
+	<string name="pref_location_distance_title">Minimum distance</string>
+	<string name="pref_location_distance_summary">Choose the minimum distance for location refreshing</string>
+	
 	<!-- User's altitude preferences -->
 	<string name="pref_user_altitude_title">User\'s altitude preferences</string>
 	<string name="pref_useGPS_title">Location service altitude</string>
