@@ -22,13 +22,15 @@ package com.libresoft.apps.ARviewer;
 
 import java.util.Comparator;
 
+import com.libresoft.apps.ARviewer.Location.ARLocationManager;
+
 
 public class ARGeoNodeAzimuthComparator implements Comparator<ARGeoNode>
 {
 
 	public int compare(ARGeoNode node1, ARGeoNode node2) {
 		// TODO Auto-generated method stub
-		float[] location = {(float) LocationService.getCurrentLocation().getLatitude(), (float) LocationService.getCurrentLocation().getLongitude()};
+		float[] location = {(float) ARLocationManager.getInstance().getLocation().getLatitude(), (float) ARLocationManager.getInstance().getLocation().getLongitude()};
 		
 		float azim1 = node1.azimuthToResource(location);
 		float azim2 = node2.azimuthToResource(location);
