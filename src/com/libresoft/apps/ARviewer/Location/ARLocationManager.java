@@ -67,4 +67,8 @@ public class ARLocationManager{
 		this.ls_altitude = ls_altitude;
 	}
 	
+	public boolean isLocationServiceAltitude(){
+		return ls_altitude;
+	}
+	
 }
