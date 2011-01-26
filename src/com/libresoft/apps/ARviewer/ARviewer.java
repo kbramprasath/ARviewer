@@ -21,6 +21,16 @@
 
 package com.libresoft.apps.ARviewer;
 
+/*
+ * 
+ * Intent extras:
+ * LAYER: The layer that must contain the AR nodes (GenericLayer). Mandatory.
+ * LATITUDE: User's latitude coordinate (float). Optional.
+ * LONGITUDE: User's longitude coordinate (float). Optional.
+ * LABELING: Enable the labeling system. Optional.
+ * 
+ */
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,10 +105,6 @@ public class ARviewer extends ARActivity{
     private DrawRadar mRadar;
 	private DrawUserStatus mUserStatus;
     
-    //FIXME Open GL part
-//    private GLSurfaceView opengl;
-//    private CubeRenderer cubeList;
-    ////////////////////
     
     private float cam_altitude = 0;
     private ARCompassManager compassManager;

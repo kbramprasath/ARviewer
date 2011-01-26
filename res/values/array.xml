@@ -6,7 +6,7 @@
     <!-- Used in route preferences -->
     <string-array name="location_methods">
         <item>GPS</item>
-        <item>Wi-Fi</item>
+        <item>Network</item>
     </string-array>
     
    

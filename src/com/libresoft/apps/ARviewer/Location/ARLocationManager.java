@@ -20,9 +20,17 @@
 
 package com.libresoft.apps.ARviewer.Location;
 
+import java.util.ArrayList;
+
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 public class ARLocationManager{
 	public static final int NO_LATLONG = -360;
@@ -33,8 +41,24 @@ public class ARLocationManager{
 	
 	private static ARLocationManager arLocationManager = null;
 	
+	private ArrayList<OnLocationUpdateListener> arrayLocationListener = null;
+	
 	private boolean ls_altitude = false;
 	private Location mLocation = null;
+	private LocationManager mLocationManager;
+	private MLocationListener mLocationListener = null;
+	
+	// Location provider (GPS or network), by default: network
+	private String loc_provider;
+	
+	// Location Unit (seconds:1 or minutes:60), by default: seconds.
+	private Integer location_unit = null;
+	
+	// Location Periodic in seconds, by default 2 minutes.
+	private Integer location_period = null; 
+	
+	// Minimum distance of gps refresh
+	private Integer minimum_distance = null;
 	
 	private ARLocationManager(){
 		mLocation = new Location("Manual");
@@ -69,6 +93,70 @@ public class ARLocationManager{
 	
 	public boolean isLocationServiceAltitude(){
 		return ls_altitude;
+	}
+	
+	private void loadConfig (Context mContext){
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+		
+		if (sharedPreferences.getString(LocationPreferences.KEY_LOCATION_PROVIDERS, "network").equals("gps"))
+			loc_provider = LocationManager.GPS_PROVIDER;
+		else
+			loc_provider = LocationManager.NETWORK_PROVIDER;
+		
+		location_unit = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_UNITS, 60);
+		location_period = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_PERIOD, 2);
+		minimum_distance = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_DISTANCE, 10);
+	}
+	
+	private void startUpdates(Context mContext){
+		loadConfig(mContext);
+		mLocationManager.requestLocationUpdates( loc_provider, 
+				 ((location_period)* 1000) * location_unit, 
+				 minimum_distance, 
+				 mLocationListener);
+	}
+	
+	private class MLocationListener implements LocationListener {
+
+        public void onLocationChanged(Location loc) {
+
+        	if (loc != null) {
+    			
+    			// Save the current location
+				mLocation = loc;
+ 
+        		if ((arrayLocationListener != null) && (arrayLocationListener.size() > 0)){
+        			// Execute all the listener
+        			for (int i=0; i<arrayLocationListener.size(); i++)
+        				arrayLocationListener.get(i).onUpdate(loc); 
+        		}
+            }
+            
+        }
+        
+        public void onProviderDisabled(String provider) {}
+        
+        public void onProviderEnabled(String provider) {}
+        
+        public void onStatusChanged(String provider, int status, 
+            Bundle extras) {}
+    }
+	
+	public int addLocationListener(OnLocationUpdateListener listener){
+		if(arrayLocationListener == null)
+			arrayLocationListener = new ArrayList<OnLocationUpdateListener>();
+		if(arrayLocationListener.indexOf(listener) == -1)
+			arrayLocationListener.add(listener);
+		return arrayLocationListener.indexOf(listener);
+	}
+	
+	public void removeLocationListener(int id){
+		if ((arrayLocationListener != null) && (arrayLocationListener.size() > id))
+			arrayLocationListener.remove(id);
+	}
+	
+	public interface OnLocationUpdateListener {
+		public abstract void onUpdate(Location loc);
 	}
 	
 }
