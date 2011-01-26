@@ -141,7 +141,7 @@ public class AltitudeManager{
 				SharedPreferences sharedPreferences = 
 					PreferenceManager.getDefaultSharedPreferences(context);
 
-				float user_height = sharedPreferences.getFloat(AltitudePreferences.KEY_USER_HEIGHT, 1.75f);
+				float user_height = ((float)sharedPreferences.getInt(AltitudePreferences.KEY_USER_HEIGHT, 175)) / 100;
 
 				if(is_floor && sharedPreferences.getBoolean(AltitudePreferences.KEY_USE_FLOOR, false)){
 					int floor_number = sharedPreferences.getInt(AltitudePreferences.KEY_FLOOR, 0);
