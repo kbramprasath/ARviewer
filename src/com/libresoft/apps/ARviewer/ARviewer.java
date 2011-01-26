@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
 import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
+import com.libresoft.apps.ARviewer.Location.ARLocationManager;
+import com.libresoft.apps.ARviewer.Location.LocationWays;
 import com.libresoft.apps.ARviewer.Overlays.CamPreview;
 import com.libresoft.apps.ARviewer.Overlays.CustomViews;
 import com.libresoft.apps.ARviewer.Overlays.DrawFocus;
@@ -583,8 +585,8 @@ public class ARviewer extends ARActivity{
 	    		break;
 	    		
 	    	case LOC_WAYS:
-    			float[] location = {(float) LocationService.getCurrentLocation().getLatitude(), 
-    					(float) LocationService.getCurrentLocation().getLongitude(), 
+    			float[] location = {(float) ARLocationManager.getInstance().getLocation().getLatitude(), 
+    					(float)  ARLocationManager.getInstance().getLocation().getLongitude(), 
     					0};
 				if((location[0] == getLocation()[0]) && (location[1] == getLocation()[1]))
 					break;
@@ -633,13 +635,13 @@ public class ARviewer extends ARActivity{
 		
 		new Thread(){
 			public void run(){
-				if(!AltitudeManager.isLocationServiceAltitude())
+				if(!ARLocationManager.getInstance().isLocationServiceAltitude())
 					cam_altitude = (float) AltitudeManager.getAbsoluteAltitude(
 							getBaseContext(), 
 							(float) AltitudeManager.getAltitudeFromLatLong(getLocation()[0], getLocation()[1]), 
 							true);
 				else
-					cam_altitude = (float) LibreGeoSocial.getInstance().getLocation().getAltitude();
+					cam_altitude = (float) ARLocationManager.getInstance().getLocation().getAltitude();
 				LocationUtils.setUserHeight(cam_altitude);
 				altHandler.sendEmptyMessage(0);
 			}
