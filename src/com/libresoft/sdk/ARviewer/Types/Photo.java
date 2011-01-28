@@ -107,7 +107,7 @@ public class Photo extends GeoNode implements Serializable {
 
 	public Bitmap getBitmapPhoto ()
 	{
-		if (mByteBitMapImageThumb != null)
+		if (mByteBitMapImageThumb == null)
 		{
 			Bitmap bitmapImage = null;
 
@@ -125,7 +125,12 @@ public class Photo extends GeoNode implements Serializable {
 			}
 			
 			mByteBitMapImageThumb = baos.toByteArray();
+			
+			
 		}
+		
+		if (mByteBitMapImageThumb == null)
+			return null;
 		
 		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapImageThumb) );
 	}
