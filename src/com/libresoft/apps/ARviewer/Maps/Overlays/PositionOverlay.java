@@ -45,7 +45,7 @@ import com.libresoft.apps.ARviewer.R;
 public class PositionOverlay extends Overlay
 {
 	private final int mRadius = 5;
-	private int AVATAR_LENGTH = 30;
+	private int AVATAR_LENGTH;
 	
 	private Bitmap avatar = null;
 	private GeoPoint geoPoint;
@@ -54,7 +54,8 @@ public class PositionOverlay extends Overlay
 	private Location mLocationPerimeter;
 	
 	public PositionOverlay(Context mContext){
-		avatar = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.user_70);
+		avatar = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.user_70), 
+				48, 48, true);
 		AVATAR_LENGTH = avatar.getWidth()/2;
 	}
 	
@@ -136,20 +137,22 @@ public class PositionOverlay extends Overlay
 		canvas.drawRoundRect(backRect, 5, 5, backPaint);
 		
 		if(avatar != null){
+			
+			float x_c = point.x + 2 + mRadius + (tlongitude + 20)/2;
+			float y_b = point.y - 3*mRadius;
+			
 			int offset = AVATAR_LENGTH + 10;
-			int x = (int) (point.x + 2 + mRadius + (tlongitude + 20)/2 - offset / 2);
-			int y = point.y - 3*mRadius;
-			RectF avatarRect = new RectF (x, y - offset,
-					x + offset, y);
+			RectF avatarRect = new RectF (x_c - offset, y_b - (offset * 2),
+					x_c + offset, y_b);
 			
 			Paint avatarPaint = new Paint();
 			avatarPaint.setARGB(175,0,0,0);
-			avatarPaint.setShader(new LinearGradient(x, y - offset, 
-					x, y, Color.WHITE, Color.DKGRAY, TileMode.MIRROR));
+			avatarPaint.setShader(new LinearGradient(x_c, y_b - (offset * 2), 
+					x_c, y_b, Color.WHITE, Color.DKGRAY, TileMode.MIRROR));
 			avatarPaint.setAntiAlias(true);
 			
 			canvas.drawRoundRect(avatarRect, 5, 5, avatarPaint);
-			canvas.drawBitmap(avatar, x + 5, y - offset + 5, null);
+			canvas.drawBitmap(avatar, x_c - AVATAR_LENGTH, y_b - (AVATAR_LENGTH*2 + 10), null);
 		}
 		
 		
