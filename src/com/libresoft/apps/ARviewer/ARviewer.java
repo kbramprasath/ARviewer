@@ -25,8 +25,8 @@ package com.libresoft.apps.ARviewer;
  * 
  * Intent extras:
  * LAYER: The layer that must contain the AR nodes (GenericLayer). Mandatory.
- * LATITUDE: User's latitude coordinate (float). Optional.
- * LONGITUDE: User's longitude coordinate (float). Optional.
+ * LATITUDE: User's latitude coordinate (double). Optional.
+ * LONGITUDE: User's longitude coordinate (double). Optional.
  * LABELING: Enable the labeling system (boolean). Optional.
  * 
  */
@@ -294,12 +294,18 @@ public class ARviewer extends ARActivity{
 		
 		if(getIntent().hasExtra("LATITUDE") && getIntent().hasExtra("LONGITUDE")){
 			float[] location = new float[3];
-			location[0] =  getIntent().getFloatExtra("LATITUDE", 0);
-			location[1] = getIntent().getFloatExtra("LONGITUDE", 0);
+			location[0] =  (float) getIntent().getDoubleExtra("LATITUDE", 0);
+			location[1] = (float) getIntent().getDoubleExtra("LONGITUDE", 0);
 			setLocation(location);
+			ARLocationManager.getInstance(this).setLocation(location[0], location[1], (float)AltitudeManager.NO_ALTITUDE_VALUE);
 			requestAltitudeInfo();
 		}else{
 			// TODO
+			float[] location = new float[3];
+			location[0] =  (float) ARLocationManager.getInstance(this).getLocation().getLatitude();
+			location[1] = (float) ARLocationManager.getInstance(this).getLocation().getLongitude();
+			cam_altitude = (float) ARLocationManager.getInstance(this).getLocation().getAltitude();
+			setLocation(location);
 		}
 		
 //		if(strCategories == null)
@@ -364,14 +370,15 @@ public class ARviewer extends ARActivity{
 
     	setResourcesList(null);
 
-    	ArrayList<ARGeoNode> res_list;
-
-    	res_list = ARUtils.cleanNoLocation(this, getLayers(), getMyLayer().getNodes());
+    	ArrayList<ARGeoNode> res_list = null;
+    	
+    	if(getMyLayer() != null)
+    		res_list = ARUtils.cleanNoLocation(this, getLayers(), getMyLayer().getNodes());
 
     	if(res_list == null){
     		Toast.makeText(getBaseContext(), 
     				"No resources available", 
-    				Toast.LENGTH_LONG).show();
+    				Toast.LENGTH_SHORT).show();
     		Log.e("ARView", "No resources available");
     		return;
     	}
@@ -634,16 +641,6 @@ public class ARviewer extends ARActivity{
 		}
 	}
 	
-	private Handler handlerEnd = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			if(ARviewer.this.isFinishing())
-				return;
-			removeDialog(DIALOG_PBAR);
-			showResources();
-		}
-	};
-	
 	private synchronized void requestAltitudeInfo(){
 		Log.i("ARView", "Request altitude");
 		if(mUserStatus != null)
@@ -662,12 +659,16 @@ public class ARviewer extends ARActivity{
 		new Thread(){
 			public void run(){
 				if(!ARLocationManager.getInstance(getBaseContext()).isLocationServiceAltitude())
+					if(cam_altitude != AltitudeManager.NO_ALTITUDE_VALUE)
+						cam_altitude = (float) AltitudeManager.getAbsoluteAltitude(
+								getBaseContext(), 
+								(float) AltitudeManager.getAltitudeFromLatLong(getLocation()[0], getLocation()[1]), 
+								true);
+				else
 					cam_altitude = (float) AltitudeManager.getAbsoluteAltitude(
 							getBaseContext(), 
-							(float) AltitudeManager.getAltitudeFromLatLong(getLocation()[0], getLocation()[1]), 
+							(float) ARLocationManager.getInstance(getBaseContext()).getLocation().getAltitude(),
 							true);
-				else
-					cam_altitude = (float) ARLocationManager.getInstance(getBaseContext()).getLocation().getAltitude();
 				LocationUtils.setUserHeight(cam_altitude);
 				altHandler.sendEmptyMessage(0);
 			}
