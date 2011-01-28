@@ -187,11 +187,7 @@ public class ARviewer extends ARActivity{
 			showMenu = true;
 			// TODO
     		getLayers().removeExtraElement((View) v.getParent());
-//    		if(getMyLayer().getRadius() != CustomViews.getSeekbarValue()){
-//    			getMyLayer().setRadius(CustomViews.getSeekbarValue());
-//    			getLayers().cleanResouceLayer();
-//    			loadResources();
-//    		}
+    		setMaxDistance((float)(CustomViews.getSeekbarValue()*1E3));
 		}
 	};
 	
@@ -487,7 +483,7 @@ public class ARviewer extends ARActivity{
     	switch (item.getItemId()) {
 
     	case MENU_DISTANCE_FILTER:
-    		View view = CustomViews.createSeekBar(this, 50, getMyLayer().getRadius(), "Km.", distFiltClickListener);
+    		View view = CustomViews.createSeekBar(this, 50, 0, "Km.", distFiltClickListener);
 
     		getLayers().addExtraElement(view, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 

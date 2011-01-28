@@ -314,8 +314,9 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		}
 	}
 	
-	public void setDrawnValues(float azimuth, float abs_azimuth, float elevation, float distance){
-		drawn.setValues(azimuth, elevation);
+	public void setDrawnValues(float azimuth, float abs_azimuth, float elevation, float distance, float max_distance){
+		drawn.setMaxDistance(max_distance);
+		drawn.setValues(azimuth, elevation, distance);
 		this.distance = distance;
 		this.azimuth = abs_azimuth;
 		
