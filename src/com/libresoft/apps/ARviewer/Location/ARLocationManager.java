@@ -106,7 +106,7 @@ public class ARLocationManager{
 		else
 			loc_provider = LocationManager.NETWORK_PROVIDER;
 		
-		location_unit = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_UNITS, 60);
+		location_unit = Integer.parseInt(sharedPreferences.getString(LocationPreferences.KEY_LOCATION_UNITS, "60"));
 		location_period = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_PERIOD, 2);
 		minimum_distance = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_DISTANCE, 10);
 	}
