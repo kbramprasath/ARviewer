@@ -137,7 +137,7 @@ public class LocationWays extends MapActivity {
 				Location loc = MapUtils.getLocFromXY(ev.getX(), ev.getY(), map, 0);
 				
 				setCurrentLocation(loc);
-//				setPositionInMap(17);
+				setPositionInMap(0);
 				
 				Toast.makeText(getBaseContext(), 
                         "Location updated", 
@@ -161,11 +161,12 @@ public class LocationWays extends MapActivity {
 				  (int) (currentLocation.getLongitude() * 1E6));
 		
 		controller.animateTo(point);
-		controller.setZoom(zoom);
+		if(zoom != 0)
+			controller.setZoom(zoom);
 		//OverlayItem marker = new OverlayItem(point, "You", "Now");
 		PositionOverlay myposOverlay = new PositionOverlay(this);
 		myposOverlay.setPoint(point);
-        //map.getOverlays().clear();
+        map.getOverlays().clear();
 	    final List<Overlay> overlays = map.getOverlays();	   
 	    overlays.add( myposOverlay );
 	}
@@ -230,7 +231,7 @@ public class LocationWays extends MapActivity {
 				loc.setLongitude(addressList.get(0).getLongitude());
 				
 				setCurrentLocation(loc);
-				setPositionInMap(15);
+				setPositionInMap(17);
 				//Send coordinates to the server
 				Toast.makeText(getBaseContext(), 
                         R.string.lw_update, 
