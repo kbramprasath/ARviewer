@@ -30,7 +30,8 @@ public class ARGeoNodeAzimuthComparator implements Comparator<ARGeoNode>
 
 	public int compare(ARGeoNode node1, ARGeoNode node2) {
 		// TODO Auto-generated method stub
-		float[] location = {(float) ARLocationManager.getInstance().getLocation().getLatitude(), (float) ARLocationManager.getInstance().getLocation().getLongitude()};
+		float[] location = {(float) ARLocationManager.getInstance(null).getLocation().getLatitude(), 
+				(float) ARLocationManager.getInstance(null).getLocation().getLongitude()};
 		
 		float azim1 = node1.azimuthToResource(location);
 		float azim2 = node2.azimuthToResource(location);
