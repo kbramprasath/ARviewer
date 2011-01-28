@@ -495,6 +495,7 @@ public class ARviewer extends ARActivity{
     			if(mUserStatus != null)
     				mUserStatus.setLocationServiceOnProgress();
     			idGPS = ARLocationManager.getInstance(this).addLocationListener(locationListener);
+    			ARLocationManager.getInstance(this).startUpdates(getBaseContext());
     		}else{
     			ARLocationManager.getInstance(this).stopUpdates();
     			idGPS = -1;
