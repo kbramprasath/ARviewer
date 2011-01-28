@@ -22,24 +22,31 @@
 package com.libresoft.apps.ARviewer;
 
 
+import com.libresoft.apps.ARviewer.Location.LocationPreferences;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudePreferences;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
-public class ARPreferences extends PreferenceActivity implements OnSharedPreferenceChangeListener {
-
+public class ARPreferences extends PreferenceActivity implements OnSharedPreferenceChangeListener, OnPreferenceClickListener {
+	private static final int DIALOG_SELECT_THRESHOLD = 1;
 
 	public static final String KEY_HEIGHT				= "height";
 	public static final String KEY_IS_DIST_FILTER		= "useDistFilter";
@@ -51,6 +58,8 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 	public static final String KEY_IMAGE_ICON			= "imageIcon";
 	public static final String KEY_SEARCH_SYSTEM		= "searchSystem";
 	public static final String KEY_ROTATING_COMPASS		= "rotatingCompass";
+	public static final String KEY_LOCATION_INTENT		= "locationIntent";
+	public static final String KEY_ALTITUDE_INTENT		= "altitudeIntent";
 	
 	
 	EditTextPreference userTestPref;
@@ -59,166 +68,47 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-	    setPreferenceScreen(createPreferenceHierarchy());
-	      
+	    addPreferencesFromResource(R.xml.ar_preferences);
+	    initPreferences();
+	    
 	    // Set up a listener whenever a key changes            
 	    getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-	    
-	    blockVisibility();
 	}
 
-	private PreferenceScreen createPreferenceHierarchy() {
-	    // Root
-	    PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
-	    
-	    /* Height Properties */
-	    PreferenceCategory dialogBasedPrefCat = new PreferenceCategory(this);
-	    dialogBasedPrefCat.setTitle("Altitude properties");
-	    root.addPreference(dialogBasedPrefCat);
-	    
-	    // Intent preference
-        PreferenceScreen userAltitudePref = getPreferenceManager().createPreferenceScreen(this);
-        userAltitudePref.setIntent(new Intent(this,AltitudePreferences.class));
-        userAltitudePref.setTitle("User's altitude preferences");
-        userAltitudePref.setSummary("Configure the user's altitude preferences");
-        dialogBasedPrefCat.addPreference(userAltitudePref);
-	    
-	    // Altitude status options
-	    ListPreference altitudePref = new ListPreference(this);
-	    altitudePref.setEntries(R.array.height_options);
-	    altitudePref.setEntryValues(R.array.values_height_options);
-	    altitudePref.setDialogTitle("Altitude status");
-	    altitudePref.setKey(KEY_HEIGHT);
-        altitudePref.setTitle("Altitude status");
-        altitudePref.setSummary("Select if you want to use the altitude info");
-        dialogBasedPrefCat.addPreference(altitudePref);
+	private void initPreferences() {
 
-	    
 	    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 	    
-        
-        /* Height Threshold*/
-	    
-	    CheckBoxPreference useThresholdPref = new CheckBoxPreference(this);
-	    useThresholdPref.setKey(KEY_IS_DIST_FILTER);
-	    useThresholdPref.setTitle("Active altitude threshold");
-	    useThresholdPref.setSummary("Use threshold to see far objects at the horizon");
-	    dialogBasedPrefCat.addPreference(useThresholdPref);
-	    
         // threshold
-        String thrhld = sharedPreferences.getString(KEY_DIST_FILTER, null);
-		if (thrhld == null)
-			thrhld = "0";
-		
-		boolean is_enabled = sharedPreferences.getBoolean(KEY_IS_DIST_FILTER, false);
-        
-		EditTextPreference thresholdTestPref = new EditTextPreference(this);
-		thresholdTestPref.setEnabled(is_enabled);
-		thresholdTestPref.setDialogTitle("Threshold (meters)");
-		thresholdTestPref.setKey(KEY_DIST_FILTER);
-		thresholdTestPref.setTitle("Threshold");
-		thresholdTestPref.setSummary(thrhld);
-        dialogBasedPrefCat.addPreference(thresholdTestPref);
-        
-        /* Tools */
-	    PreferenceCategory dialogBasedPrefCat2 = new PreferenceCategory(this);
-	    dialogBasedPrefCat2.setTitle("Tools");
-	    root.addPreference(dialogBasedPrefCat2);
-	    
-	    CheckBoxPreference rotatingCompassPref = new CheckBoxPreference(this);
-	    rotatingCompassPref.setKey(KEY_ROTATING_COMPASS);
-	    rotatingCompassPref.setTitle("Rotating compass");
-	    rotatingCompassPref.setSummary("Rotate the compass instead of the visual range");
-	    rotatingCompassPref.setDefaultValue(true);
-	    dialogBasedPrefCat2.addPreference(rotatingCompassPref);
+        int thrhld = sharedPreferences.getInt(KEY_DIST_FILTER, 0);
+        getPreferenceScreen().findPreference(KEY_DIST_FILTER).setSummary(Integer.toString(thrhld));
+        getPreferenceScreen().findPreference(KEY_DIST_FILTER).setOnPreferenceClickListener(this);
 
-	    CheckBoxPreference searchSystemPref = new CheckBoxPreference(this);
-	    searchSystemPref.setKey(KEY_SEARCH_SYSTEM);
-	    searchSystemPref.setTitle("Clicked node search system");
-	    searchSystemPref.setSummary("Active the clicked node search system");
-	    searchSystemPref.setDefaultValue(true);
-	    dialogBasedPrefCat2.addPreference(searchSystemPref);
-	    
-	    /* Show objects labels */
-	    PreferenceCategory dialogBasedPrefCat5 = new PreferenceCategory(this);
-	    dialogBasedPrefCat5.setTitle("Labels");
-	    root.addPreference(dialogBasedPrefCat5);
-	    
-	    CheckBoxPreference moveLabelsPref = new CheckBoxPreference(this);
-	    moveLabelsPref.setKey(KEY_MOVE_LABELS);
-	    moveLabelsPref.setTitle("Dinamic summary");
-	    moveLabelsPref.setSummary("Set the summary as a dinamic box");
-	    dialogBasedPrefCat5.addPreference(moveLabelsPref);
-	    
-	    CheckBoxPreference centerLabelsPref = new CheckBoxPreference(this);
-	    centerLabelsPref.setKey(KEY_CENTER_LABELS);
-	    centerLabelsPref.setTitle("Central labels");
-	    centerLabelsPref.setSummary("Open the summary box automatically for the central node");
-	    dialogBasedPrefCat5.addPreference(centerLabelsPref);
-	    
-	    CheckBoxPreference imageIconPref = new CheckBoxPreference(this);
-	    imageIconPref.setKey(KEY_IMAGE_ICON);
-	    imageIconPref.setTitle("Image icon");
-	    imageIconPref.setDefaultValue(true);
-	    imageIconPref.setSummary("Set the resource own image as icon, if any");
-	    dialogBasedPrefCat5.addPreference(imageIconPref);
-	    
-	    /* Show names options */
-	    PreferenceCategory dialogBasedPrefCat6 = new PreferenceCategory(this);
-	    dialogBasedPrefCat6.setTitle("Object names");
-	    root.addPreference(dialogBasedPrefCat6);
-
-        ListPreference listPref = new ListPreference(this);
-        listPref.setEntries(R.array.draw_name_options);
-        listPref.setEntryValues(R.array.values_draw_name_options);
-        listPref.setDialogTitle("Show");
-        listPref.setKey(KEY_NAMES_SHOWING);
-        listPref.setTitle("Show");
-        listPref.setSummary("Object names showing");
-        dialogBasedPrefCat6.addPreference(listPref);
-	    
-
-	    /* Debug preferences */
-	    PreferenceCategory dialogBasedPrefCat4 = new PreferenceCategory(this);
-	    dialogBasedPrefCat4.setTitle("Debug");
-	    root.addPreference(dialogBasedPrefCat4);
-	    
-	    // 
-	    CheckBoxPreference measuresPref = new CheckBoxPreference(this);
-	    measuresPref.setKey(KEY_MEASURES);
-	    measuresPref.setTitle("Show sensors data");
-	    measuresPref.setSummary("Show the sensors measures info on screen");
-	    dialogBasedPrefCat4.addPreference(measuresPref);
+        getPreferenceScreen().findPreference(KEY_ALTITUDE_INTENT).setOnPreferenceClickListener(this);
+        getPreferenceScreen().findPreference(KEY_LOCATION_INTENT).setOnPreferenceClickListener(this);
         
-	    return root;
+        blockVisibility(sharedPreferences);
 	        
 	}
 
 	public void onSharedPreferenceChanged (SharedPreferences sharedPreferences, String key) 
 	{
-		if (key.equals(KEY_HEIGHT)){
-			blockVisibility();
-			
-		}else if (key.equals(KEY_IS_DIST_FILTER)) {
-
-			Preference pref = this.findPreference(KEY_DIST_FILTER);
-			if(pref == null) 
-				return;
-			
-			pref.setEnabled(sharedPreferences.getBoolean(key, false));
-		}else if(key.equals(KEY_DIST_FILTER)) {
+		if(key.equals(KEY_DIST_FILTER)) {
 
 			Preference pref = this.findPreference(key);
 			if(pref == null) 
 				return;
 			
-			pref.setSummary(sharedPreferences.getString(key, ""));
+			pref.setSummary(Integer.toString(sharedPreferences.getInt(key, 0)));
+		}else if(key.equals(KEY_HEIGHT)){
+
+			blockVisibility(sharedPreferences);
+			
 		}
 	    
 	}
 	
-	private void blockVisibility(){
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+	private void blockVisibility(SharedPreferences sharedPreferences){
 
 		Preference pref = this.findPreference(KEY_HEIGHT);
 		if(pref == null) 
@@ -235,6 +125,109 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 			pref.setEnabled(true);
 		else
 			pref.setEnabled(false);
+	}
+
+	@Override
+	public boolean onPreferenceClick(Preference preference) {
+		if(preference.getKey().equals(KEY_DIST_FILTER)){
+			showDialog(DIALOG_SELECT_THRESHOLD);
+			return true;
+		}else if(preference.getKey().equals(KEY_ALTITUDE_INTENT)){
+			Intent i1 = new Intent(getBaseContext(), AltitudePreferences.class);
+			startActivity(i1);
+			return true;
+		}else if(preference.getKey().equals(KEY_LOCATION_INTENT)){
+			Intent i1 = new Intent(getBaseContext(), LocationPreferences.class);
+			startActivity(i1);
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+    protected void onPrepareDialog(int id, Dialog dialog) { 
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		switch(id){
+		case DIALOG_SELECT_THRESHOLD:
+			configureSeekbarDiag(dialog, KEY_DIST_FILTER, sharedPreferences.getInt(KEY_DIST_FILTER, 0), 500, " m.", 1, sharedPreferences);
+			break;
+		}
+	}
+	
+	@Override
+    protected Dialog onCreateDialog(int id) {  
+		
+		switch(id){
+		case DIALOG_SELECT_THRESHOLD:
+			LayoutInflater factory = LayoutInflater.from(this);
+			View view = factory.inflate(R.layout.seekbar_num, null);
+			
+			return new AlertDialog.Builder(this)	    
+			.setView(view)
+			.setCancelable(true)
+			.setPositiveButton(R.string.ok, null)
+			.create();
+		}
+		
+		return null;
+	}
+	
+	private void configureSeekbarDiag(final Dialog dialog,
+			final String key,
+			int progress, 
+			int max,
+			final String units,
+			final int divider,
+			final SharedPreferences sharedPreferences){
+		
+		final TextView tv = (TextView)dialog.findViewById(R.id.tv_sb_text);
+		
+		String text = "";
+		if(divider > 1)
+			text += Float.toString(((float)progress)/divider);
+		else
+			text += Integer.toString(progress);
+		tv.setText(text + units);
+		
+		final SeekBar sb = (SeekBar)dialog.findViewById(R.id.sb_bar); 
+		sb.setMax(max);
+		sb.setProgress(progress);
+		sb.setKeyProgressIncrement(1);
+		sb.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				String text = "";
+				if(divider > 1)
+					text += Float.toString(((float)progress)/divider);
+				else
+					text += Integer.toString(progress);
+				tv.setText(text + units);
+				
+//				if(progress > 70)
+//				tv.setAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.push_left_in));
+			}
+		});
+		sb.invalidate();
+		
+		Button bt_ok = ((AlertDialog)dialog).getButton(Dialog.BUTTON_POSITIVE);
+		bt_ok.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Editor edit = sharedPreferences.edit();
+				edit.putInt(key, sb.getProgress());
+				edit.commit();
+				dialog.dismiss();
+			}
+		});
+		bt_ok.invalidate();
 	}
 	
 }
