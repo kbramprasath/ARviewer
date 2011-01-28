@@ -81,7 +81,7 @@ public class AltitudePreferences extends PreferenceActivity implements OnSharedP
 	public void onSharedPreferenceChanged (SharedPreferences sharedPreferences, String key) 
 	{
 		if (key.equals(KEY_GPS))
-			ARLocationManager.getInstance().setLocationServiceAltitude(sharedPreferences.getBoolean(key, false));
+			ARLocationManager.getInstance(this).setLocationServiceAltitude(sharedPreferences.getBoolean(key, false));
 		
 		else if (key.equals(KEY_USER_HEIGHT)) {
 			Preference pref = this.findPreference(key);

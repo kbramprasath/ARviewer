@@ -47,6 +47,7 @@ public class ARLocationManager{
 	private Location mLocation = null;
 	private LocationManager mLocationManager;
 	private MLocationListener mLocationListener = null;
+	private boolean isUpdateOn = false;
 	
 	// Location provider (GPS or network), by default: network
 	private String loc_provider;
@@ -60,16 +61,18 @@ public class ARLocationManager{
 	// Minimum distance of gps refresh
 	private Integer minimum_distance = null;
 	
-	private ARLocationManager(){
+	private ARLocationManager(Context mContext){
 		mLocation = new Location("Manual");
-		mLocation.setLatitude(NO_LATLONG);
-		mLocation.setLongitude(NO_LATLONG);
+		mLocation.setLatitude(0);
+		mLocation.setLongitude(0);
 		mLocation.setAltitude(AltitudeManager.NO_ALTITUDE_VALUE);
+		mLocationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+		mLocationListener = new MLocationListener();
 	}
 	
-	public static ARLocationManager getInstance(){
+	public static ARLocationManager getInstance(Context mContext){
 		if(arLocationManager == null)
-			arLocationManager = new ARLocationManager();
+			arLocationManager = new ARLocationManager(mContext);
 		return arLocationManager;
 	}
 	
@@ -108,12 +111,27 @@ public class ARLocationManager{
 		minimum_distance = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_DISTANCE, 10);
 	}
 	
-	private void startUpdates(Context mContext){
+	public void startUpdates(Context mContext){
 		loadConfig(mContext);
 		mLocationManager.requestLocationUpdates( loc_provider, 
 				 ((location_period)* 1000) * location_unit, 
 				 minimum_distance, 
 				 mLocationListener);
+	}
+	
+	public void pauseUpdates(){
+		if(mLocationManager != null)
+			mLocationManager.removeUpdates(mLocationListener);
+	}
+	
+	public void stopUpdates(){
+		pauseUpdates();
+		if(arrayLocationListener != null)
+			arrayLocationListener.clear();
+	}
+	
+	public boolean isUpdateOn(){
+		return isUpdateOn;
 	}
 	
 	private class MLocationListener implements LocationListener {

@@ -91,7 +91,7 @@ public class LocationWays extends MapActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        currentLocation = ARLocationManager.getInstance().getLocation();
+        currentLocation = ARLocationManager.getInstance(this).getLocation();
         
         if ((currentLocation == null) || (currentLocation.getLatitude() == ARLocationManager.NO_LATLONG) || 
         		(currentLocation.getLongitude() == ARLocationManager.NO_LATLONG)){
@@ -172,7 +172,7 @@ public class LocationWays extends MapActivity {
 	
 	private void setCurrentLocation(Location loc){
 		currentLocation = loc;
-		ARLocationManager.getInstance().setLocation(loc);
+		ARLocationManager.getInstance(this).setLocation(loc);
 	}
 	
     @Override
