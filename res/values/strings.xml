@@ -6,6 +6,7 @@
 	
 	<!-- Location preferences -->
 	<string name="pref_location_title">Location</string>
+	<string name="pref_location_summary">Configure the location preferences</string>
 	<string name="pref_location_provider_title">Provider</string>
 	<string name="pref_location_provider_summary">Choose the provider for your location</string>
 	<string name="pref_location_tunits_title">Time units</string>
@@ -15,7 +16,42 @@
 	<string name="pref_location_distance_title">Minimum distance</string>
 	<string name="pref_location_distance_summary">Choose the minimum distance for location refreshing</string>
 	
+	<!-- AR preferences -->
+	<string name="pref_ar_altitude_title">Altitude properties</string>
+	<string name="pref_ar_altitude_status_title">Altitude mode</string>
+	<string name="pref_ar_altitude_status_summary">Select the altitude system mode</string>
+	<string name="pref_ar_altitude_useDistFilter_title">Altitude threshold</string>
+	<string name="pref_ar_altitude_useDistFilter_summary_on">Far objects will be shown at the horizon line</string>
+	<string name="pref_ar_altitude_useDistFilter_summary_off">Threshold disabled</string>
+	<string name="pref_ar_altitude_distFilter_title">Threshold</string>
+	<string name="pref_ar_location_title">Location properties</string>
+	<string name="pref_ar_tools_title">Tools</string>
+	<string name="pref_ar_tools_rotatingCompass_title">Rotating compass</string>
+	<string name="pref_ar_tools_rotatingCompass_summary_on">Compass rotation enabled</string>
+	<string name="pref_ar_tools_rotatingCompass_summary_off">Compass rotation disabled</string>
+	<string name="pref_ar_tools_searchSystem_title">Search system</string>
+	<string name="pref_ar_tools_searchSystem_summary_on">Clicked node search system enabled</string>
+	<string name="pref_ar_tools_searchSystem_summary_off">Clicked node search system disabled</string>
+	<string name="pref_ar_labels_title">Labels</string>
+	<string name="pref_ar_labels_moveLabels_title">Dynamic summary</string>
+	<string name="pref_ar_labels_moveLabels_summary_on">Dynamic summary box enabled</string>
+	<string name="pref_ar_labels_moveLabels_summary_off">Dynamic summary box disabled</string>
+	<string name="pref_ar_labels_centerLabels_title">Central labels</string>
+	<string name="pref_ar_labels_centerLabels_summary_on">Automatic opening of the central node summary box enabled</string>
+	<string name="pref_ar_labels_centerLabels_summary_off">Automatic opening of the central node summary box disabled</string>
+	<string name="pref_ar_labels_imageIcon_title">Image icon</string>
+	<string name="pref_ar_labels_imageIcon_summary_on">Set resource image as icon enabled</string>
+	<string name="pref_ar_labels_imageIcon_summary_off">Set resource image as icon disabled</string>
+	<string name="pref_ar_names_title">Object names</string>
+	<string name="pref_ar_names_namesShowing_title">Show</string>
+	<string name="pref_ar_names_namesShowing_summary">Objects name showing mode</string>
+	<string name="pref_ar_debug_title">Debug</string>
+	<string name="pref_ar_debug_showMeasures_title">Show sensors data</string>
+	<string name="pref_ar_debug_showMeasures_summary_on">On-screen sensors measures info enabled</string>
+	<string name="pref_ar_debug_showMeasures_summary_off">On-screen sensors measures info disabled</string>
+	
 	<!-- User's altitude preferences -->
+	<string name="pref_user_altitude_summary">Configure the user\'s altitude preferences</string>
 	<string name="pref_user_altitude_title">User\'s altitude preferences</string>
 	<string name="pref_useGPS_title">Location service altitude</string>
 	<string name="pref_useGPS_summary_on">Location service altitude enabled</string>
@@ -39,4 +75,5 @@
 	<string name="ok">Ok</string>
 	<string name="cancel">Cancel</string>
 	<string name="search">Search</string>
+	<string name="no_layer">No layer introduced</string>
 </resources>
