@@ -27,7 +27,7 @@ package com.libresoft.apps.ARviewer;
  * LAYER: The layer that must contain the AR nodes (GenericLayer). Mandatory.
  * LATITUDE: User's latitude coordinate (float). Optional.
  * LONGITUDE: User's longitude coordinate (float). Optional.
- * LABELING: Enable the labeling system. Optional.
+ * LABELING: Enable the labeling system (boolean). Optional.
  * 
  */
 
@@ -38,6 +38,7 @@ import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
 import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager;
 import com.libresoft.apps.ARviewer.Location.LocationWays;
+import com.libresoft.apps.ARviewer.Location.ARLocationManager.OnLocationUpdateListener;
 import com.libresoft.apps.ARviewer.Overlays.CamPreview;
 import com.libresoft.apps.ARviewer.Overlays.CustomViews;
 import com.libresoft.apps.ARviewer.Overlays.DrawFocus;
@@ -112,11 +113,12 @@ public class ARviewer extends ARActivity{
     private static boolean showMenu = true;
     
     private boolean refreshed;
+    private boolean is_labeling = false;
     
     private static ARTagManager tagManager; 
     private static ScreenshotManager screenshotManager;
     
-    private String[] strCategories = null;
+//    private String[] strCategories = null;
     
     private String altitude_status = AltitudeManager.EXISTING_HEIGHTS;
 	
@@ -140,8 +142,6 @@ public class ARviewer extends ARActivity{
 			showMenu = true;
 			if(success){
 				Toast.makeText(getBaseContext(), "Ok", Toast.LENGTH_SHORT).show();
-				// Reload list
-				loadResources();
 			}else
 				Toast.makeText(getBaseContext(), "Fail", Toast.LENGTH_SHORT).show();
 		}
@@ -185,19 +185,19 @@ public class ARviewer extends ARActivity{
 		
 		public void onClick(View v) {
 			showMenu = true;
-
+			// TODO
     		getLayers().removeExtraElement((View) v.getParent());
-    		if(getMyLayer().getRadius() != CustomViews.getSeekbarValue()){
-    			getMyLayer().setRadius(CustomViews.getSeekbarValue());
-    			getLayers().cleanResouceLayer();
-    			loadResources();
-    		}
+//    		if(getMyLayer().getRadius() != CustomViews.getSeekbarValue()){
+//    			getMyLayer().setRadius(CustomViews.getSeekbarValue());
+//    			getLayers().cleanResouceLayer();
+//    			loadResources();
+//    		}
 		}
 	};
 	
-    ILocationServiceListener locationListener = new ILocationServiceListener(){
+    OnLocationUpdateListener locationListener = new OnLocationUpdateListener(){
 
-		public void updateCurrentLocation(Location loc) {
+		public void onUpdate(Location loc) {
 			
 			float[] location = {(float) loc.getLatitude(), (float) loc.getLongitude(), 0};
 			setLocation(location);
@@ -205,7 +205,7 @@ public class ARviewer extends ARActivity{
 			if(mUserStatus != null)
 				mUserStatus.setLocationServiceActive(true);
 			
-			if(AltitudeManager.isLocationServiceAltitude()){
+			if(ARLocationManager.getInstance(getBaseContext()).isLocationServiceAltitude()){
 				cam_altitude = (float) loc.getAltitude();
 				LocationUtils.setUserHeight(cam_altitude);
 				if(mUserStatus != null)
@@ -230,17 +230,15 @@ public class ARviewer extends ARActivity{
 			refreshed = false;
         	
         	showMenu = true;
-        	
-			float[] location = new float[3];
-			location[0] =  (float) LocationService.getCurrentLocation().getLatitude();
-			location[1] = (float) LocationService.getCurrentLocation().getLongitude();
-			setLocation(location);
-			requestAltitudeInfo();
 			
 			// Hide the window title and notifications bar.
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			
+			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
+			this.mWakeLock.acquire();
 			
 			// Create our Preview view and set it as the content of our activity.
 			mPreview = new CamPreview(this);
@@ -259,23 +257,13 @@ public class ARviewer extends ARActivity{
 			getLayers().addInfoElement(mFocus, null);
 			getLayers().addInfoElement(mUserStatus, null);
 			
+			if(!loadParameters()){
+				Toast.makeText(getBaseContext(), R.string.no_layer, Toast.LENGTH_LONG).show();
+			}
+				
 			loadConfig(false);
 			
-			ARGeoNode.setRadar(mRadar);
-			
-			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-			this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-			this.mWakeLock.acquire();
-        	
-			if(getMyLayer() == null)
-				setMyLayer((GenericLayer) DataManager.getInstance().removeData(DataManager.GENERIC_LAYER));
-			if(strCategories == null)
-			{
-				ArrayList<Category> categories = (ArrayList<Category>) DataManager.getInstance().removeData(DataManager.LAYER_CATEGORIES);
-				strCategories = new String[categories.size()];
-				for (int i=0; i<categories.size();i++)
-					strCategories[i] = String.valueOf(categories.get(i).getId());
-			}
+			ARGeoNode.setRadar(mRadar);			
 			
 			compassManager = new ARCompassManager(this);
 			
@@ -295,6 +283,40 @@ public class ARviewer extends ARActivity{
 		}
         
     }
+	
+	private boolean loadParameters(){
+		
+		if(!getIntent().hasExtra("LAYER"))
+			return false;
+		else{
+			setMyLayer((GenericLayer) getIntent().getSerializableExtra("LAYER"));
+		}
+		
+		if(getIntent().hasExtra("LATITUDE") && getIntent().hasExtra("LONGITUDE")){
+			float[] location = new float[3];
+			location[0] =  getIntent().getFloatExtra("LATITUDE", 0);
+			location[1] = getIntent().getFloatExtra("LONGITUDE", 0);
+			setLocation(location);
+			requestAltitudeInfo();
+		}else{
+			// TODO
+		}
+		
+//		if(strCategories == null)
+//		{
+//			ArrayList<Category> categories = (ArrayList<Category>) DataManager.getInstance().removeData(DataManager.LAYER_CATEGORIES);
+//			strCategories = new String[categories.size()];
+//			for (int i=0; i<categories.size();i++)
+//				strCategories[i] = String.valueOf(categories.get(i).getId());
+//		}
+		
+		if(getIntent().hasExtra("LABELING")){
+			// TODO
+			is_labeling = getIntent().getBooleanExtra("LABELING", false);
+		}
+		
+		return true;
+	}
     
     private void loadConfig(boolean refresh_altitude){
 
@@ -309,7 +331,7 @@ public class ARviewer extends ARActivity{
 			
 		if(isUsingHeight()){
 			useThreshold(sharedPreferences.getBoolean(ARPreferences.KEY_IS_DIST_FILTER, false));
-			setThreshold(Float.parseFloat(sharedPreferences.getString(ARPreferences.KEY_DIST_FILTER, "0")));
+			setThreshold(sharedPreferences.getInt(ARPreferences.KEY_DIST_FILTER, 0));
 		}
 		
 		if(sharedPreferences.getBoolean(ARPreferences.KEY_MEASURES, false)){
@@ -378,11 +400,6 @@ public class ARviewer extends ARActivity{
     	if(altitude_status.equals(AltitudeManager.ALL_HEIGHTS))
 			actionRequestHeight();
     }
-    
-    private void loadResources(){
-    	showDialog(DIALOG_PBAR);
-		getMyLayer().getThreadtoUpdate (handlerEnd, strCategories).start();
-    }
 	
     protected void onPause(){
     	super.onPause();
@@ -390,13 +407,13 @@ public class ARviewer extends ARActivity{
     	getLayers().removeBaseElement(mPreview);
     	compassManager.unregisterListeners();
     	if(!(idGPS<0))
-    			LocationService.unRegisterLocationListener(idGPS);
+    		ARLocationManager.getInstance(this).pauseUpdates();
 		
 		Location loc = new Location("Manual");
 		loc.setLatitude(getLocation()[0]);
 		loc.setLongitude(getLocation()[1]);
 		loc.setAltitude(cam_altitude);
-		LocationService.setCurrentLocation(loc);
+		ARLocationManager.getInstance(this).setLocation(loc);
 		
     }
     
@@ -411,13 +428,18 @@ public class ARviewer extends ARActivity{
     	compassManager.setOnCompassChangeListener(compassListener);
 		
     	if(!(idGPS<0))
-    		idGPS = LocationService.registerLocationListener(locationListener);
+    		ARLocationManager.getInstance(this).startUpdates(this);
     	
     }
     
     protected void onDestroy(){
     	ARGeoNode.clearBox();
+    	ARLocationManager.getInstance(this).stopUpdates();
     	this.mWakeLock.release();
+    	
+    	if(is_labeling){
+    		//TODO
+    	}
     	super.onDestroy();
     }
     
@@ -425,23 +447,26 @@ public class ARviewer extends ARActivity{
     public boolean onPrepareOptionsMenu(Menu menu) {
     	menu.clear();
     	
-    	if((getMyLayer().getWriteable()) & (LibreGeoSocial.getInstance().isLogged())){
-    		tagManager.onCreateOptionsMenu(menu);
-    	}
-    	
-    	menu.add(0, MENU_DISTANCE_FILTER, 0, "Distance filter")
-		.setIcon(R.drawable.meter);
-    	
-    	SubMenu sub1 = menu.addSubMenu(0, MENU_LOCATION, 0, "Location")
+    	if(showMenu){
+    		if(is_labeling){
+    			tagManager.onCreateOptionsMenu(menu);
+    		}
+
+    		menu.add(0, MENU_DISTANCE_FILTER, 0, "Distance filter")
+    		.setIcon(R.drawable.meter);
+
+    		SubMenu sub1 = menu.addSubMenu(0, MENU_LOCATION, 0, "Location")
     		.setIcon(R.drawable.mundo);
-    	sub1.add(0,MENU_INDOOR_LOCATION, 0, "BIDI Location");
-    	sub1.add(0,MENU_SERVICE_LOCATION, 0, "Location service");
-    	sub1.add(0,MENU_LOCATION_WAYS, 0, "Manual");
+    		sub1.add(0,MENU_INDOOR_LOCATION, 0, "BIDI Location");
+    		sub1.add(0,MENU_SERVICE_LOCATION, 0, "Location service");
+    		sub1.add(0,MENU_LOCATION_WAYS, 0, "Manual");
+    	}
     	
     	screenshotManager.onCreateOptionsMenu(menu);
     	
-    	menu.add(0, MENU_PREFERENCES, 0, "Settings")
-    		.setIcon(R.drawable.spanner_48);
+    	if(showMenu)
+    		menu.add(0, MENU_PREFERENCES, 0, "Settings")
+    			.setIcon(R.drawable.spanner_48);
     	
         super.onCreateOptionsMenu(menu);        
         return true;
@@ -451,72 +476,67 @@ public class ARviewer extends ARActivity{
     	
     	if(screenshotManager.onOptionsItemSelected(item))
     		return super.onOptionsItemSelected(item);
-    	
-    	if(showMenu){
-    		switch (item.getItemId()) {
 
-    		case MENU_DISTANCE_FILTER:
-    			View view = CustomViews.createSeekBar(this, 50, getMyLayer().getRadius(), "Km.", distFiltClickListener);
+    	switch (item.getItemId()) {
 
-    			getLayers().addExtraElement(view, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
-    			
-    			showMenu = false;
-    			break;
-    			
-    		case MENU_SERVICE_LOCATION:
-    			if(idGPS==-1){
-					if(mUserStatus != null)
-						mUserStatus.setLocationServiceOnProgress();
-    				idGPS = LocationService.registerLocationListener(locationListener);
-    			}else{
-    				LocationService.unRegisterLocationListener(idGPS);
-    				idGPS = -1;
-					if(mUserStatus != null)
-						mUserStatus.setLocationServiceActive(false);
-    			}
-    			if(tagManager != null)
-    				tagManager.setLocationServiceOn(idGPS);
-    			break;
-    			
-    		case MENU_INDOOR_LOCATION:
-    			PackageManager pm = getPackageManager();
-    			List<ApplicationInfo> list = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-    			boolean isBarcode = false;
-    			for(int i = 0; i< list.size(); i++){
-    				if( list.get(i).packageName.equals("com.google.zxing.client.android")){
-    					isBarcode = true;
-    					break;
-    				}
-    			}
+    	case MENU_DISTANCE_FILTER:
+    		View view = CustomViews.createSeekBar(this, 50, getMyLayer().getRadius(), "Km.", distFiltClickListener);
 
-    			if (!isBarcode){
-    				Toast.makeText(getBaseContext(), 
-    						"Please, install Barcode Scanner from Market",
-    						Toast.LENGTH_LONG).show();
+    		getLayers().addExtraElement(view, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+
+    		showMenu = false;
+    		break;
+
+    	case MENU_SERVICE_LOCATION:
+    		if(idGPS==-1){
+    			if(mUserStatus != null)
+    				mUserStatus.setLocationServiceOnProgress();
+    			idGPS = ARLocationManager.getInstance(this).addLocationListener(locationListener);
+    		}else{
+    			ARLocationManager.getInstance(this).stopUpdates();
+    			idGPS = -1;
+    			if(mUserStatus != null)
+    				mUserStatus.setLocationServiceActive(false);
+    		}
+    		if(tagManager != null)
+    			tagManager.setLocationServiceOn(idGPS);
+    		break;
+
+    	case MENU_INDOOR_LOCATION:
+    		PackageManager pm = getPackageManager();
+    		List<ApplicationInfo> list = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+    		boolean isBarcode = false;
+    		for(int i = 0; i< list.size(); i++){
+    			if( list.get(i).packageName.equals("com.google.zxing.client.android")){
+    				isBarcode = true;
     				break;
     			}
-    			
-    			Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-    			intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-    			startActivityForResult(intent, BIDI_LOC);
-    			break;
-    			
-    		case MENU_LOCATION_WAYS:
-    			Intent intent1 = new Intent(this, LocationWays.class);
-    			startActivityForResult(intent1, LOC_WAYS);
-    			break;
-    			
-    		case MENU_PREFERENCES:
-    			Intent i = new Intent(this, ARPreferences.class);
-        		startActivityForResult(i, MENU_PREFERENCES);
+    		}
+
+    		if (!isBarcode){
+    			Toast.makeText(getBaseContext(), 
+    					"Please, install Barcode Scanner from Market",
+    					Toast.LENGTH_LONG).show();
     			break;
     		}
-    		
-    	}else
-    		Toast.makeText(getBaseContext(), 
-					   "Please, finish your action.",
-					   Toast.LENGTH_LONG).show();
-        return super.onOptionsItemSelected(item);
+
+    		Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+    		intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+    		startActivityForResult(intent, BIDI_LOC);
+    		break;
+
+    	case MENU_LOCATION_WAYS:
+    		Intent intent1 = new Intent(this, LocationWays.class);
+    		startActivityForResult(intent1, LOC_WAYS);
+    		break;
+
+    	case MENU_PREFERENCES:
+    		Intent i = new Intent(this, ARPreferences.class);
+    		startActivityForResult(i, MENU_PREFERENCES);
+    		break;
+    	}
+
+    	return super.onOptionsItemSelected(item);
     }
     
     @Override
@@ -577,7 +597,7 @@ public class ARviewer extends ARActivity{
 	    				setLocation(location);
 	    				cam_altitude = (float) AltitudeManager.getAbsoluteAltitude(this, Float.parseFloat(info[2]), false);
 	    				LocationUtils.setUserHeight(cam_altitude);
-	        			loadResources();
+//	        			loadResources();
 	    			}catch(Exception e){
 	    				Toast.makeText(getBaseContext(), 
 	    						"There was an error with BIDI location", 
@@ -591,14 +611,14 @@ public class ARviewer extends ARActivity{
 	    		break;
 	    		
 	    	case LOC_WAYS:
-    			float[] location = {(float) ARLocationManager.getInstance().getLocation().getLatitude(), 
-    					(float)  ARLocationManager.getInstance().getLocation().getLongitude(), 
+    			float[] location = {(float) ARLocationManager.getInstance(this).getLocation().getLatitude(), 
+    					(float)  ARLocationManager.getInstance(this).getLocation().getLongitude(), 
     					0};
 				if((location[0] == getLocation()[0]) && (location[1] == getLocation()[1]))
 					break;
     			setLocation(location);
 				requestAltitudeInfo();
-    			loadResources();
+//    			loadResources();
 	    		break;
 	    		
 	    	case MENU_PREFERENCES:
@@ -641,13 +661,13 @@ public class ARviewer extends ARActivity{
 		
 		new Thread(){
 			public void run(){
-				if(!ARLocationManager.getInstance().isLocationServiceAltitude())
+				if(!ARLocationManager.getInstance(getBaseContext()).isLocationServiceAltitude())
 					cam_altitude = (float) AltitudeManager.getAbsoluteAltitude(
 							getBaseContext(), 
 							(float) AltitudeManager.getAltitudeFromLatLong(getLocation()[0], getLocation()[1]), 
 							true);
 				else
-					cam_altitude = (float) ARLocationManager.getInstance().getLocation().getAltitude();
+					cam_altitude = (float) ARLocationManager.getInstance(getBaseContext()).getLocation().getAltitude();
 				LocationUtils.setUserHeight(cam_altitude);
 				altHandler.sendEmptyMessage(0);
 			}
