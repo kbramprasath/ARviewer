@@ -103,12 +103,12 @@ public class Video extends GeoNode implements Serializable {
 		this.mPath = mPath;
 	}
 		
-	public Bitmap getBitmapImageThumb() {		
-		
-		Bitmap bitmapImage = null;
+	public Bitmap getBitmapImageThumb() {
 		
 		if (mByteBitMapImageThumb == null)
-		{
+		{		
+			
+			Bitmap bitmapImage = null;
 			
 			bitmapImage = BitmapUtils.loadBitmap(mVideo_thumb_url);
 	
