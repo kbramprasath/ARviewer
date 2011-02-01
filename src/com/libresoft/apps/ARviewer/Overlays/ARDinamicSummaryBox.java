@@ -24,8 +24,8 @@ package com.libresoft.apps.ARviewer.Overlays;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 
+import com.libresoft.apps.ARviewer.ARBase;
 import com.libresoft.apps.ARviewer.ARGesturesHandler;
-import com.libresoft.apps.ARviewer.ARviewer;
 import com.libresoft.apps.ARviewer.R;
 
 import android.app.Activity;
@@ -160,7 +160,7 @@ public class ARDinamicSummaryBox extends ARSummaryBox{
 			try {
 
 				/* Set the static methods that execute when gesture is recognize */
-				Class<ARviewer> c = ARviewer.class;
+				Class<ARBase> c = ARBase.class;
 				Method m = c.getDeclaredMethod("GestureNext", (Class[]) null);
 				Method m2 = c.getDeclaredMethod("GesturePrevious", (Class[]) null);
 

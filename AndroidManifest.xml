@@ -18,6 +18,15 @@
         		<category android:name="android.intent.category.DEFAULT"/>
       		</intent-filter>
         </activity>
+        
+        <activity android:name=".ARlabeling"
+                  android:screenOrientation="landscape" 
+                  android:theme="@android:style/Theme.NoTitleBar">
+            <intent-filter>
+        		<action android:name="com.libresoft.apps.ARviewer.LABELING"/>
+        		<category android:name="android.intent.category.DEFAULT"/>
+      		</intent-filter>
+        </activity>
 
 		<activity android:name=".ARPreferences"></activity>
 		<activity android:name=".Location.LocationPreferences"></activity> 
