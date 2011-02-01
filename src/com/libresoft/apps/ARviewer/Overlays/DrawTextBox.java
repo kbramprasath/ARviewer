@@ -36,17 +36,17 @@ public class DrawTextBox extends View{
 	private float[] center = {0, 0};
 	private String text;
 	
-	public DrawTextBox(Context context, float x, float y) {
+	public DrawTextBox(Context context, double x, double y) {
 		super(context);
 		// TODO Auto-generated constructor stub
 		
-		this.center[0] = x;
-		this.center[1] = y;
+		this.center[0] = (float) x;
+		this.center[1] = (float) y;
 	}
 	
-	public void setCenter(float x, float y){
-		this.center[0] = x;
-		this.center[1] = y;
+	public void setCenter(double x, double y){
+		this.center[0] = (float) x;
+		this.center[1] = (float) y;
 	}
 	
 	public void setText(String text){

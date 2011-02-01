@@ -129,7 +129,7 @@ public class ARTagManager{
 			return;
 		case TAG_FAST:
 			tagIFContainer = new RelativeLayout(mActivity);
-			tagIFContainer.addView(CustomViews.createSeekBar(mActivity.getBaseContext(), 500, 1, "m.", fast_click));
+			tagIFContainer.addView(CustomViews.createSeekBars(mActivity, 1, 500, " m.", 1, 1, fast_click));
 			layers.addExtraElement(tagIFContainer, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 			return;
 		case TAG_MAP:

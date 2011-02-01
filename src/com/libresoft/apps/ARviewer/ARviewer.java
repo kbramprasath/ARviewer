@@ -487,7 +487,7 @@ public class ARviewer extends ARActivity{
     	switch (item.getItemId()) {
 
     	case MENU_DISTANCE_FILTER:
-    		View view = CustomViews.createSeekBar(this, 50, distanceFilter/1E3, "Km.", distFiltClickListener);
+    		View view = CustomViews.createSeekBars(this, distanceFilter/1E3, 50, " Km.", 10, 0, distFiltClickListener);
 
     		getLayers().addExtraElement(view, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 
