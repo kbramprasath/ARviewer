@@ -22,6 +22,7 @@
 package com.libresoft.apps.ARviewer.Overlays;
 
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 import com.libresoft.apps.ARviewer.ARGeoNode;
 import com.libresoft.apps.ARviewer.ARUtils;
@@ -39,6 +40,7 @@ import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 
 public class DrawRadar extends View{
@@ -57,6 +59,8 @@ public class DrawRadar extends View{
 	
 	private Bitmap compass_appearance = null;
 	private Bitmap compass_shadow = null;
+	
+	private Semaphore sem;
 	
 	private boolean rotate_compass;
 	
@@ -78,6 +82,7 @@ public class DrawRadar extends View{
 		maxRadiusResource = mRADIUSANGLE - ARUtils.transformPixInDip(mContext, resourceRadius);
 		azimuth = 0;
 		rotate_compass = false;
+		sem = new Semaphore(1);
 	}
 	
 	public void setPointClicked(int point_clicked){
@@ -94,9 +99,14 @@ public class DrawRadar extends View{
 	        	for(int i = 0; i < max; i++){
 	        		points.add(nodes.get(i).getPoint());
 	        	}	
-	        	resources = points;
-	        	
-	        	mHandler.sendEmptyMessage(0);
+	        	try {
+					sem.acquire();
+		        	resources = points;
+		        	sem.release();
+		        	mHandler.sendEmptyMessage(0);
+				} catch (InterruptedException e) {
+					Log.e("DrawRadar", "", e);
+				}
 			}
 		}.start();
 	}
@@ -143,27 +153,34 @@ public class DrawRadar extends View{
         		compass_center_y - mRADIUS, null);
         
         // RESOURCE POINTS
-        if(resources != null){
-        	Paint paint = new Paint();
-            paint.setStyle(Paint.Style.FILL);
-            paint.setARGB(255, 255, 255, 255);
-            
-        	int max = resources.size();
-        	for(int i = 0; i < max; i++){
-        		if(i == point_clicked)
-                    continue;
-        			
-        		canvas.drawCircle(compass_center_x + ((float)maxRadiusResource * resources.get(i).x)/100, 
-        				compass_center_y + ((float)maxRadiusResource * resources.get(i).y)/100,
-        				resourceRadius, paint);
-        	}
-        	if(point_clicked > -1){
-        		paint.setARGB(255, 255, 0, 0);
-        		canvas.drawCircle(compass_center_x + ((float)maxRadiusResource * resources.get(point_clicked).x)/100, 
-        				compass_center_y + ((float)maxRadiusResource * resources.get(point_clicked).y)/100,
-        				resourceRadius, paint);
-        	}
-        }
+        try {
+			sem.acquire();
+			if(resources != null){
+	        	Paint paint = new Paint();
+	            paint.setStyle(Paint.Style.FILL);
+	            paint.setARGB(255, 255, 255, 255);
+	            
+	        	int max = resources.size();
+	        	for(int i = 0; i < max; i++){
+	        		if(i == point_clicked)
+	                    continue;
+	        			
+	        		canvas.drawCircle(compass_center_x + ((float)maxRadiusResource * resources.get(i).x)/100, 
+	        				compass_center_y + ((float)maxRadiusResource * resources.get(i).y)/100,
+	        				resourceRadius, paint);
+	        	}
+	        	if(point_clicked > -1){
+	        		paint.setARGB(255, 255, 0, 0);
+	        		canvas.drawCircle(compass_center_x + ((float)maxRadiusResource * resources.get(point_clicked).x)/100, 
+	        				compass_center_y + ((float)maxRadiusResource * resources.get(point_clicked).y)/100,
+	        				resourceRadius, paint);
+	        	}
+	        }
+			sem.release();
+		} catch (InterruptedException e) {
+			Log.e("DrawRadar", "", e);
+		}
+        
 
 		super.onDraw(canvas);
 	}
