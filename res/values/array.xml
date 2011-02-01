@@ -15,15 +15,6 @@
         <item>network</item>
     </string-array>
     
-    <string-array name="location_periodic">
-        <item>1</item>
-        <item>2</item>
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>  
-        <item>30</item>       
-    </string-array>
-    
     <string-array name="location_units">
     	<item>Seconds</item>
     	<item>Minutes</item>
@@ -32,16 +23,6 @@
     <string-array name="valueslocation_units">
     	<item>1</item>
     	<item>60</item>
-    </string-array>
-    
-    <string-array name="values_minimumdistance">
-    	<item>0</item>
-    	<item>1</item>
-    	<item>5</item>
-    	<item>10</item>
-    	<item>20</item>
-    	<item>50</item>
-    	<item>100</item>
     </string-array>
     
     <string-array name="draw_name_options">
