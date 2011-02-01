@@ -63,8 +63,7 @@ public class DrawResource extends View {
 	
 	private float posx, posy;
 	private String name;
-	private float azimuth,elevation,distance;
-	private float max_distance;
+	private float azimuth,elevation;
 	private Bitmap bitmap_small;
 	private Bitmap bitmap_normal;
 	private Bitmap bitmap_clicked;
@@ -113,14 +112,9 @@ public class DrawResource extends View {
 		this.bitmap_small = Bitmap.createScaledBitmap(bitmap_clicked, MIN_ICON_SIZE, MIN_ICON_SIZE, true);
 	}
 	
-	public void setValues (float azimuth, float elevation, float distance){
+	public void setValues (float azimuth, float elevation){
 		this.azimuth = azimuth;
 		this.elevation = elevation;
-		this.distance = distance;
-	}
-	
-	public void setMaxDistance(float max_distance){
-		this.max_distance = max_distance;
 	}
 	
 	public void setClicked(boolean isClick){
@@ -139,8 +133,7 @@ public class DrawResource extends View {
         
         /* Calculating if the icon should be drawn */
         if ((Math.abs(azimuth)>MAX_AZIMUTH_VISIBLE) || 
-        		(Math.abs(elevation)>MAX_ELEVATION_VISIBLE) ||
-        		((max_distance > 0) && (Math.abs(distance) > max_distance))){
+        		(Math.abs(elevation)>MAX_ELEVATION_VISIBLE)){
         	if(onBoxChangeListener != null)
         		onBoxChangeListener.onChange(-1, -1, -1, -1);
         	if(onShowIconListener != null)

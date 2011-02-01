@@ -27,26 +27,40 @@ import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 
 public class ARUtils {
     
-    public static ArrayList<ARGeoNode> cleanNoLocation(Activity activity, ARLayerManager layers, ArrayList<GeoNode> list){
+    public static ArrayList<ARGeoNode> cleanNoLocation(Activity activity, 
+    		ARLayerManager layers, 
+    		ArrayList<GeoNode> list, 
+    		float[] location,
+    		float distanceFilter){
     	ArrayList<ARGeoNode> cleaned_list = new ArrayList<ARGeoNode>();
     	
+    	Location mLocation = new Location("");
+    	mLocation.setLatitude(location[0]);
+    	mLocation.setLongitude(location[1]);
+    	
+		Location resLocation = new Location("");
     	for(int i = list.size() - 1; i >= 0 ; i--){
     		GeoNode resource = list.get(i);
-//    		ARNode node = new ARNode(resource.getId(), resource.getLatitude(), resource.getLongitude(),
-//    				resource.getAltitude(), resource.getRadius(), resource.getSince());
     		if(resource == null){
     			Log.e("ARUtils", "Vacio");
     			continue;
     		}
     		if((resource.getLatitude() != -1.0) && (resource.getLongitude() != -1.0)){
-    			
+    			if(distanceFilter > 0){
+    				resLocation.setLatitude(resource.getLatitude());
+    				resLocation.setLongitude(resource.getLongitude());
+    				resLocation.setAltitude(mLocation.getAltitude());
+
+    				if(mLocation.distanceTo(resLocation) > distanceFilter)
+    					continue;
+    			}
     			ARGeoNode node = new ARGeoNode(activity, resource, layers.getInfoLayer());
     			cleaned_list.add(node);
-    			
     		}
     	}
     	

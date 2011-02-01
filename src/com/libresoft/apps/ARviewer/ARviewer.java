@@ -49,7 +49,6 @@ import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
 import com.libresoft.apps.ARviewer.ScreenCapture.ScreenshotManager;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
-import com.libresoft.sdk.ARviewer.Types.Category;
 import com.libresoft.sdk.ARviewer.Types.GenericLayer;
 
 import android.app.Activity;
@@ -108,6 +107,7 @@ public class ARviewer extends ARActivity{
     
     
     private float cam_altitude = 0;
+    private float distanceFilter = 0;
     private ARCompassManager compassManager;
     private int idGPS = -1;
     private static boolean showMenu = true;
@@ -185,9 +185,12 @@ public class ARviewer extends ARActivity{
 		
 		public void onClick(View v) {
 			showMenu = true;
-			// TODO
     		getLayers().removeExtraElement((View) v.getParent());
-    		setMaxDistance((float)(CustomViews.getSeekbarValue()*1E3));
+    		float dist = (float)(CustomViews.getSeekbarValue()*1E3);
+    		if(distanceFilter != dist){
+    			distanceFilter = dist;
+    			showResources();
+    		}
 		}
 	};
 	
@@ -226,6 +229,7 @@ public class ARviewer extends ARActivity{
 			refreshed = false;
         	
         	showMenu = true;
+        	distanceFilter = 0;
 			
 			// Hide the window title and notifications bar.
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -369,7 +373,7 @@ public class ARviewer extends ARActivity{
     	ArrayList<ARGeoNode> res_list = null;
     	
     	if(getMyLayer() != null)
-    		res_list = ARUtils.cleanNoLocation(this, getLayers(), getMyLayer().getNodes());
+    		res_list = ARUtils.cleanNoLocation(this, getLayers(), getMyLayer().getNodes(), getLocation(), distanceFilter);
 
     	if(res_list == null){
     		Toast.makeText(getBaseContext(), 
@@ -483,7 +487,7 @@ public class ARviewer extends ARActivity{
     	switch (item.getItemId()) {
 
     	case MENU_DISTANCE_FILTER:
-    		View view = CustomViews.createSeekBar(this, 50, 0, "Km.", distFiltClickListener);
+    		View view = CustomViews.createSeekBar(this, 50, distanceFilter/1E3, "Km.", distFiltClickListener);
 
     		getLayers().addExtraElement(view, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 
