@@ -23,6 +23,7 @@ package com.libresoft.apps.ARviewer.Overlays;
 import com.libresoft.apps.ARviewer.ARUtils;
 import com.libresoft.apps.ARviewer.R;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,8 +52,18 @@ public class CustomViews{
 		return view;
 	}
 	
-	public static View createSeekBar(final Context mContext,int max, double current_dist, final String units, OnClickListener buttonListener){
-		LayoutInflater factory = LayoutInflater.from(mContext);
+	public static View createSeekBars(final Activity mActivity,
+			double progress, 
+			double max,
+			final String units,
+			final int divider, // 1, 10, 100, 1000...
+			final int offset, // < max
+			OnClickListener buttonListener){
+		
+		seekbarValue = progress;
+		
+		// Loading layout
+		LayoutInflater factory = LayoutInflater.from(mActivity);
 		View seekbar = factory.inflate(R.layout.seekbar_choice, null);
 		
 		SeekBar sb = (SeekBar)seekbar.findViewById(R.id.tag_bar);
@@ -61,53 +72,50 @@ public class CustomViews{
 		
 		button.setOnClickListener(buttonListener);
 		
-		seekbarValue = current_dist;
+		double sb_w = mActivity.getWindowManager().getDefaultDisplay().getWidth() - ARUtils.transformPixInDip(mActivity, 65);
+		double box_x = ARUtils.transformPixInDip(mActivity, 10) + 
+			ARUtils.transformPixInDip(mActivity, 8) + 
+			(((progress * divider) - offset)/((max * divider) - offset)) * (sb_w - ARUtils.transformPixInDip(mActivity, 10) - ARUtils.transformPixInDip(mActivity, 16));
+		final DrawTextBox tb = new DrawTextBox(mActivity, box_x, ARUtils.transformPixInDip(mActivity, 10));
 		
-		double dist = current_dist;
-		int max_bar = max;
-		if(units.equals("Km.") || units.equals("º")){
-			dist *= 10;
-			max_bar *= 10;
-		}
-		sb.setMax(max_bar - 1);
-		sb.setProgress((int)dist - 1);
-		sb.setKeyProgressIncrement(1);
-		
-		float box_x = ((float) (dist - 1 ))/((float) max_bar - 1) * ARUtils.transformPixInDip(mContext, 400) + ARUtils.transformPixInDip(mContext, 10);
-		final DrawTextBox tb = new DrawTextBox(mContext, box_x, 10);
-		tb.setText(Double.toString(current_dist) + " " + units);
-		
+		if (divider > 1)
+			tb.setText(Double.toString(progress) + units);
+		else
+			tb.setText(Integer.toString((int)progress) + units);
 		rl.addView(tb);
 		
+		sb.setMax((int)(max * divider) - offset);
+		sb.setProgress((int)(progress * divider) - offset);
+		sb.setKeyProgressIncrement(1);
 		sb.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {}
 			
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				seekbarValue = (double)seekBar.getProgress() + 1;
-				if(units.equals("Km.") || units.equals("º"))
-					seekbarValue = seekbarValue / 10;
-				
-				float box_x = ((float)seekBar.getProgress())/((float) seekBar.getMax()) * (seekBar.getWidth() - 10) + seekBar.getPaddingLeft();
-				tb.setCenter(box_x, 10);
-				tb.setText(Double.toString(seekbarValue) + " " + units);
-			}
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {}
 			
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-				
-			}
-			
+			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
-				seekbarValue = (double)seekBar.getProgress() + 1;
-				if(units.equals("Km.") || units.equals("º"))
-					seekbarValue = seekbarValue / 10;
-
-				float box_x = ((float)seekBar.getProgress())/((float) seekBar.getMax()) * (seekBar.getWidth() - 10) + seekBar.getPaddingLeft();
-				tb.setCenter(box_x, 10);
-
-				tb.setText(Double.toString(seekbarValue) + " " + units);
+				String text = "";
+				if(divider > 1){
+					text += Double.toString(((double)progress + offset) / divider);
+					seekbarValue = ((double)progress + offset) / divider;
+				}else{
+					text += Integer.toString(progress + offset);
+					seekbarValue = progress + offset;
+				}
+				tb.setText(text + units);
+				double box_x = seekBar.getPaddingLeft() + 
+					ARUtils.transformPixInDip(mActivity, 8) + 
+					(((double)progress)/seekBar.getMax()) * ((double)seekBar.getWidth() - seekBar.getPaddingLeft() - ARUtils.transformPixInDip(mActivity, 16));
+				tb.setCenter(box_x, ARUtils.transformPixInDip(mActivity, 10));
+				tb.invalidate();
+//				if(progress > 70)
+//				tv.setAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.push_left_in));
 			}
 		});
+		sb.invalidate();
 		
 		return seekbar;
 	}

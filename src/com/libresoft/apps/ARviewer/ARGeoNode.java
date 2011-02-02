@@ -41,7 +41,6 @@ import com.libresoft.sdk.ARviewer.Types.Video;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -314,9 +313,8 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		}
 	}
 	
-	public void setDrawnValues(float azimuth, float abs_azimuth, float elevation, float distance, float max_distance){
-		drawn.setMaxDistance(max_distance);
-		drawn.setValues(azimuth, elevation, distance);
+	public void setDrawnValues(float azimuth, float abs_azimuth, float elevation, float distance){
+		drawn.setValues(azimuth, elevation);
 		this.distance = distance;
 		this.azimuth = abs_azimuth;
 		

@@ -32,7 +32,7 @@ interface ARNodeDrawingIF{
 	
 	public void setLoaded(boolean isloaded);
 	
-	public void setDrawnValues(float azimuth, float abs_azimuth, float elevation, float distance, float max_distance);
+	public void setDrawnValues(float azimuth, float abs_azimuth, float elevation, float distance);
 	
 	public void createDrawn(Context context);
 	

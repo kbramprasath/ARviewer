@@ -39,7 +39,6 @@ public class ARActivity extends Activity{
 	private boolean is_threshold;
 	private float threshold;
 	private boolean use_height = true;
-	private float max_distance = 0;
 	
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +67,6 @@ public class ARActivity extends Activity{
     
     protected void setThreshold(float threshold){
     	this.threshold = threshold;
-    }
-    
-    protected void setMaxDistance(float max_distance){
-    	this.max_distance = max_distance;
     }
     
     protected ArrayList<ARGeoNode> getResourcesList(){
@@ -131,7 +126,7 @@ public class ARActivity extends Activity{
 				resource.setLoaded(true);
 			}
 
-			resource.setDrawnValues(azimuth_camera, res_azimuth, elevation, distance, max_distance);
+			resource.setDrawnValues(azimuth_camera, res_azimuth, elevation, distance);
 
 			if(!layers.isChildInResourcesList(resource.getDrawn()))
 				layers.addResourceElement(resource.getDrawn(), null);

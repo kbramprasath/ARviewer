@@ -21,7 +21,6 @@ package com.libresoft.apps.ARviewer;
 
 import java.util.List;
 
-import com.libresoft.apps.ARviewer.Overlays.CustomViews;
 import com.libresoft.apps.ARviewer.Utils.CompassController;
 
 import android.content.Context;
@@ -30,8 +29,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 
 
 
@@ -65,10 +62,10 @@ public class ARCompassManager implements SensorEventListener{
     public static float getElevation(float[] values){
     	return values[1];
     }
-    
-    public View getCorrectionSeekbar(Context mContext, OnClickListener listener){
-    	return CustomViews.createSeekBar(mContext, 180, Math.abs(correction), "º", listener);
-    }
+//    
+//    public View getCorrectionSeekbar(Context mContext, OnClickListener listener){
+//    	return CustomViews.createSeekBars(mContext, Math.abs(correction), 180, " º", 1, 0, listener);
+//    }
     
 //    public void setCorrection(Context mContext, float correction){
 //    	this.correction = correction;
