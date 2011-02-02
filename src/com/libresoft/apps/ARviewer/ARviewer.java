@@ -94,10 +94,11 @@ public class ARviewer extends ARBase{
 	};
 	
 	protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if(!loadParameters()){
 			Toast.makeText(getBaseContext(), R.string.no_layer, Toast.LENGTH_LONG).show();
 		}
-        super.onCreate(savedInstanceState);
+        loadConfig(false);
         showResources();
     }
 	
@@ -141,17 +142,6 @@ public class ARviewer extends ARBase{
 
     	return super.onOptionsItemSelected(item);
     }
-    
-    @Override
-    protected Dialog onCreateDialog(int id) {       
-    	
-    	Dialog diag = tagManager.onCreateDialog(id);
-    	if(diag != null)
-    		return diag;
-    	
-		return super.onCreateDialog(id);
-    
-	}
     
 	protected void onActivityResult (int requestCode, int resultCode, Intent data) { 
 		

@@ -31,8 +31,11 @@ package com.libresoft.apps.ARviewer;
  */
 
 
+import java.util.ArrayList;
+
 import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
 import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
+import com.libresoft.sdk.ARviewer.Types.GenericLayer;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -64,13 +67,22 @@ public class ARlabeling extends ARBase{
 	};
 	
 	protected void onCreate(Bundle savedInstanceState) {
-		loadParameters();
         super.onCreate(savedInstanceState);
-		
-		tagManager = new ARTagManager(this, getLayers(), getMyLayer(), getLocation(), cam_altitude);
+		loadParameters();
+		loadConfig(false);
+		tagManager = new ARTagManager(this, getLayers(), getResourcesList(), getLocation(), cam_altitude);
 		tagManager.setOnLocationChangeListener(onTaggingLocationListener);
 		tagManager.setOnTaggingFinishedListener(onTaggingFinishedListener);
+		showResources();
     }
+	
+	@Override
+	protected boolean loadParameters(){
+		super.loadParameters();
+		setResourcesList(new ArrayList<ARGeoNode>());
+		
+		return true;
+	}
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {

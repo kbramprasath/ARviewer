@@ -21,6 +21,8 @@
 package com.libresoft.apps.ARviewer;
 
 
+import java.util.ArrayList;
+
 import com.libresoft.apps.ARviewer.Overlays.CustomViews;
 import com.libresoft.apps.ARviewer.Tagging.AccurateTag;
 import com.libresoft.apps.ARviewer.Tagging.MapTagging;
@@ -91,7 +93,7 @@ public class ARTagManager{
 	
 	private Activity mActivity;
 	private ARLayerManager layers;
-	private GenericLayer myLayer;
+	private ArrayList<ARGeoNode> res_list;
 	
 	OnClickListener fast_click = new OnClickListener() {
 		
@@ -108,10 +110,10 @@ public class ARTagManager{
 		}
 	};
 	
-	public ARTagManager(Activity mActivity, ARLayerManager layers, GenericLayer myLayer, float[] user_location, float cam_altitude){
+	public ARTagManager(Activity mActivity, ARLayerManager layers, ArrayList<ARGeoNode> res_list, float[] user_location, float cam_altitude){
 		this.mActivity = mActivity;
 		this.layers = layers;
-		this.myLayer = myLayer;
+		this.res_list = res_list;
 		setSavingType(TAG_NONE);
 		setUserLocation(user_location);
 		setCamAltitude(cam_altitude);
@@ -203,7 +205,7 @@ public class ARTagManager{
 			myLoc.setLongitude(user_location_fixed[1]);
 
 			Intent i = new Intent(mActivity, TagResult.class);
-			i.putExtra("LAYER_ID", myLayer.getId());
+			i.putExtra("RESOURCES_LIST", res_list);
 			i.putExtra("LATITUDE", loc.getLatitude());
 			i.putExtra("LONGITUDE", loc.getLongitude());
 			i.putExtra("ALTITUDE", loc.getAltitude());
@@ -244,10 +246,6 @@ public class ARTagManager{
     		res_location = accurateTag.getLineLocationArray();
     		break;
     		
-//    	case TAG_ANGLE:
-//    		res_location = angleTag.getLocationArray();
-//    		break;
-    		
     	default:
     		res_location = new float[2];	
     		
@@ -262,14 +260,6 @@ public class ARTagManager{
     	resource.setLatitude(res_location[0]);
     	resource.setLongitude(res_location[1]);
     	resource.setAltitude(res_height);
-    	
-    	//FIXME Testing lines
-//    	TestingManager.setFinalTime();
-//    	TestingManager.setResLoc(res_location[0], res_location[1], res_height);
-//    	TestingManager.setUserLoc(user_location_fixed[0], user_location_fixed[1], cam_altitude);
-//    	TestingManager.setAzimuth(ARCompassManager.getAzimuth(res_angles));
-//    	TestingManager.setInclination(ARCompassManager.getElevation(res_angles));
-//    	TestingManager.resetRealLocation();
     	
     	return resource;
     }
@@ -330,18 +320,6 @@ public class ARTagManager{
     			return false;
     		}
     		break;
-
-//    	case TAG_ANGLE:
-//
-//    		if(angleTag.addElem(user_location_fixed, ARCompassManager.getAzimuth(res_angles), ARCompassManager.getElevation(res_angles))){
-//    			launchResult();
-//    		}else{
-//    			Toast.makeText(mActivity, 
-//    					"Saved", 
-//    					Toast.LENGTH_LONG).show();
-//    		}
-//    		break;
-//
     	}
     	return true;
     }
@@ -356,7 +334,6 @@ public class ARTagManager{
     	sub0.add(0,MENU_TAGGING_MAP, 0, "Map");
     	sub0.add(0,MENU_TAGGING_ACCURATE_SIDE, 0, "Accurate side");
     	sub0.add(0,MENU_TAGGING_ACCURATE_LINE, 0, "Accurate line");
-    	//    		sub0.add(0,MENU_TAGGING_ANGLE, 0, "Angular");
     		
     }
     
@@ -383,10 +360,6 @@ public class ARTagManager{
     	case MENU_TAGGING_ACCURATE_LINE:
     		setSavingType(TAG_ACCURATE_LINE);
     		break;
-
-//    	case MENU_TAGGING_ANGLE:
-//    		setSavingType(TAG_ANGLE);
-//    		break;
 
     	default:
     		return false;

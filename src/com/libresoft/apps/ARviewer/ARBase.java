@@ -21,16 +21,6 @@
 
 package com.libresoft.apps.ARviewer;
 
-/*
- * 
- * Intent extras:
- * LAYER: The layer that must contain the AR nodes (GenericLayer). Mandatory.
- * LATITUDE: User's latitude coordinate (double). Optional.
- * LONGITUDE: User's longitude coordinate (double). Optional.
- * LABELING: Enable the labeling system (boolean). Optional.
- * 
- */
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -226,7 +216,7 @@ public class ARBase extends ARActivity{
 //				Toast.makeText(getBaseContext(), R.string.no_layer, Toast.LENGTH_LONG).show();
 //			}
 				
-			loadConfig(false);
+//			loadConfig(false);
 			
 			ARGeoNode.setRadar(mRadar);			
 			
@@ -274,7 +264,7 @@ public class ARBase extends ARActivity{
 		return true;
 	}
     
-    private void loadConfig(boolean refresh_altitude){
+    protected void loadConfig(boolean refresh_altitude){
 
 		SharedPreferences sharedPreferences = 
 			PreferenceManager.getDefaultSharedPreferences(this);
@@ -317,14 +307,15 @@ public class ARBase extends ARActivity{
     	ARGeoNode.clearClicked(getResourcesList());
     	getLayers().cleanResouceLayer();
     	
-
-    	setResourcesList(null);
-
     	ArrayList<ARGeoNode> res_list = null;
     	
-    	if(getMyLayer() != null)
+    	if(getMyLayer() == null){
+    		res_list = getResourcesList();
+    	}else{
+        	setResourcesList(null);
     		res_list = ARUtils.cleanNoLocation(this, getLayers(), getMyLayer().getNodes(), getLocation(), distanceFilter);
-
+    	}
+    	
     	if(res_list == null){
     		Toast.makeText(getBaseContext(), 
     				"No resources available", 
@@ -523,9 +514,6 @@ public class ARBase extends ARActivity{
     
 	protected void onActivityResult (int requestCode, int resultCode, Intent data) { 
 		
-    	if (tagManager.onActivityResult(requestCode, resultCode, data))
-    		return;
-    	
 		switch (requestCode) { 
 	    		
 	    	case BIDI_LOC:
