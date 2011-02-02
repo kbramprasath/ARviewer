@@ -31,6 +31,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class ARLocationManager{
 	public static final int NO_LATLONG = -360;
@@ -77,6 +78,21 @@ public class ARLocationManager{
 	}
 	
 	public Location getLocation(){
+		return mLocation;
+	}
+	
+	public Location getLastKnownLocation(Context mContext){
+		loadConfig(mContext);
+		Location loc = mLocationManager.getLastKnownLocation(loc_provider);
+		if(loc != null){
+			Log.e("ARLocationManager", "Latitude: " + Double.toString(loc.getLatitude()) + "\n" +
+					"Longitude: " + Double.toString(loc.getLongitude()) + "\n" +
+					"Altitude: " + Double.toString(loc.getAltitude()));
+			mLocation = loc;
+			mLocation.setAltitude(AltitudeManager.NO_ALTITUDE_VALUE);
+		}else{
+			Log.e("ARLocationManager", "location Null");
+		}
 		return mLocation;
 	}
 	
