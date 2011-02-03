@@ -61,7 +61,7 @@ public class ARGeoNode implements ARNodeDrawingIF{
 	private Point point = null;
 	private DrawResourceSearcher nodeSearcher;
 	
-	private Activity mActivity;
+	private ARBase mActivity;
 	
 	private static ARSummaryBox arSummaryBox = null;
 	private static boolean doCenterSummary = false;
@@ -98,8 +98,7 @@ public class ARGeoNode implements ARNodeDrawingIF{
 	private DrawResource.OnBoxChangeListener onBoxChangeListener = new DrawResource.OnBoxChangeListener() {
 		
 		public void onChange(int left, int top, int right, int bottom) {
-			ARviewer activity = (ARviewer) mActivity;
-			int num = activity.getResourcesList().indexOf(ARGeoNode.this);
+			int num = mActivity.getResourcesList().indexOf(ARGeoNode.this);
 			if((arSummaryBox != null) && ARDinamicSummaryBox.class.isInstance(arSummaryBox))
 				((ARDinamicSummaryBox)arSummaryBox).translateSummaryBox(num, left, top, right, bottom);
 		}
@@ -148,7 +147,7 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		}
 	};
 	
-	public ARGeoNode(Activity activity, GeoNode geoNode, RelativeLayout container) {
+	public ARGeoNode(ARBase activity, GeoNode geoNode, RelativeLayout container) {
 		this.mActivity = activity;
 		this.geoNode = geoNode;
 		
@@ -259,20 +258,18 @@ public class ARGeoNode implements ARNodeDrawingIF{
 	
 	private void removeLastClicked(){
 		/* Set the last clicked node icon to normal state */
-		ARviewer activity = (ARviewer) mActivity;
-		int node_clicked = activity.getResourcesList().indexOf(this);
+		int node_clicked = mActivity.getResourcesList().indexOf(this);
 		
 		int last_node_clicked = -1;
 		last_node_clicked = arSummaryBox.getNodeClicked();
 		
 		if((last_node_clicked > -1) && (node_clicked != last_node_clicked))
-			activity.getResourcesList().get(last_node_clicked).setDrawnClicked(false);
+			mActivity.getResourcesList().get(last_node_clicked).setDrawnClicked(false);
 	}
 	
 	public void setDrawnClicked(boolean isOpen){
 		/* Switch the icon of this node between normal state and clicked state */
-		ARviewer activity = (ARviewer) mActivity;
-		int node_clicked = activity.getResourcesList().indexOf(this);
+		int node_clicked = mActivity.getResourcesList().indexOf(this);
 		
 		drawn.setClicked(isOpen);
 		if(isOpen){
@@ -386,9 +383,8 @@ public class ARGeoNode implements ARNodeDrawingIF{
 			removeSummaryBox();
 			return;
 		}
-
-		ARviewer activity = (ARviewer) mActivity;
-		int num = activity.getResourcesList().indexOf(this);
+		
+		int num = mActivity.getResourcesList().indexOf(this);
 		
 		if(ARDinamicSummaryBox.class.isInstance(arSummaryBox)){
 
@@ -455,8 +451,8 @@ public class ARGeoNode implements ARNodeDrawingIF{
 				if(requestImage && (th == null)){
 					th = new Thread(){
 						public void run(){
-							node.getBitmapPhoto();
-							mHandler.sendEmptyMessage(0);
+							if(node.getBitmapPhoto() != null)
+								mHandler.sendEmptyMessage(0);
 						}
 					};
 					th.start();
@@ -475,8 +471,8 @@ public class ARGeoNode implements ARNodeDrawingIF{
 				if(requestImage && (th == null)){
 					th = new Thread(){
 						public void run(){
-							node.getBitmapImageThumb();
-							mHandler.sendEmptyMessage(0);
+							if(node.getBitmapImageThumb() != null)
+								mHandler.sendEmptyMessage(0);
 						}
 					};
 					th.start();
@@ -494,8 +490,8 @@ public class ARGeoNode implements ARNodeDrawingIF{
 					if((th == null)){
 						th = new Thread(){
 							public void run(){
-								node.getAvatarBitmap();
-								mHandler.sendEmptyMessage(0);
+								if(node.getAvatarBitmap() != null)
+									mHandler.sendEmptyMessage(0);
 							}
 						};
 						th.start();
@@ -513,32 +509,6 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		return is_media;
 	}
 	
-//	public OnClickListener getDetailsClickListener(final Activity mActivity){
-//		Intent intent = null;
-//		if(Photo.class.isInstance(geoNode)){
-//			intent = new Intent(mActivity, PhotoCard.class);
-//		}else if(Note.class.isInstance(geoNode)){
-//			intent = new Intent(mActivity, NoteCard.class);
-//		}else if(Audio.class.isInstance(geoNode)){
-//			intent = new Intent(mActivity, AudioCard.class);
-//		}else if(Video.class.isInstance(geoNode)){
-//			intent = new Intent(mActivity, VideoCard.class);
-//		}else if(User.class.isInstance(geoNode)){
-//			intent = new Intent(mActivity, UserCard.class);
-//		}else
-//			return null;
-//		
-//		final Intent result_intent = intent;
-//		
-//		OnClickListener listener = new OnClickListener() {
-//			public void onClick(View v) {
-//				result_intent.putExtra("node", geoNode);
-//				mActivity.startActivity(result_intent);
-//			}
-//		};		
-//		return listener;
-//	}
-	
 	private void refreshIcon(){
 		Bitmap icon = null;
 		if(Photo.class.isInstance(geoNode))
@@ -551,8 +521,7 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		if((refreshIcon) && (drawn != null))
 			drawn.setIcon(icon);
 		
-		//TODO refresh summary box
-		int num = ((ARviewer)mActivity).getResourcesList().indexOf(ARGeoNode.this);
+		int num = mActivity.getResourcesList().indexOf(ARGeoNode.this);
 		refreshSummaryBoxImage(num, icon);
 	}
 	
