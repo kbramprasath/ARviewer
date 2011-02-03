@@ -40,7 +40,7 @@ public class AudioManager extends ContextWrapper {
 	 
 	private String mFileName = "tmpaudio.3gpp";
 	
-	private static final String AUDIO_DIR = "/sdcard/audio_lgs/";
+	private static final String AUDIO_DIR = "/sdcard/arviewer/audio/";
 	
 	private MediaRecorder mRecorder;
 	
