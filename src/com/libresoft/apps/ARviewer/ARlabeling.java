@@ -93,9 +93,9 @@ public class ARlabeling extends ARBase{
     	menu.clear();
     	
     	if(showMenu){
-    		tagManager.onCreateOptionsMenu(menu);
     		menu.add(0, MENU_DONE, 0, R.string.done)
     			.setIcon(R.drawable.done);
+    		tagManager.onCreateOptionsMenu(menu);
     	}
     	
         super.onPrepareOptionsMenu(menu);        
