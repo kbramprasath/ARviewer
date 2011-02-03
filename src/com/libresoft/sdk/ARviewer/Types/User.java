@@ -185,19 +185,32 @@ public class User extends GeoNode implements Serializable {
 		
 		if (mByteBitMapAvatar == null)
 		{
-			Log.d("AVATAR",getAvatarUrl());
-						
-			bitmapImage = BitmapUtils.loadBitmap(mAvatarUrl);
-			
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			
-			if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
-			{
-				Log.e("getAvatarBitmap","Error: Don't compress de image");
+			try{
+				Log.d("AVATAR",getAvatarUrl());
+
+				bitmapImage = BitmapUtils.loadBitmap(mAvatarUrl);
+
+				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 153600){ // 480x320
+					if(bitmapImage.getWidth() > bitmapImage.getHeight())
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 480, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*480), true);
+					else
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*480), 480, true);
+				}
+				
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+				if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+				{
+					Log.e("getAvatarBitmap","Error: Don't compress de image");
+					return null;
+				}
+				mByteBitMapAvatar = baos.toByteArray();
+
+			}catch(Exception e){
+				Log.e("User", "", e);
+				mByteBitMapAvatar = null;
 				return null;
 			}
-			mByteBitMapAvatar = baos.toByteArray();
-			
 		}
 		
 		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapAvatar) );

@@ -107,20 +107,31 @@ public class Video extends GeoNode implements Serializable {
 		
 		if (mByteBitMapImageThumb == null)
 		{		
-			
-			Bitmap bitmapImage = null;
-			
-			bitmapImage = BitmapUtils.loadBitmap(mVideo_thumb_url);
-	
-	
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			
-			if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
-			{
-				Log.e("getBitmapImageThumb","Error: Don't compress de image");
+			try{
+				Bitmap bitmapImage = null;
+
+				bitmapImage = BitmapUtils.loadBitmap(mVideo_thumb_url);
+
+				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 153600){ // 480x320
+					if(bitmapImage.getWidth() > bitmapImage.getHeight())
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 480, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*480), true);
+					else
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*480), 480, true);
+				}
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+				if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+				{
+					Log.e("getBitmapImageThumb","Error: Don't compress de image");
+					return null;
+				}
+				mByteBitMapImageThumb = baos.toByteArray();
+			}catch(Exception e){
+				Log.e("Video", "", e);
+				mByteBitMapImageThumb = null;
 				return null;
 			}
-			mByteBitMapImageThumb = baos.toByteArray();
 			
 		}
 		

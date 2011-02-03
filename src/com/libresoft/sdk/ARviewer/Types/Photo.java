@@ -109,24 +109,37 @@ public class Photo extends GeoNode implements Serializable {
 	{
 		if (mByteBitMapImageThumb == null)
 		{
-			Bitmap bitmapImage = null;
+			try{
+				Bitmap bitmapImage = null;
 
-			if (mPhotoUrl != null)
-				bitmapImage = BitmapUtils.loadBitmap(mPhotoUrl);
+				if (mPhotoUrl != null)
+					bitmapImage = BitmapUtils.loadBitmap(mPhotoUrl);
 
-			else if (mPhotoPath != null)
-				bitmapImage = BitmapUtils.loadBitMapFromFile(mPhotoPath);
+				else if (mPhotoPath != null)
+					bitmapImage = BitmapUtils.loadBitMapFromFile(mPhotoPath);
+				
+				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 153600){ // 480x320
+					if(bitmapImage.getWidth() > bitmapImage.getHeight())
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 480, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*480), true);
+					else
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*480), 480, true);
+				}
 
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
-			{
-				Log.e("getBitmapImageThumb","Error: Don't compress de image");
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+				{
+					Log.e("getBitmapImageThumb","Error: Don't compress de image");
+					return null;
+				}
+
+				mByteBitMapImageThumb = baos.toByteArray();
+
+			}catch(Exception e){
+				Log.e("Photo", "", e);
+				mByteBitMapImageThumb = null;
 				return null;
 			}
-			
-			mByteBitMapImageThumb = baos.toByteArray();
-			
-			
+
 		}
 		
 		if (mByteBitMapImageThumb == null)
