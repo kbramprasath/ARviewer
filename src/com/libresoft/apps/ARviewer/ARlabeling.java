@@ -64,6 +64,7 @@ public class ARlabeling extends ARBase{
 			showMenu = true;
 			if(success){
 				Toast.makeText(getBaseContext(), "Ok", Toast.LENGTH_SHORT).show();
+				showResources();
 			}else
 				Toast.makeText(getBaseContext(), "Fail", Toast.LENGTH_SHORT).show();
 		}

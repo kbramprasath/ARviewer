@@ -82,7 +82,7 @@ public class TagResult extends MapActivity{
         
         content_attacher = new ContentAttacher(this);
         content_attacher.setOnAttachListener(onAttachListener);
-        
+        content_attacher.setResourceLocation(res_location, false);
         tvDistance.setText("Distance: " + distance + " m.");
         tvHeight.setText("Height: " + height + " m.");
     }

@@ -533,7 +533,7 @@ public class ARTagManager{
 			if( resultCode != Activity.RESULT_CANCELED ) {
 				GeoNode node = (GeoNode) data.getSerializableExtra("RES_NODE");
 				if((node != null) && (res_list != null))
-						res_list.add(new ARGeoNode(mActivity, node, layers.getInfoLayer()));
+						res_list.add(new ARGeoNode((ARBase) mActivity, node, layers.getInfoLayer()));
 				onTaggingFinishedListener.onFinish(true);	    		
 			} else{
 				onTaggingFinishedListener.onFinish(false);

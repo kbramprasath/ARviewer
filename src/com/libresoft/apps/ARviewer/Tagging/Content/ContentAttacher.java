@@ -25,7 +25,9 @@ package com.libresoft.apps.ARviewer.Tagging.Content;
 import java.io.File;
 import java.util.List;
 
+import com.libresoft.apps.ARviewer.Constants;
 import com.libresoft.apps.ARviewer.R;
+import com.libresoft.apps.ARviewer.File.FileManager;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager;
 import com.libresoft.apps.ARviewer.Multimedia.AudioRecorder;
 import com.libresoft.apps.ARviewer.Multimedia.AudioRecorder.OnFinishListener;
@@ -165,7 +167,7 @@ public class ContentAttacher{
 					resource_location.getLatitude(),
 					resource_location.getLongitude(), 
 					resource_location.getAltitude(), 
-					0.0, "", "", "", null, null, null, 0.0);
+					0.0, "", "", null, null, null, null, 0.0);
 			
 			mActivity.showDialog(DIALOG_SELECT);
 			break;
@@ -174,7 +176,7 @@ public class ContentAttacher{
 			resource = new Audio  (null, 
 					  "", 
 					  "",
-					  "", "",
+					  null, null,
 					  resource_location.getLatitude(),
 					  resource_location.getLongitude(),
 					  resource_location.getAltitude(),
@@ -222,14 +224,16 @@ public class ContentAttacher{
 	        .setPositiveButton("Create", new DialogInterface.OnClickListener() {
 	            public void onClick(DialogInterface dialog, int whichButton) {
 	            	if(Photo.class.isInstance(resource)){
+	            		FileManager.getInstance();
 	            		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	            		String path = PHOTO_TMP;
-	            		if(Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1)
+	            		if(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)
 	            			path = "/mnt" + path;
 	            		Uri outputFile = Uri.fromFile(new File(path));
 	            		i.putExtra(MediaStore.EXTRA_OUTPUT, outputFile);
 	        			mActivity.startActivityForResult(i, ACTIVITY_PHOTO);
 	            	}else if(Audio.class.isInstance(resource)){
+	            		FileManager.getInstance();
 	            		audio_recorder = new AudioRecorder(mActivity);
 	            		audio_recorder.doRecording(AUDIO_TMP, DIALOG_RECORD_AUDIO);
 	            	}
@@ -245,14 +249,14 @@ public class ContentAttacher{
 	        	    	mActivity.startActivityForResult(i,ACTIVITY_PICK_GALLERY) ;
 	            	}else if(Audio.class.isInstance(resource)){
 	        			Intent i2;
-	        			if((Build.VERSION.SDK_INT < Build.VERSION_CODES.ECLAIR) || 
-	        					(Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1)){
+	        			if((Build.VERSION.SDK_INT < Constants.ANDROID_ECLAIR) || 
+	        					(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)){
 	        				i2 = new Intent(Intent.ACTION_PICK) ;
 	        				i2.setDataAndType(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, 
 	        									MediaStore.Audio.Media.CONTENT_TYPE) ;
 	        			}else{
 	        				i2 = new Intent(mActivity, ContentPick.class) ;
-	        				i2.putExtra("MAIN_PATH", "/sdcard/audio_lgs/");
+	        				i2.putExtra("MAIN_PATH", "/sdcard/arviewer/audio/");
 	        				i2.putExtra("MIME_TYPE", "audio/3gpp");
 	        			}
 	        	    	
@@ -335,8 +339,8 @@ public class ContentAttacher{
 		switch(requestCode){
 		
 		case ACTIVITY_PICK_GALLERY:
-			if((Build.VERSION.SDK_INT < Build.VERSION_CODES.ECLAIR) || 
-					(Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1)|| 
+			if((Build.VERSION.SDK_INT < Constants.ANDROID_ECLAIR) || 
+					(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)|| 
 					(!Audio.class.isInstance(resource))){
 				Cursor c = mActivity.managedQuery(data.getData(),null,null,null,null);
 				if( c.moveToFirst() )
@@ -350,7 +354,7 @@ public class ContentAttacher{
 			
 		case ACTIVITY_PHOTO:
     		String path = PHOTO_TMP;
-    		if(Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1)
+    		if(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)
     			path = "/mnt" + path;
     		this.path = path;
 			mActivity.showDialog(DIALOG_UPLOAD);
