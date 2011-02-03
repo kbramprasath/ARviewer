@@ -376,6 +376,7 @@ public class ARBase extends ARActivity{
     protected void onDestroy(){
     	ARGeoNode.clearBox();
     	ARLocationManager.getInstance(this).stopUpdates();
+    	ARLocationManager.getInstance(this).resetLocation();
     	this.mWakeLock.release();
     	super.onDestroy();
     }

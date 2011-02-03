@@ -90,6 +90,10 @@ public class ARLocationManager{
 		mLocation.setAltitude(altitude);
 	}
 	
+	public void resetLocation(){
+		arLocationManager = null;
+	}
+	
 	public void setLocationServiceAltitude(boolean ls_altitude){
 		this.ls_altitude = ls_altitude;
 	}
