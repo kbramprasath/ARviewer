@@ -76,6 +76,15 @@ public class ARLocationManager{
 		return arLocationManager;
 	}
 	
+	public Location getLastKnownLocation(Context mContext){
+		loadConfig(mContext);
+		if(mLocationManager != null){
+			mLocation = mLocationManager.getLastKnownLocation(loc_provider);
+			return mLocation;
+		}
+		return mLocation;
+	}
+	
 	public Location getLocation(){
 		return mLocation;
 	}

@@ -229,22 +229,19 @@ public class ARBase extends ARActivity{
     }
 	
 	protected boolean loadParameters(){
-		
+		float[] location = new float[3];
 		if(getIntent().hasExtra("LATITUDE") && getIntent().hasExtra("LONGITUDE")){
-			float[] location = new float[3];
 			location[0] =  (float) getIntent().getDoubleExtra("LATITUDE", 0);
 			location[1] = (float) getIntent().getDoubleExtra("LONGITUDE", 0);
-			setLocation(location);
 			ARLocationManager.getInstance(this).setLocation(location[0], location[1], (float)AltitudeManager.NO_ALTITUDE_VALUE);
-			requestAltitudeInfo();
 		}else{
 			// TODO
-			float[] location = new float[3];
-			location[0] =  (float) ARLocationManager.getInstance(this).getLocation().getLatitude();
-			location[1] = (float) ARLocationManager.getInstance(this).getLocation().getLongitude();
-			cam_altitude = (float) ARLocationManager.getInstance(this).getLocation().getAltitude();
-			setLocation(location);
+			Location loc = ARLocationManager.getInstance(this).getLastKnownLocation(this);
+			location[0] =  (float) loc.getLatitude();
+			location[1] = (float) loc.getLongitude();
 		}
+		setLocation(location);
+		requestAltitudeInfo();
 		
 //		if(strCategories == null)
 //		{
