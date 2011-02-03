@@ -59,7 +59,7 @@ public class ARUtils {
     				if(mLocation.distanceTo(resLocation) > distanceFilter)
     					continue;
     			}
-    			ARGeoNode node = new ARGeoNode(activity, resource, layers.getInfoLayer());
+    			ARGeoNode node = new ARGeoNode((ARBase) activity, resource, layers.getInfoLayer());
     			cleaned_list.add(node);
     		}
     	}
