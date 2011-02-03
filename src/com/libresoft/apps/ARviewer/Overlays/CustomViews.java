@@ -76,7 +76,7 @@ public class CustomViews{
 		double box_x = ARUtils.transformPixInDip(mActivity, 10) + 
 			ARUtils.transformPixInDip(mActivity, 8) + 
 			(((progress * divider) - offset)/((max * divider) - offset)) * (sb_w - ARUtils.transformPixInDip(mActivity, 10) - ARUtils.transformPixInDip(mActivity, 16));
-		final DrawTextBox tb = new DrawTextBox(mActivity, box_x, ARUtils.transformPixInDip(mActivity, 10));
+		final DrawTextBox tb = new DrawTextBox(mActivity, box_x, 0);
 		
 		if (divider > 1)
 			tb.setText(Double.toString(progress) + units);
@@ -109,7 +109,7 @@ public class CustomViews{
 				double box_x = seekBar.getPaddingLeft() + 
 					ARUtils.transformPixInDip(mActivity, 8) + 
 					(((double)progress)/seekBar.getMax()) * ((double)seekBar.getWidth() - seekBar.getPaddingLeft() - ARUtils.transformPixInDip(mActivity, 16));
-				tb.setCenter(box_x, ARUtils.transformPixInDip(mActivity, 10));
+				tb.setCenter(box_x, 0);
 				tb.invalidate();
 //				if(progress > 70)
 //				tv.setAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.push_left_in));

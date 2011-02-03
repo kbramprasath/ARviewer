@@ -22,6 +22,7 @@
 package com.libresoft.apps.ARviewer.Overlays;
 
 import com.libresoft.apps.ARviewer.ARCompassManager;
+import com.libresoft.apps.ARviewer.ARUtils;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -32,9 +33,10 @@ import android.view.View;
 public class DrawParameters extends View{
 
 	private static final int COLUMN = 10;
-	private static final int LINE_AZIMUTH = 50;
-	private static final int LINE_ELEVATION = LINE_AZIMUTH + 10;
-	private static final int LINE_POSITION = LINE_ELEVATION + 10;
+	private static float TEXT_SIZE;
+	private static float LINE_AZIMUTH;
+	private static float LINE_ELEVATION;
+	private static float LINE_POSITION;
 	
 	private float mValues[] = new float[3];
 	private float coords[] = null;
@@ -42,7 +44,10 @@ public class DrawParameters extends View{
 	
 	public DrawParameters(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
+		TEXT_SIZE = ARUtils.transformPixInDip(context, 10);
+		LINE_AZIMUTH = TEXT_SIZE + ARUtils.transformPixInDip(context, 2.5f);
+		LINE_ELEVATION = LINE_AZIMUTH * 2;
+		LINE_POSITION = LINE_AZIMUTH * 3;
 	}
 	
 	public void setValues (float[] values, float[] location, float altitude){
@@ -59,6 +64,7 @@ public class DrawParameters extends View{
 		
 		Paint paint = new Paint();
 		paint.setStyle(Paint.Style.FILL);
+		paint.setTextSize(TEXT_SIZE);
 		paint.setColor(Color.RED);
 		
 		azimuth = ARCompassManager.getAzimuth(mValues);

@@ -21,6 +21,8 @@
 
 package com.libresoft.apps.ARviewer.Overlays;
 
+import com.libresoft.apps.ARviewer.ARUtils;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,15 +31,12 @@ import android.view.View;
 
 
 public class DrawFocus extends View{
-
-	public static final int CENTER = 0;
-	public static final int SIDE = 1;
 	
-	private static final float fRADIUS = 5;
-	private int position = CENTER;
+	private static float fRADIUS;
 	
 	public DrawFocus(Context context) {
 		super(context);
+		fRADIUS = ARUtils.transformPixInDip(context, 5);
 	}
 	
 	@Override
@@ -50,25 +49,8 @@ public class DrawFocus extends View{
 		
 		int w = canvas.getWidth();
         int h = canvas.getHeight();
-        float cx;
-        float cy;
-        
-        switch (position){
-        
-        case CENTER:
-            cx = ((float)w) / 2 ;
-            cy = ((float)h) / 2 ;
-            break;
-            
-        case SIDE:
-        	cx = ((float)w) / 4;
-            cy = ((float)h) / 2 ;
-        	break;
-        	
-        default:
-        	cx = 0;
-        	cy = 0;
-        }
+        float cx = ((float)w) / 2 ;
+        float cy = ((float)h) / 2 ;
 
 		paint.setStyle(Paint.Style.STROKE);
 		canvas.drawCircle(cx, cy, fRADIUS, paint);

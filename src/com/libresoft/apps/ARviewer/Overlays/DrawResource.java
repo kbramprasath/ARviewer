@@ -44,17 +44,17 @@ public class DrawResource extends View {
 	
 	public static final float MAX_AZIMUTH_VISIBLE = 30; 
 	public static final float MAX_ELEVATION_VISIBLE = 20;
-	private static final int MAX_ICON_SIZE = 56;
-	private static final int MED_ICON_SIZE = 36;
-	private static final int MIN_ICON_SIZE = 24;
-	private static final int MAX_TEXT_SIZE = 14;
-	private static final int MED_TEXT_SIZE = 11;
-	private static final int MIN_TEXT_SIZE = 10;
 	private static final int BORDER = 5;
+	private float MAX_ICON_SIZE;
+	private float MED_ICON_SIZE;
+	private float MIN_ICON_SIZE;
+	private float MAX_TEXT_SIZE;
+	private float MED_TEXT_SIZE;
+	private float MIN_TEXT_SIZE;
 	
-	private static final float CLICK_RANGE = 25;
-	private static final float BIG_CENTER_RANGE = 150;
-	private static final float CENTER_RANGE = 20;
+	private float CLICK_RANGE;
+	private float BIG_CENTER_RANGE;
+	private float CENTER_RANGE;
 
 	public static final String ALL_NAMES = "All_names";
 	public static final String CENTRAL_NAMES = "Central_names";
@@ -68,7 +68,7 @@ public class DrawResource extends View {
 	private Bitmap bitmap_normal;
 	private Bitmap bitmap_clicked;
 	private Bitmap bitmap;
-	private int icon_size;
+	private float icon_size;
 	private float text_size;
 	private boolean is_clicked;
 	private float cx, cy;
@@ -90,6 +90,17 @@ public class DrawResource extends View {
 		this.name = name;
 		this.is_clicked = false;
 		this.onGetIconListener = onGetIconListener;
+		
+		MAX_ICON_SIZE = ARUtils.transformPixInDip(context, 56);
+		MED_ICON_SIZE = ARUtils.transformPixInDip(context, 36);
+		MIN_ICON_SIZE = ARUtils.transformPixInDip(context, 24);
+		MAX_TEXT_SIZE = ARUtils.transformPixInDip(context, 14);
+		MED_TEXT_SIZE = ARUtils.transformPixInDip(context, 11);
+		MIN_TEXT_SIZE = ARUtils.transformPixInDip(context, 10);
+		
+		CLICK_RANGE = ARUtils.transformPixInDip(context, 25);
+		BIG_CENTER_RANGE = ARUtils.transformPixInDip(context, 150);
+		CENTER_RANGE = ARUtils.transformPixInDip(context, 20);
 	}
 	
 	public static void setNamesStatus(String name_status){
@@ -103,13 +114,13 @@ public class DrawResource extends View {
 		}
 		
 		if(icon != null){
-			this.bitmap_clicked = Bitmap.createScaledBitmap(icon, MAX_ICON_SIZE, MAX_ICON_SIZE, true);
+			this.bitmap_clicked = Bitmap.createScaledBitmap(icon, (int)MAX_ICON_SIZE, (int)MAX_ICON_SIZE, true);
 		}else{
 			this.bitmap_clicked = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), 
-					R.drawable.icon_70), MAX_ICON_SIZE, MAX_ICON_SIZE, true);
+					R.drawable.icon_70), (int)MAX_ICON_SIZE, (int)MAX_ICON_SIZE, true);
 		}
-		this.bitmap_normal = Bitmap.createScaledBitmap(bitmap_clicked, MED_ICON_SIZE, MED_ICON_SIZE, true);
-		this.bitmap_small = Bitmap.createScaledBitmap(bitmap_clicked, MIN_ICON_SIZE, MIN_ICON_SIZE, true);
+		this.bitmap_normal = Bitmap.createScaledBitmap(bitmap_clicked, (int)MED_ICON_SIZE, (int)MED_ICON_SIZE, true);
+		this.bitmap_small = Bitmap.createScaledBitmap(bitmap_clicked, (int)MIN_ICON_SIZE, (int)MIN_ICON_SIZE, true);
 	}
 	
 	public void setValues (float azimuth, float elevation){
@@ -225,18 +236,18 @@ public class DrawResource extends View {
 			}
 
 			paint_bg.setShader(new LinearGradient(posx, posy + (icon_size/2) + 2*BORDER, 
-					posx, posy + (icon_size/2) + 4*BORDER + icon_size/8, Color.WHITE, Color.BLACK, TileMode.MIRROR));
+					posx, posy + (icon_size/2) + 3*BORDER + text_size, Color.WHITE, Color.BLACK, TileMode.MIRROR));
 			paint_bg.setAntiAlias(true);
 
 			backRect = new RectF (posx - tlongitude/2 - 2*BORDER, posy + (icon_size/2) + 2*BORDER,
-					posx + tlongitude/2 + 2*BORDER, posy + (icon_size/2) + 4*BORDER + icon_size/8);
+					posx + tlongitude/2 + 2*BORDER, posy + (icon_size/2) + 3*BORDER + text_size);
 
 			canvas.drawRoundRect(backRect, BORDER/2, BORDER/2, paint_bg);
 
 			/* Painting the name */
 			path = new Path();
-			path.moveTo(posx - tlongitude/2, posy + (icon_size/2) + 2*BORDER + (2*BORDER + icon_size/8)*3/4);
-			path.lineTo(posx + tlongitude/2, posy + (icon_size/2) + 2*BORDER + (2*BORDER + icon_size/8)*3/4);
+			path.moveTo(posx - tlongitude/2, posy + (icon_size/2) + 2*BORDER + (BORDER + text_size)*3/4);
+			path.lineTo(posx + tlongitude/2, posy + (icon_size/2) + 2*BORDER + (BORDER + text_size)*3/4);
 
 			canvas.drawTextOnPath(text, path, 0, 0, paint);
 		}
@@ -244,7 +255,7 @@ public class DrawResource extends View {
 		// calculating box padding
 		if(is_clicked && (onBoxChangeListener != null)){
 			int left = (int)Math.max(0, (posx - ARUtils.transformPixInDip(mContext, 125)));
-			int top = (int)(posy + (icon_size/2) + 4*BORDER + icon_size/8);
+			int top = (int)(posy + (icon_size/2) + 3*BORDER + text_size);
 			int right = (int)Math.max(0, (w - (left + ARUtils.transformPixInDip(mContext, 250))));
 			int bottom = (int)Math.max(0, (h - (top + ARUtils.transformPixInDip(mContext, 200))));
 
