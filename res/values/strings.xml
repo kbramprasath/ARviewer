@@ -70,9 +70,13 @@
 	<string name="lw_empty_address">Empty address</string>
 	<string name="lw_insert_address">Where are you?</string>
 	
+	<!-- Labeling -->
+	<string name="label_attach_content">Attach content</string>
+	<string name="label_create">Create</string>
 	
 	<!-- GUI messages -->
 	<string name="ok">Ok</string>
+	<string name="done">Done</string>
 	<string name="cancel">Cancel</string>
 	<string name="search">Search</string>
 	<string name="no_layer">No layer introduced</string>
