@@ -30,48 +30,13 @@ package com.libresoft.apps.ARviewer;
  * 
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
-import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
-import com.libresoft.apps.ARviewer.Location.ARLocationManager;
-import com.libresoft.apps.ARviewer.Location.LocationWays;
-import com.libresoft.apps.ARviewer.Location.ARLocationManager.OnLocationUpdateListener;
-import com.libresoft.apps.ARviewer.Overlays.CamPreview;
 import com.libresoft.apps.ARviewer.Overlays.CustomViews;
-import com.libresoft.apps.ARviewer.Overlays.DrawFocus;
-import com.libresoft.apps.ARviewer.Overlays.DrawParameters;
-import com.libresoft.apps.ARviewer.Overlays.DrawRadar;
-import com.libresoft.apps.ARviewer.Overlays.DrawResource;
-import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
-import com.libresoft.apps.ARviewer.ScreenCapture.ScreenshotManager;
-import com.libresoft.apps.ARviewer.Utils.LocationUtils;
-import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
 import com.libresoft.sdk.ARviewer.Types.GenericLayer;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Toast;
@@ -123,7 +88,7 @@ public class ARviewer extends ARBase{
     		.setIcon(R.drawable.meter);
     	}
     	
-        super.onCreateOptionsMenu(menu);        
+        super.onPrepareOptionsMenu(menu);        
         return true;
     }
 
@@ -142,11 +107,4 @@ public class ARviewer extends ARBase{
 
     	return super.onOptionsItemSelected(item);
     }
-    
-	protected void onActivityResult (int requestCode, int resultCode, Intent data) { 
-		
-    	if (tagManager.onActivityResult(requestCode, resultCode, data))
-    		return;
-    	super.onActivityResult(requestCode, resultCode, data);
-	}
 }

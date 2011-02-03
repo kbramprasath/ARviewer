@@ -24,13 +24,10 @@ package com.libresoft.apps.ARviewer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
-import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager;
 import com.libresoft.apps.ARviewer.Location.LocationWays;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager.OnLocationUpdateListener;
 import com.libresoft.apps.ARviewer.Overlays.CamPreview;
-import com.libresoft.apps.ARviewer.Overlays.CustomViews;
 import com.libresoft.apps.ARviewer.Overlays.DrawFocus;
 import com.libresoft.apps.ARviewer.Overlays.DrawParameters;
 import com.libresoft.apps.ARviewer.Overlays.DrawRadar;
@@ -39,7 +36,6 @@ import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
 import com.libresoft.apps.ARviewer.ScreenCapture.ScreenshotManager;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
-import com.libresoft.sdk.ARviewer.Types.GenericLayer;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -60,14 +56,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Toast;
 
 public class ARBase extends ARActivity{ 
+	private static final int ACTIVITY_BIDI_LOC = 1;
+	private static final int ACTIVITY_LOC_WAYS = ACTIVITY_BIDI_LOC + 1;
+	private static final int ACTIVITY_PREFERENCES = ACTIVITY_LOC_WAYS + 1;
+	
 	
 	private static final int MENU_COMPASS_CORRECTION = Menu.FIRST + 1;
 	
@@ -79,9 +76,6 @@ public class ARBase extends ARActivity{
 	private static final int MENU_PREFERENCES = MENU_LOCATION_WAYS + 1;
 	
 	private static final int DIALOG_PBAR = 0;
-	
-	private static final int BIDI_LOC = 20;
-	private static final int LOC_WAYS = 21;
 	
 	private static ARBase pointerObject = null;
 	
@@ -101,7 +95,6 @@ public class ARBase extends ARActivity{
     protected static boolean showMenu = true;
     
     private boolean refreshed;
-    private boolean is_labeling = false;
     
     protected static ARTagManager tagManager; 
     private static ScreenshotManager screenshotManager;
@@ -384,19 +377,12 @@ public class ARBase extends ARActivity{
     	ARGeoNode.clearBox();
     	ARLocationManager.getInstance(this).stopUpdates();
     	this.mWakeLock.release();
-    	
-    	if(is_labeling){
-    		//TODO
-    	}
     	super.onDestroy();
     }
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-    	menu.clear();
-    	
     	if(showMenu){
-
     		SubMenu sub1 = menu.addSubMenu(0, MENU_LOCATION, 0, "Location")
     		.setIcon(R.drawable.mundo);
     		sub1.add(0,MENU_INDOOR_LOCATION, 0, "BIDI Location");
@@ -457,17 +443,17 @@ public class ARBase extends ARActivity{
 
     		Intent intent = new Intent("com.google.zxing.client.android.SCAN");
     		intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-    		startActivityForResult(intent, BIDI_LOC);
+    		startActivityForResult(intent, ACTIVITY_BIDI_LOC);
     		break;
 
     	case MENU_LOCATION_WAYS:
     		Intent intent1 = new Intent(this, LocationWays.class);
-    		startActivityForResult(intent1, LOC_WAYS);
+    		startActivityForResult(intent1, ACTIVITY_LOC_WAYS);
     		break;
 
     	case MENU_PREFERENCES:
     		Intent i = new Intent(this, ARPreferences.class);
-    		startActivityForResult(i, MENU_PREFERENCES);
+    		startActivityForResult(i, ACTIVITY_PREFERENCES);
     		break;
     	}
 
@@ -516,7 +502,7 @@ public class ARBase extends ARActivity{
 		
 		switch (requestCode) { 
 	    		
-	    	case BIDI_LOC:
+	    	case ACTIVITY_BIDI_LOC:
 	    		
 	    		if( resultCode != Activity.RESULT_CANCELED ){
 		    		String contents = data.getStringExtra("SCAN_RESULT");
@@ -542,7 +528,7 @@ public class ARBase extends ARActivity{
 	    		
 	    		break;
 	    		
-	    	case LOC_WAYS:
+	    	case ACTIVITY_LOC_WAYS:
     			float[] location = {(float) ARLocationManager.getInstance(this).getLocation().getLatitude(), 
     					(float)  ARLocationManager.getInstance(this).getLocation().getLongitude(), 
     					0};
@@ -553,7 +539,7 @@ public class ARBase extends ARActivity{
 //    			loadResources();
 	    		break;
 	    		
-	    	case MENU_PREFERENCES:
+	    	case ACTIVITY_PREFERENCES:
 	    		requestAltitudeInfo();
     			
 	    		loadConfig(true);
