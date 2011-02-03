@@ -22,6 +22,8 @@
 
 package com.libresoft.sdk.ARviewer.Types;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -107,14 +109,17 @@ public class Audio extends GeoNode implements Serializable {
 		{
 			DefaultHttpClient httpclient = new DefaultHttpClient();
 			
-			HttpPost httpost = new HttpPost(mUrl + url);
-						
-			/* Send and receive the petition */
-			HttpResponse response = httpclient.execute(httpost);
-		    HttpEntity entity = response.getEntity(); 
-		    
-		    return entity.getContent();
-		   	
+			if (mUrl != null){
+				HttpPost httpost = new HttpPost(mUrl + url);
+
+				/* Send and receive the petition */
+				HttpResponse response = httpclient.execute(httpost);
+				HttpEntity entity = response.getEntity(); 
+
+				return entity.getContent();
+			}else if(mPath != null){
+			}
+			return null;
 		}
 		
 		catch (IOException e) {
