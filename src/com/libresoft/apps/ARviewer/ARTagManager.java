@@ -28,7 +28,7 @@ import com.libresoft.apps.ARviewer.Tagging.AccurateTag;
 import com.libresoft.apps.ARviewer.Tagging.MapTagging;
 import com.libresoft.apps.ARviewer.Tagging.TagResult;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
-import com.libresoft.sdk.ARviewer.Types.GenericLayer;
+import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -205,7 +205,6 @@ public class ARTagManager{
 			myLoc.setLongitude(user_location_fixed[1]);
 
 			Intent i = new Intent(mActivity, TagResult.class);
-			i.putExtra("RESOURCES_LIST", res_list);
 			i.putExtra("LATITUDE", loc.getLatitude());
 			i.putExtra("LONGITUDE", loc.getLongitude());
 			i.putExtra("ALTITUDE", loc.getAltitude());
@@ -532,7 +531,9 @@ public class ARTagManager{
 		case ACTIVITY_RESULT:
 
 			if( resultCode != Activity.RESULT_CANCELED ) {
-
+				GeoNode node = (GeoNode) data.getSerializableExtra("RES_NODE");
+				if((node != null) && (res_list != null))
+						res_list.add(new ARGeoNode(mActivity, node, layers.getInfoLayer()));
 				onTaggingFinishedListener.onFinish(true);	    		
 			} else{
 				onTaggingFinishedListener.onFinish(false);

@@ -27,7 +27,7 @@ package com.libresoft.apps.ARviewer;
  * LONGITUDE: User's longitude coordinate (double). Optional.
  * 
  * Return extra:
- * LABELED_NODES: ArrayList containing the GeoNode objects labeled.
+ * LABELED_NODES_LIST: ArrayList containing the GeoNode objects labeled.
  */
 
 
@@ -35,8 +35,9 @@ import java.util.ArrayList;
 
 import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
 import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
-import com.libresoft.sdk.ARviewer.Types.GenericLayer;
+import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,6 +46,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class ARlabeling extends ARBase{ 
+
+	private static final int MENU_DONE = 101;
 	
     private OnLocationChangeListener onTaggingLocationListener = new OnLocationChangeListener() {
 		
@@ -90,15 +93,32 @@ public class ARlabeling extends ARBase{
     	
     	if(showMenu){
     		tagManager.onCreateOptionsMenu(menu);
+    		menu.add(0, MENU_DONE, 0, R.string.done)
+    			.setIcon(R.drawable.done);
     	}
     	
-        super.onCreateOptionsMenu(menu);        
+        super.onPrepareOptionsMenu(menu);        
         return true;
     }
 
     public boolean onOptionsItemSelected (MenuItem item) {
-
+    	if(tagManager.onOptionsItemSelected(item))
+    		return true;
+    	
     	switch (item.getItemId()) {
+    	case MENU_DONE:
+    		ArrayList<GeoNode> nodes_list = new ArrayList<GeoNode>();
+    		ArrayList<ARGeoNode> source_nodes_list = getResourcesList();
+    		
+    		for(ARGeoNode node: source_nodes_list){
+    			nodes_list.add(node.getGeoNode());
+    		}
+    		
+    		Intent resultIntent = new Intent();
+    		resultIntent.putExtra("LABELED_NODES_LIST", nodes_list);
+    		setResult(Activity.RESULT_OK, resultIntent);
+    		finish();
+    		break;
     	}
 
     	return super.onOptionsItemSelected(item);
