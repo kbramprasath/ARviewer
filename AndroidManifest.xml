@@ -14,7 +14,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-        		<action android:name="com.libresoft.apps.ARviewer.VIEW"/>
+        		<action android:name="com.libresoft.apps.ARviewer.VIEWER"/>
         		<category android:name="android.intent.category.DEFAULT"/>
       		</intent-filter>
         </activity>
@@ -23,7 +23,7 @@
                   android:screenOrientation="landscape" 
                   android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
-        		<action android:name="com.libresoft.apps.ARviewer.LABELING"/>
+        		<action android:name="com.libresoft.apps.ARviewer.LABELER"/>
         		<category android:name="android.intent.category.DEFAULT"/>
       		</intent-filter>
         </activity>
