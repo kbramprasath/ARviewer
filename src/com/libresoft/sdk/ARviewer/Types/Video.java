@@ -42,7 +42,7 @@ public class Video extends GeoNode implements Serializable {
 	private String mPath;
 	private String mInfo_url, mVideo_url, mVideo_thumb_url;
 	
-	byte[]  mByteBitMapImageThumb;
+	byte[]  mByteBitMapImageThumb, mByteBitMapImage;
 	
 	
 	public Video(Integer id, String Name, String Description,
@@ -110,13 +110,16 @@ public class Video extends GeoNode implements Serializable {
 			try{
 				Bitmap bitmapImage = null;
 
-				bitmapImage = BitmapUtils.loadBitmap(mVideo_thumb_url);
+				if(mByteBitMapImage != null)
+					bitmapImage = BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapImage) );
+				else if(mVideo_thumb_url != null)
+					bitmapImage = BitmapUtils.loadBitmap(mVideo_thumb_url);
 
-				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 153600){ // 480x320
+				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 57600){ // 240x240
 					if(bitmapImage.getWidth() > bitmapImage.getHeight())
-						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 480, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*480), true);
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 240, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*240), true);
 					else
-						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*480), 480, true);
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*240), 240, true);
 				}
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -141,6 +144,47 @@ public class Video extends GeoNode implements Serializable {
 	
 	public boolean isBitmapImageThumbLoaded(){
 		return (mByteBitMapImageThumb != null);
+	}
+	
+	public Bitmap getBitmapImage() {
+		
+		if (mByteBitMapImage == null)
+		{		
+			try{
+				Bitmap bitmapImage = null;
+
+				bitmapImage = BitmapUtils.loadBitmap(mVideo_thumb_url);
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+				if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+				{
+					Log.e("getBitmapImage","Error: Don't compress de image");
+					return null;
+				}
+				mByteBitMapImage = baos.toByteArray();
+			}catch(Exception e){
+				Log.e("Video", "", e);
+				mByteBitMapImage = null;
+				return null;
+			}
+			
+		}
+		
+		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapImage) );
+		
+	}
+	
+	public boolean isBitmapImageLoaded(){
+		return (mByteBitMapImage != null);
+	}
+	
+	public void clearBitmapPhotoThumb(){
+		mByteBitMapImageThumb = null;
+	}
+	
+	public void clearBitmapPhoto(){
+		mByteBitMapImage = null;
 	}
 }
 

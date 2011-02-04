@@ -42,7 +42,7 @@ public class Photo extends GeoNode implements Serializable {
 	private String mPhotoUrl = null;
 	private String mPhotoPath = null;
 	
-	byte[]  mByteBitMapImageThumb, mByteBitMapImageMedium, mByteBitMapImageLarge, mByteBitMapImage;
+	byte[]  mByteBitMapImageThumb, mByteBitMapImage;
 	
 	private User mUploader;
 	
@@ -59,11 +59,7 @@ public class Photo extends GeoNode implements Serializable {
 		mUploader = uploader;
 		
 		mByteBitMapImageThumb = null;
-		mByteBitMapImageMedium = null;
-		mByteBitMapImageLarge = null;
 		mByteBitMapImage = null;
-
-
 	}
 
 	public String getName() {
@@ -100,29 +96,30 @@ public class Photo extends GeoNode implements Serializable {
 		mPhotoPath = path;
 	}
 	
-	public boolean isBitmapPhoto()
+	public boolean isBitmapPhotoThumb()
 	{
 		return mByteBitMapImageThumb != null;
 	}
 
-	public Bitmap getBitmapPhoto ()
+	public Bitmap getBitmapPhotoThumb()
 	{
 		if (mByteBitMapImageThumb == null)
 		{
 			try{
 				Bitmap bitmapImage = null;
-
-				if (mPhotoUrl != null)
+				
+				if(mByteBitMapImage != null)
+					bitmapImage = BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapImage) );
+				else if (mPhotoUrl != null)
 					bitmapImage = BitmapUtils.loadBitmap(mPhotoUrl);
-
 				else if (mPhotoPath != null)
 					bitmapImage = BitmapUtils.loadBitMapFromFile(mPhotoPath);
 				
-				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 153600){ // 480x320
+				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 57600){ // 240x240
 					if(bitmapImage.getWidth() > bitmapImage.getHeight())
-						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 480, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*480), true);
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 240, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*240), true);
 					else
-						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*480), 480, true);
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*240), 240, true);
 				}
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -146,6 +143,55 @@ public class Photo extends GeoNode implements Serializable {
 			return null;
 		
 		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapImageThumb) );
+	}
+	
+	public void clearBitmapPhotoThumb(){
+		mByteBitMapImageThumb = null;
+	}
+	
+	public void clearBitmapPhoto(){
+		mByteBitMapImage = null;
+	}
+	
+	public boolean isBitmapPhoto()
+	{
+		return mByteBitMapImage != null;
+	}
+
+	public Bitmap getBitmapPhoto ()
+	{
+		if (mByteBitMapImage == null)
+		{
+			try{
+				Bitmap bitmapImage = null;
+
+				if (mPhotoUrl != null)
+					bitmapImage = BitmapUtils.loadBitmap(mPhotoUrl);
+
+				else if (mPhotoPath != null)
+					bitmapImage = BitmapUtils.loadBitMapFromFile(mPhotoPath);
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+				{
+					Log.e("getBitmapImage","Error: Don't compress de image");
+					return null;
+				}
+
+				mByteBitMapImage = baos.toByteArray();
+
+			}catch(Exception e){
+				Log.e("Photo", "", e);
+				mByteBitMapImage = null;
+				return null;
+			}
+
+		}
+		
+		if (mByteBitMapImage == null)
+			return null;
+		
+		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapImage) );
 	}
 	
 

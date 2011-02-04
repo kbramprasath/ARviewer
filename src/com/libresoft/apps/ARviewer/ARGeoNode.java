@@ -444,14 +444,14 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		Bitmap image = null;
 		if(Photo.class.isInstance(geoNode)){
 			final Photo node = (Photo) geoNode;
-			if(requestImage && (node.isBitmapPhoto()))
-				image = node.getBitmapPhoto();
+			if(requestImage && (node.isBitmapPhotoThumb()))
+				image = node.getBitmapPhotoThumb();
 			else{
 				image = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.camera);
 				if(requestImage && (th == null)){
 					th = new Thread(){
 						public void run(){
-							if(node.getBitmapPhoto() != null)
+							if(node.getBitmapPhotoThumb() != null)
 								mHandler.sendEmptyMessage(0);
 						}
 					};
@@ -483,14 +483,14 @@ public class ARGeoNode implements ARNodeDrawingIF{
 			if(node.getAvatarId() == 0)
 				image = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.user_70);
 			else{
-				if(node.isBitmapAvatar())
-					image = node.getAvatarBitmap();
+				if(node.isBitmapAvatarThumb())
+					image = node.getAvatarBitmapThumb();
 				else{
 					image = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.user_70);
 					if((th == null)){
 						th = new Thread(){
 							public void run(){
-								if(node.getAvatarBitmap() != null)
+								if(node.getAvatarBitmapThumb() != null)
 									mHandler.sendEmptyMessage(0);
 							}
 						};
@@ -512,11 +512,11 @@ public class ARGeoNode implements ARNodeDrawingIF{
 	private void refreshIcon(){
 		Bitmap icon = null;
 		if(Photo.class.isInstance(geoNode))
-			icon = ((Photo)geoNode).getBitmapPhoto();
+			icon = ((Photo)geoNode).getBitmapPhotoThumb();
 		if(Video.class.isInstance(geoNode))
 			icon = ((Video)geoNode).getBitmapImageThumb();
 		if(User.class.isInstance(geoNode))
-			icon = ((User)geoNode).getAvatarBitmap();
+			icon = ((User)geoNode).getAvatarBitmapThumb();
 		
 		if((refreshIcon) && (drawn != null))
 			drawn.setIcon(icon);

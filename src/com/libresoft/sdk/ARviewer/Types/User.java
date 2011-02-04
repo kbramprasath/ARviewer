@@ -56,7 +56,7 @@ public class User extends GeoNode implements Serializable {
 	private Integer mAvatarId;
 	private String mAvatarUrl;
 	
-	byte[]  mByteBitMapAvatar;
+	byte[]  mByteBitmapAvatar, mByteBitmapAvatarThumb;
 	
 	
 	public User (Integer id, String name, String lastName, String username, String email, String state,
@@ -87,7 +87,8 @@ public class User extends GeoNode implements Serializable {
 			mAvatarId = avatarId;
 		mAvatarUrl = avatarUrl;
 		
-		mByteBitMapAvatar=null;
+		mByteBitmapAvatar = null;
+		mByteBitmapAvatarThumb = null;
 		
 	}
 	
@@ -173,7 +174,7 @@ public class User extends GeoNode implements Serializable {
 			return;
 		}
 		Log.e("setAvatarBitmap", "Compress correctly");
-		mByteBitMapAvatar = baos.toByteArray();
+		mByteBitmapAvatar = baos.toByteArray();
 	}
 	
 	public Bitmap getAvatarBitmap ()
@@ -183,19 +184,12 @@ public class User extends GeoNode implements Serializable {
 		
 		Bitmap bitmapImage = null;
 		
-		if (mByteBitMapAvatar == null)
+		if (mByteBitmapAvatar == null)
 		{
 			try{
 				Log.d("AVATAR",getAvatarUrl());
 
 				bitmapImage = BitmapUtils.loadBitmap(mAvatarUrl);
-
-				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 153600){ // 480x320
-					if(bitmapImage.getWidth() > bitmapImage.getHeight())
-						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 480, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*480), true);
-					else
-						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*480), 480, true);
-				}
 				
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -204,21 +198,69 @@ public class User extends GeoNode implements Serializable {
 					Log.e("getAvatarBitmap","Error: Don't compress de image");
 					return null;
 				}
-				mByteBitMapAvatar = baos.toByteArray();
+				mByteBitmapAvatar = baos.toByteArray();
 
 			}catch(Exception e){
 				Log.e("User", "", e);
-				mByteBitMapAvatar = null;
+				mByteBitmapAvatar = null;
 				return null;
 			}
 		}
 		
-		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitMapAvatar) );
+		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitmapAvatar) );
 		
 	}
 	
 	public boolean isBitmapAvatar(){
-		return (mByteBitMapAvatar!=null);
+		return (mByteBitmapAvatar!=null);
+	}
+	
+	public Bitmap getAvatarBitmapThumb ()
+	{
+		if (getAvatarId()==0)
+			return null;
+		
+		Bitmap bitmapImage = null;
+		
+		if (mByteBitmapAvatarThumb == null)
+		{
+			try{
+				Log.d("AVATAR",getAvatarUrl());
+				
+				if(mByteBitmapAvatar != null)
+					bitmapImage = BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitmapAvatar ) );
+				else if(mAvatarUrl != null)
+					bitmapImage = BitmapUtils.loadBitmap(mAvatarUrl);
+
+				if((bitmapImage.getHeight()*bitmapImage.getWidth()) > 57600){ // 240x240
+					if(bitmapImage.getWidth() > bitmapImage.getHeight())
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, 240, (int)(((double)bitmapImage.getHeight()/(double)bitmapImage.getWidth())*240), true);
+					else
+						bitmapImage = Bitmap.createScaledBitmap(bitmapImage, (int)(((double)bitmapImage.getWidth()/(double)bitmapImage.getHeight())*240), 240, true);
+				}
+				
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+				if (!bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos))
+				{
+					Log.e("getAvatarBitmapThumb","Error: Don't compress de image");
+					return null;
+				}
+				mByteBitmapAvatarThumb = baos.toByteArray();
+
+			}catch(Exception e){
+				Log.e("User", "", e);
+				mByteBitmapAvatarThumb = null;
+				return null;
+			}
+		}
+		
+		return BitmapFactory.decodeStream( new ByteArrayInputStream( mByteBitmapAvatarThumb) );
+		
+	}
+	
+	public boolean isBitmapAvatarThumb(){
+		return (mByteBitmapAvatarThumb!=null);
 	}
 }
 
