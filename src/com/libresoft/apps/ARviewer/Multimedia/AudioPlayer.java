@@ -45,7 +45,9 @@ public class AudioPlayer{
 			return;
 		// Downloading
 		InputStream is = audio.getAudio();
-
+		
+		if(is == null)
+			return;
 		aManager.saveAudio (is,"tmpaudio");
 
 		// Playing audio    		
