@@ -79,8 +79,9 @@ public class ARLocationManager{
 	public Location getLastKnownLocation(Context mContext){
 		loadConfig(mContext);
 		if(mLocationManager != null){
-			mLocation = mLocationManager.getLastKnownLocation(loc_provider);
-			return mLocation;
+			Location loc = mLocationManager.getLastKnownLocation(loc_provider);
+			if(loc != null)
+				mLocation = loc;
 		}
 		return mLocation;
 	}
