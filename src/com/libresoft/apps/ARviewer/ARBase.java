@@ -158,7 +158,7 @@ public class ARBase extends ARActivity{
 				if(mUserStatus != null)
 					mUserStatus.setAltitudeLoaded(true);
 			}else
-				if(tagManager.getSavingType() == -1)
+				if((tagManager == null) || (tagManager.getSavingType() == -1))
 					requestAltitudeInfo();
 			if(tagManager != null){
 				tagManager.setUserLocation(location);
@@ -214,6 +214,7 @@ public class ARBase extends ARActivity{
 			ARGeoNode.setRadar(mRadar);			
 			
 			compassManager = new ARCompassManager(this);
+			compassManager.setDrawUserStatusElement(mUserStatus);
 			
 			screenshotManager = new ScreenshotManager(getBaseContext());
 			screenshotManager.setCam(mPreview, frameReadyListener);
@@ -235,7 +236,6 @@ public class ARBase extends ARActivity{
 			location[1] = (float) getIntent().getDoubleExtra("LONGITUDE", 0);
 			ARLocationManager.getInstance(this).setLocation(location[0], location[1], (float)AltitudeManager.NO_ALTITUDE_VALUE);
 		}else{
-			// TODO
 			Location loc = ARLocationManager.getInstance(this).getLastKnownLocation(this);
 			location[0] =  (float) loc.getLatitude();
 			location[1] = (float) loc.getLongitude();
@@ -459,12 +459,7 @@ public class ARBase extends ARActivity{
     }
     
     @Override
-    protected Dialog onCreateDialog(int id) {       
-    	
-    	Dialog diag = tagManager.onCreateDialog(id);
-    	if(diag != null)
-    		return diag;
-    	
+    protected Dialog onCreateDialog(int id) {   
     	switch (id) {
     	case DIALOG_PBAR:
     		ProgressDialog dialog = new ProgressDialog(this);
