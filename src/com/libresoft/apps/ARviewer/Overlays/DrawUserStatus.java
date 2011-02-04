@@ -27,6 +27,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.hardware.SensorManager;
 import android.view.View;
 
 public class DrawUserStatus extends View{
@@ -35,9 +36,11 @@ public class DrawUserStatus extends View{
 	private boolean isAltitudeLoaded = false;
 	private boolean isLocationServiceActive = false;
 	private boolean isLocationServiceOnProgress = false;
+	private int compassAccurate = SensorManager.SENSOR_STATUS_UNRELIABLE;
 	
 	private Bitmap altitude_status = null;
 	private Bitmap location_status = null;
+	private Bitmap compass_status = null;
 	
 	public DrawUserStatus(Context context){
 		super(context);
@@ -82,6 +85,30 @@ public class DrawUserStatus extends View{
 		}
 	}
 	
+	public void setCompassAccurate(int accuracy){
+		if(compassAccurate != accuracy){
+			switch(accuracy){
+			case SensorManager.SENSOR_STATUS_UNRELIABLE:
+				compass_status = BitmapFactory.decodeResource(
+						getContext().getResources(), 
+						R.drawable.compass_off);
+				break;
+			case SensorManager.SENSOR_STATUS_ACCURACY_HIGH:
+				compass_status = BitmapFactory.decodeResource(
+						getContext().getResources(), 
+						R.drawable.compass_high);
+				break;
+			default:
+				compass_status = BitmapFactory.decodeResource(
+						getContext().getResources(), 
+						R.drawable.compass_medium);
+				break;
+			}
+			this.compassAccurate = accuracy;
+			invalidate();
+		}
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas){
 		int w = canvas.getWidth();
@@ -96,12 +123,20 @@ public class DrawUserStatus extends View{
 			location_status = BitmapFactory.decodeResource(
 					getContext().getResources(), 
 					R.drawable.gps_off);
+		
+		if(compass_status == null)
+			compass_status = BitmapFactory.decodeResource(
+					getContext().getResources(), 
+					R.drawable.compass_off);
         
         float center_x = w - BORDER - location_status.getWidth();
         float center_y = h - BORDER - location_status.getHeight();
 
         /* Painting the location service status indicator */
-        canvas.drawBitmap(location_status, center_x, center_y - location_status.getHeight(), null);
+        canvas.drawBitmap(location_status, center_x, center_y - 2*location_status.getHeight(), null);
+
+        /* Painting the compass accuracy indicator */
+        canvas.drawBitmap(compass_status, center_x, center_y - compass_status.getHeight(), null);
         
         /* Painting the altitude status indicator */
         canvas.drawBitmap(altitude_status, center_x, center_y, null);

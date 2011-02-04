@@ -21,6 +21,7 @@ package com.libresoft.apps.ARviewer;
 
 import java.util.List;
 
+import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
 import com.libresoft.apps.ARviewer.Utils.CompassController;
 
 import android.content.Context;
@@ -43,6 +44,8 @@ public class ARCompassManager implements SensorEventListener{
 //    private float[] or_values = new float[3];
     private CompassController azimuthPID = new CompassController(0.8f, true);
     private CompassController elevationPID = new CompassController(0.5f, false);
+    
+    private DrawUserStatus drawUserStatus = null;
 	
 	public ARCompassManager(Context mContext){
 		
@@ -112,6 +115,10 @@ public class ARCompassManager implements SensorEventListener{
     	this.onCompassChangeListener = onCompassChangeListener;
     }
     
+    public void setDrawUserStatusElement(DrawUserStatus drawUserStatus){
+    	this.drawUserStatus = drawUserStatus;
+    }
+    
     public void unregisterListeners(){
     	sm.unregisterListener(this);
     	onCompassChangeListener = null;
@@ -168,6 +175,12 @@ public class ARCompassManager implements SensorEventListener{
     }
 	
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		switch(sensor.getType()){
+		case Sensor.TYPE_MAGNETIC_FIELD:
+			if(drawUserStatus != null)
+				drawUserStatus.setCompassAccurate(accuracy);
+			break;
+		}
 	}
 
 	public void onSensorChanged(SensorEvent event) {
