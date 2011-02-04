@@ -97,12 +97,8 @@ public class Audio extends GeoNode implements Serializable {
 	public void setUrl(String mUrl) {
 		this.mUrl = mUrl;
 	}
-	public InputStream getAudio() 
-	{		
-		return getStream(mUrl);
-	}
 	
-	private InputStream getStream (String url)
+	public InputStream getAudio()
 	{
 		
 		try
@@ -110,7 +106,7 @@ public class Audio extends GeoNode implements Serializable {
 			DefaultHttpClient httpclient = new DefaultHttpClient();
 			
 			if (mUrl != null){
-				HttpPost httpost = new HttpPost(mUrl + url);
+				HttpPost httpost = new HttpPost(mUrl);
 
 				/* Send and receive the petition */
 				HttpResponse response = httpclient.execute(httpost);
@@ -118,6 +114,8 @@ public class Audio extends GeoNode implements Serializable {
 
 				return entity.getContent();
 			}else if(mPath != null){
+				FileInputStream fin = new FileInputStream(new File(mPath));
+				return fin;
 			}
 			return null;
 		}
