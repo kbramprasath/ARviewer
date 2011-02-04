@@ -80,7 +80,7 @@ public class ContentAttacher{
 	public static final int DIALOG_PBAR = 10004;
 	
 	public static final String PHOTO_TMP = "/sdcard/arviewer/tmp/";
-	public static final String AUDIO_TMP = "audio_tmp";
+	public static final String AUDIO_TMP = "audio_tmp_";
 	
 	private Activity mActivity;
 	
@@ -236,7 +236,7 @@ public class ContentAttacher{
 	            	}else if(Audio.class.isInstance(resource)){
 	            		FileManager.getInstance();
 	            		audio_recorder = new AudioRecorder(mActivity);
-	            		audio_recorder.doRecording(AUDIO_TMP, DIALOG_RECORD_AUDIO);
+	            		audio_recorder.doRecording(AUDIO_TMP + Long.toString(System.currentTimeMillis()), DIALOG_RECORD_AUDIO);
 	            	}
 	            }
 	        })
