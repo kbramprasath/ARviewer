@@ -32,7 +32,7 @@
 		<activity android:name=".Location.LocationPreferences"></activity> 
 		<activity android:name=".Location.LocationWays"></activity> 
 		<activity android:name=".Tagging.MapTagging" android:screenOrientation="portrait"></activity> 
-		<activity android:name=".Tagging.TagResult"></activity> 
+		<activity android:name=".Tagging.TagResult" android:screenOrientation="portrait"></activity> 
 		<activity android:name=".Utils.GeoNames.AltitudePreferences"></activity>  
     </application>
     
