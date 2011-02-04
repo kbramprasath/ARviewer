@@ -79,7 +79,7 @@ public class ContentAttacher{
 	public static final int DIALOG_RECORD_AUDIO = 10003;
 	public static final int DIALOG_PBAR = 10004;
 	
-	public static final String PHOTO_TMP = "arviewer/tmp/";
+	public static final String PHOTO_TMP = "/sdcard/arviewer/tmp/";
 	public static final String AUDIO_TMP = "audio_tmp";
 	
 	private Activity mActivity;
@@ -227,10 +227,9 @@ public class ContentAttacher{
 	            	if(Photo.class.isInstance(resource)){
 	            		FileManager.getInstance();
 	            		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//	            		String path = PHOTO_TMP;
-//	            		if(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)
-//	            			path = "/mnt" + path;
-	            		String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + PHOTO_TMP + "node_" + Long.toString(System.currentTimeMillis()) + ".jpg";
+	            		path = PHOTO_TMP + "data_" + Long.toString(System.currentTimeMillis()) + ".jpg";
+	            		if(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)
+	            			path = "/mnt" + path;
 	            		Uri outputFile = Uri.fromFile(new File(path));
 	            		i.putExtra(MediaStore.EXTRA_OUTPUT, outputFile);
 	        			mActivity.startActivityForResult(i, ACTIVITY_PHOTO);
@@ -258,7 +257,7 @@ public class ContentAttacher{
 	        									MediaStore.Audio.Media.CONTENT_TYPE) ;
 	        			}else{
 	        				i2 = new Intent(mActivity, ContentPick.class) ;
-	        				i2.putExtra("MAIN_PATH", Environment.getExternalStorageDirectory().getAbsolutePath() + "arviewer/audio/");
+	        				i2.putExtra("MAIN_PATH", "/sdcard/arviewer/audio/");
 	        				i2.putExtra("MIME_TYPE", "audio/3gpp");
 	        			}
 	        	    	
@@ -292,9 +291,9 @@ public class ContentAttacher{
             }
             
 	        return new AlertDialog.Builder(mActivity)	        
-	        .setTitle("Upload resource")
+	        .setTitle(R.string.label_create_resource)
 	        .setView(textEntryView)
-	        .setPositiveButton("Upload", new DialogInterface.OnClickListener() {
+	        .setPositiveButton(R.string.label_create, new DialogInterface.OnClickListener() {
 	            public void onClick(DialogInterface dialog, int whichButton) {
 
 	            	GeoNode result = null;
@@ -321,7 +320,7 @@ public class ContentAttacher{
 	            		onAttachListener.onReady(result);
 	            }
 	        })
-	        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 	            public void onClick(DialogInterface dialog, int whichButton) {
 	
 	                /* User clicked cancel so do some stuff */
@@ -355,11 +354,7 @@ public class ContentAttacher{
 			break;
 			
 		case ACTIVITY_PHOTO:
-//    		String path = PHOTO_TMP;
-//    		if(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)
-//    			path = "/mnt" + path;
-    		this.path = Environment.getExternalStorageDirectory().getAbsolutePath() + PHOTO_TMP + "node_" + Long.toString(System.currentTimeMillis()) + ".jpg";
-			mActivity.showDialog(DIALOG_UPLOAD);
+    		mActivity.showDialog(DIALOG_UPLOAD);
 			break;
 			
 		case ACTIVITY_PICK_QRCODE:

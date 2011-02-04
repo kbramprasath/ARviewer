@@ -41,7 +41,7 @@ public class AudioManager extends ContextWrapper {
 	 
 	private String mFileName = "tmpaudio.3gpp";
 	
-	private static final String AUDIO_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + "arviewer/audio/";
+	private static final String AUDIO_DIR = "/sdcard/arviewer/audio/";
 	
 	private MediaRecorder mRecorder;
 	

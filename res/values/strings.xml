@@ -78,6 +78,7 @@
 	<!-- Labeling -->
 	<string name="label_attach_content">Attach content</string>
 	<string name="label_create">Create</string>
+	<string name="label_create_resource">Create resource</string>
 	
 	<!-- GUI messages -->
 	<string name="ok">Ok</string>
