@@ -35,9 +35,35 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.libresoft.sdk.ARviewer.Types.GeoNode;
 import com.libresoft.sdk.ARviewer.Types.Note;
 
+/**
+ * The Parser class provides a set of parsers from standard formats
+ * KML and GPX to the data model (GeoNode) that the ARViewer
+ * manages.
+ * 
+ * @author Jorge Fernández González <jfernandez@libresoft.es>
+ * @version 1.0
+ * @see com.libresoft.apps.ARviewer.ARviewer
+ * @see com.libresoft.sdk.ARviewer.Types.GeoNode
+ * @see com.libresoft.sdk.ARviewer.Types.Note
+ * @see com.libresoft.sdk.ARviewer.Types.Photo
+ * @see com.libresoft.sdk.ARviewer.Types.Audio
+ * @see com.libresoft.sdk.ARviewer.Types.Video
+ *
+ */
 public class Parsers{
     public static final String TAG = "Parser";
 
+    /**
+     * Getting a KML file from a given URL, it is parsed to an
+     * ArrayList of objects type GeoNode, using a SAX parser for it.
+     * 
+     * @param url The URL where you want request a KML file.
+     * @return An ArrayList containing the objects GeoNode that have been parsed.
+     * 
+     * @throws ParserConfigurationException If there are problem with the SAX parser.
+     * @throws SAXException If there are problems while parsing the KML file (document malformed).
+     * @throws IOException If there are connections problems.
+     */
     public ArrayList<GeoNode> parseKML2Note(String url) throws
     		ParserConfigurationException, SAXException, IOException{
     	
