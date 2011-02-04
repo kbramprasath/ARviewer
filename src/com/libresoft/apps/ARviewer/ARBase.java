@@ -410,7 +410,7 @@ public class ARBase extends ARActivity{
     			if(mUserStatus != null)
     				mUserStatus.setLocationServiceOnProgress();
     			idGPS = ARLocationManager.getInstance(this).addLocationListener(locationListener);
-    			ARLocationManager.getInstance(this).startUpdates(getBaseContext());
+    			ARLocationManager.getInstance(this).startUpdates(this);
     		}else{
     			ARLocationManager.getInstance(this).stopUpdates();
     			idGPS = -1;
@@ -459,7 +459,11 @@ public class ARBase extends ARActivity{
     }
     
     @Override
-    protected Dialog onCreateDialog(int id) {   
+    protected Dialog onCreateDialog(int id) {  
+    	Dialog diag = ARLocationManager.getInstance(this).onCreateDialog(this, id);
+    	if(diag != null)
+    		return diag;
+    	
     	switch (id) {
     	case DIALOG_PBAR:
     		ProgressDialog dialog = new ProgressDialog(this);

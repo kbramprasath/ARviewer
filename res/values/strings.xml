@@ -16,6 +16,11 @@
 	<string name="pref_location_distance_title">Minimum distance</string>
 	<string name="pref_location_distance_summary">Choose the minimum distance for location refreshing</string>
 	
+	<string name="location_provider_title">Provider problem</string>
+	<string name="location_provider_message">The location provider that you have selected is not enabled</string>
+	<string name="location_provider_enable">Enable</string>
+	<string name="location_provider_change">Change</string>
+	
 	<!-- AR preferences -->
 	<string name="pref_ar_altitude_title">Altitude properties</string>
 	<string name="pref_ar_altitude_status_title">Altitude mode</string>

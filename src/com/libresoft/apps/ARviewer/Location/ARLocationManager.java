@@ -22,17 +22,33 @@ package com.libresoft.apps.ARviewer.Location;
 
 import java.util.ArrayList;
 
+import com.libresoft.apps.ARviewer.ARCompassManager;
+import com.libresoft.apps.ARviewer.ARTagManager;
+import com.libresoft.apps.ARviewer.R;
+import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class ARLocationManager{
+	private static final int DIALOG_PROVIDER_PROBLEM = 300;
+	
 	public static final int NO_LATLONG = -360;
 	
 	public static final int MODE_MANUAL = 2;
@@ -76,12 +92,13 @@ public class ARLocationManager{
 		return arLocationManager;
 	}
 	
-	public Location getLastKnownLocation(Context mContext){
-		loadConfig(mContext);
-		if(mLocationManager != null){
-			Location loc = mLocationManager.getLastKnownLocation(loc_provider);
-			if(loc != null)
-				mLocation = loc;
+	public Location getLastKnownLocation(Activity mActivity){
+		if(loadConfig(mActivity)){
+			if(mLocationManager != null){
+				Location loc = mLocationManager.getLastKnownLocation(loc_provider);
+				if(loc != null)
+					mLocation = loc;
+			}
 		}
 		return mLocation;
 	}
@@ -112,8 +129,8 @@ public class ARLocationManager{
 		return ls_altitude;
 	}
 	
-	private void loadConfig (Context mContext){
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+	private boolean loadConfig (Activity mActivity){
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
 		
 		if (sharedPreferences.getString(LocationPreferences.KEY_LOCATION_PROVIDERS, "network").equals("gps"))
 			loc_provider = LocationManager.GPS_PROVIDER;
@@ -123,14 +140,27 @@ public class ARLocationManager{
 		location_unit = Integer.parseInt(sharedPreferences.getString(LocationPreferences.KEY_LOCATION_UNITS, "60"));
 		location_period = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_PERIOD, 2);
 		minimum_distance = sharedPreferences.getInt(LocationPreferences.KEY_LOCATION_DISTANCE, 10);
+		
+		// Checking availability
+		String allowedLocationProviders = Settings.System.getString(mActivity.getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
+	 
+	    if (allowedLocationProviders == null) {
+	        allowedLocationProviders = "";
+	    }
+	 
+	    if (!allowedLocationProviders.contains(loc_provider)){
+	    	mActivity.showDialog(DIALOG_PROVIDER_PROBLEM);
+	    	return false;
+	    }
+	    return true;
 	}
 	
-	public void startUpdates(Context mContext){
-		loadConfig(mContext);
-		mLocationManager.requestLocationUpdates( loc_provider, 
-				 ((location_period)* 1000) * location_unit, 
-				 minimum_distance, 
-				 mLocationListener);
+	public void startUpdates(Activity mActivity){
+		if(loadConfig(mActivity))
+			mLocationManager.requestLocationUpdates( loc_provider, 
+					((location_period)* 1000) * location_unit, 
+					minimum_distance, 
+					mLocationListener);
 	}
 	
 	public void pauseUpdates(){
@@ -147,6 +177,34 @@ public class ARLocationManager{
 	public boolean isUpdateOn(){
 		return isUpdateOn;
 	}
+	
+	public Dialog onCreateDialog(final Context mContext, int id) {    
+    	switch (id) {
+    	case DIALOG_PROVIDER_PROBLEM:
+
+    		return new AlertDialog.Builder(mContext)	      
+    		.setCancelable(true)
+    		.setTitle(R.string.location_provider_title)
+    		.setMessage(R.string.location_provider_message)
+    		.setPositiveButton(R.string.location_provider_enable, new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int whichButton) {
+    				Intent settingsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+    				settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+    				mContext.startActivity(settingsIntent);
+    			}
+    		})
+    		.setNeutralButton(R.string.location_provider_change, new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int whichButton) {
+
+    				Intent i = new Intent(mContext, LocationPreferences.class);
+    				mContext.startActivity(i);
+
+    			}
+    		})
+    		.create();
+    	}
+    	return null;
+    }
 	
 	private class MLocationListener implements LocationListener {
 
