@@ -23,14 +23,20 @@ package com.libresoft.apps.ARviewer.Overlays;
 
 import java.util.ArrayList;
 
+import com.libresoft.apps.ARviewer.ARBase;
 import com.libresoft.apps.ARviewer.ARGeoNode;
 import com.libresoft.apps.ARviewer.R;
+import com.libresoft.apps.ARviewer.Location.LocationPreferences;
 import com.libresoft.apps.ARviewer.Multimedia.AudioPlayer;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.sdk.ARviewer.Types.Audio;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
@@ -42,7 +48,8 @@ import android.widget.RelativeLayout;
 
 
 public class ARSummaryBox{
-	
+	public static final int DIALOG_SURE = 450;
+	private static boolean show_remove_button = false;
 
 	private RelativeLayout container;
 	private View summary_box;
@@ -59,6 +66,10 @@ public class ARSummaryBox{
 	
 	protected RelativeLayout getContainer(){
 		return container;
+	}
+	
+	public static void setShowRemoveButton(boolean show){
+		show_remove_button = show;
 	}
 	
 	public void setNodesList(ArrayList<ARGeoNode> nodes_list){
@@ -244,6 +255,22 @@ public class ARSummaryBox{
 //		bt.setOnClickListener(arnode.getDetailsClickListener(mActivity));
 	}
 	
+	protected void setRemoveButton(Activity mActivity, View summary_box){
+		if(num_node == -1)
+			return;
+		ARGeoNode arnode = getNode();
+
+		if(arnode == null)
+			return;
+		// Details button
+		Button bt = (Button)summary_box.findViewById(R.id.ar_button_remove);
+		if(show_remove_button){
+			bt.setVisibility(View.VISIBLE);
+			bt.setOnClickListener(arnode.getRemoveNodeListener(mActivity));
+		}else
+			bt.setVisibility(View.INVISIBLE);
+	}
+	
 	protected void setCloseButton(View summary_box){
 		if(num_node == -1)
 			return;
@@ -300,4 +327,26 @@ public class ARSummaryBox{
 		Button bt = (Button)summary_box.findViewById(buttonid);
 		bt.setOnClickListener(listener);
 	}
+	
+	public static Dialog onCreateDialog(final Activity mActivity, int id) {    
+    	switch (id) {
+    	case DIALOG_SURE:
+
+    		return new AlertDialog.Builder(mActivity)	      
+    		.setCancelable(true)
+    		.setTitle(R.string.remove)
+    		.setMessage(R.string.sure)
+    		.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int whichButton) {
+    				ARGeoNode.removeNode(((ARBase)mActivity).getLayers(), ((ARBase)mActivity).getResourcesList());
+    			}
+    		})
+    		.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int whichButton) {
+    			}
+    		})
+    		.create();
+    	}
+    	return null;
+    }
 }

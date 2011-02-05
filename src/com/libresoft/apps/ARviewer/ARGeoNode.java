@@ -194,6 +194,20 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		return -1;
 	}
 	
+	public static void removeNode(ARLayerManager layer, ArrayList<ARGeoNode> nodes_list){
+		if((layer == null) || (nodes_list == null))
+				return;
+		int num_node = arSummaryBox.getNodeClicked();
+		if(num_node == -1)
+			return;
+		
+		clearClicked(nodes_list);
+		
+		ARGeoNode node = nodes_list.get(num_node);
+		nodes_list.remove(node);
+		layer.removeResourceElement(node.getDrawn());
+	}
+	
 	public static void clearClicked(ArrayList<ARGeoNode> nodes_list){
 		if(nodes_list == null)
 			return;
@@ -507,6 +521,16 @@ public class ARGeoNode implements ARNodeDrawingIF{
 		if(Audio.class.isInstance(geoNode))
 			is_media = true;
 		return is_media;
+	}
+	
+	public OnClickListener getRemoveNodeListener(final Activity mActivity){
+		
+		OnClickListener listener = new OnClickListener() {
+			public void onClick(View v) {
+				mActivity.showDialog(ARSummaryBox.DIALOG_SURE);
+			}
+		};		
+		return listener;
 	}
 	
 	private void refreshIcon(){

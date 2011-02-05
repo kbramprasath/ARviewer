@@ -117,6 +117,7 @@ public class ARDinamicSummaryBox extends ARSummaryBox{
 		
 		
 		setDetailsButton(mActivity, summary_box);
+		setRemoveButton(mActivity, summary_box);
 		setCloseButton(summary_box);
 	}
 	

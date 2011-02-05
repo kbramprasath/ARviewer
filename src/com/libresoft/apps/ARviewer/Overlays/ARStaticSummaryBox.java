@@ -57,6 +57,7 @@ public class ARStaticSummaryBox extends ARSummaryBox{
 			View summary_box = (View) gallery.getParent();
 			setCloseButton(summary_box);
 			setDetailsButton(mActivity, summary_box);
+			setRemoveButton(mActivity, summary_box);
 		}
 
 		@Override
