@@ -69,7 +69,7 @@ public class ARActivity extends Activity{
     	this.threshold = threshold;
     }
     
-    protected ArrayList<ARGeoNode> getResourcesList(){
+    public ArrayList<ARGeoNode> getResourcesList(){
     	return resources_list;
     }
     
@@ -85,7 +85,7 @@ public class ARActivity extends Activity{
     	return location;
     }
     
-    protected ARLayerManager getLayers(){
+    public ARLayerManager getLayers(){
     	return layers;
     }
     
