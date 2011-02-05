@@ -27,6 +27,7 @@ import java.util.List;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager;
 import com.libresoft.apps.ARviewer.Location.LocationWays;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager.OnLocationUpdateListener;
+import com.libresoft.apps.ARviewer.Overlays.ARSummaryBox;
 import com.libresoft.apps.ARviewer.Overlays.CamPreview;
 import com.libresoft.apps.ARviewer.Overlays.DrawFocus;
 import com.libresoft.apps.ARviewer.Overlays.DrawParameters;
@@ -172,7 +173,8 @@ public class ARBase extends ARActivity{
         super.onCreate(savedInstanceState);
         
         try {
-        	
+
+    		ARSummaryBox.setShowRemoveButton(false);
             pointerObject = this;
 			refreshed = false;
         	
