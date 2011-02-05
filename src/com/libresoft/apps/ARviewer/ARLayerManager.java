@@ -119,6 +119,11 @@ public class ARLayerManager{
 			baseLayer.removeView(view);
 	}
 	
+	public void removeResourceElement(View view){
+		if(resourceLayer.indexOfChild(view) > -1)
+			resourceLayer.removeView(view);
+	}
+	
 	public void removeInfoElement(View view){
 		if(infoLayer.indexOfChild(view) > -1)
 			infoLayer.removeView(view);
