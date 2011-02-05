@@ -35,7 +35,11 @@ import java.util.ArrayList;
 
 import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
 import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
+import com.libresoft.apps.ARviewer.Overlays.ARSummaryBox;
 import com.libresoft.sdk.ARviewer.Types.GeoNode;
+import com.libresoft.sdk.ARviewer.Types.Photo;
+import com.libresoft.sdk.ARviewer.Types.User;
+import com.libresoft.sdk.ARviewer.Types.Video;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -63,10 +67,10 @@ public class ARlabeling extends ARBase{
 		public void onFinish(boolean success) {
 			showMenu = true;
 			if(success){
-				Toast.makeText(getBaseContext(), "Ok", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), R.string.ok, Toast.LENGTH_SHORT).show();
 				showResources();
 			}else
-				Toast.makeText(getBaseContext(), "Fail", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), R.string.error, Toast.LENGTH_SHORT).show();
 		}
 	};
 	
@@ -74,6 +78,7 @@ public class ARlabeling extends ARBase{
         super.onCreate(savedInstanceState);
 		loadParameters();
 		loadConfig(false);
+		ARSummaryBox.setShowRemoveButton(true);
 		tagManager = new ARTagManager(this, getLayers(), getResourcesList(), getLocation(), cam_altitude);
 		tagManager.setOnLocationChangeListener(onTaggingLocationListener);
 		tagManager.setOnTaggingFinishedListener(onTaggingFinishedListener);
@@ -112,6 +117,13 @@ public class ARlabeling extends ARBase{
     		ArrayList<ARGeoNode> source_nodes_list = getResourcesList();
     		
     		for(ARGeoNode node: source_nodes_list){
+    			GeoNode simple_node = node.getGeoNode();
+    			if(Photo.class.isInstance(simple_node))
+    				((Photo)simple_node).clearBitmapPhotoThumb();
+    			else if(Video.class.isInstance(simple_node))
+    				((Video)simple_node).clearBitmapPhotoThumb();
+    			else if(User.class.isInstance(simple_node))
+    				((User)simple_node).clearBitmapAvatarThumb();
     			nodes_list.add(node.getGeoNode());
     		}
     		
@@ -129,6 +141,10 @@ public class ARlabeling extends ARBase{
     protected Dialog onCreateDialog(int id) {       
     	
     	Dialog diag = tagManager.onCreateDialog(id);
+    	if(diag != null)
+    		return diag;
+    	
+    	diag = ARSummaryBox.onCreateDialog(this, id);
     	if(diag != null)
     		return diag;
     	
