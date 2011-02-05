@@ -262,5 +262,13 @@ public class User extends GeoNode implements Serializable {
 	public boolean isBitmapAvatarThumb(){
 		return (mByteBitmapAvatarThumb!=null);
 	}
+	
+	public void clearBitmapAvatarThumb(){
+		mByteBitmapAvatarThumb = null;
+	}
+	
+	public void clearBitmapAvatar(){
+		mByteBitmapAvatar = null;
+	}
 }
 
