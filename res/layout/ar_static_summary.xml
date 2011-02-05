@@ -38,7 +38,18 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_alignParentRight="true"
+			android:layout_marginBottom="5dip"
 			android:background="@drawable/bclose"
+		>
+		</Button>
+		<Button
+			android:id="@+id/ar_button_remove"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_alignParentRight="true"
+			android:visibility="invisible"
+			android:background="@drawable/bremove"
 		>
 		</Button>
 	</RelativeLayout>

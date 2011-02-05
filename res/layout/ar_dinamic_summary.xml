@@ -39,7 +39,7 @@
 	>
 </Button>
  	
-<LinearLayout
+<RelativeLayout
 	android:id="@+id/ar_container"
 	android:layout_width="wrap_content"
 	android:layout_height="fill_parent"
@@ -52,9 +52,10 @@
  	>
 
 	<RelativeLayout 
+		android:id="@+id/ar_container2"
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
-		android:gravity="center_horizontal"
+		android:layout_alignParentTop="true"
 		android:orientation="horizontal">
 		<Button
 			android:id="@+id/ar_button_details"
@@ -103,7 +104,9 @@
 	
 	<ScrollView
 		android:layout_height="fill_parent" 
-		android:layout_width="fill_parent">
+		android:layout_width="fill_parent"
+		android:layout_below="@+id/ar_container2"
+		android:layout_above="@+id/ar_button_remove">
 		
  	<LinearLayout
  		android:layout_width="fill_parent"
@@ -142,7 +145,17 @@
 		    />
 	</LinearLayout>
 	</ScrollView>
-</LinearLayout>
+	<Button
+		android:id="@+id/ar_button_remove"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"
+		android:visibility="invisible"
+		android:background="@drawable/bremove"
+	>
+	</Button>
+</RelativeLayout>
 
 <Button
 	android:id="@+id/ar_button_right"
