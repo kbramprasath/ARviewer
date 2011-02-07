@@ -22,10 +22,7 @@ package com.libresoft.apps.ARviewer.Location;
 
 import java.util.ArrayList;
 
-import com.libresoft.apps.ARviewer.ARCompassManager;
-import com.libresoft.apps.ARviewer.ARTagManager;
 import com.libresoft.apps.ARviewer.R;
-import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
 
 import android.app.Activity;
@@ -41,10 +38,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
 public class ARLocationManager{
 	private static final int DIALOG_PROVIDER_PROBLEM = 300;

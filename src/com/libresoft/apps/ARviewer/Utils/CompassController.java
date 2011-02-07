@@ -25,9 +25,8 @@ public class CompassController{
 	private static final float STDEV = 4.3351f;
 	private static final int MAX_RANGE = 20;
 	
-	private float Kp, Kd, Ki;
+	private float Kp;
 	private float last_value = 0; 
-	private float integral = 0;
 	private double last_error = 0;
 	private boolean complex = false;
 	
