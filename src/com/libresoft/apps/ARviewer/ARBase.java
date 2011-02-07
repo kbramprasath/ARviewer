@@ -24,6 +24,7 @@ package com.libresoft.apps.ARviewer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import com.libresoft.apps.ARviewer.Location.ARLocationManager;
 import com.libresoft.apps.ARviewer.Location.LocationWays;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager.OnLocationUpdateListener;
@@ -39,15 +40,19 @@ import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -75,8 +80,10 @@ public class ARBase extends ARActivity{
 	private static final int MENU_LOCATION_WAYS = MENU_SERVICE_LOCATION + 1;
 	
 	private static final int MENU_PREFERENCES = MENU_LOCATION_WAYS + 1;
+	private static final int MENU_ABOUT = MENU_PREFERENCES + 1;
 	
 	private static final int DIALOG_PBAR = 0;
+	private static final int DIALOG_ABOUT = DIALOG_PBAR + 1;
 	
 	private static ARBase pointerObject = null;
 	
@@ -395,6 +402,9 @@ public class ARBase extends ARActivity{
     	if(showMenu)
     		menu.add(0, MENU_PREFERENCES, 0, "Settings")
     			.setIcon(R.drawable.spanner_48);
+    	menu.add(0, MENU_ABOUT, 0, "About")
+	    	.setIcon(R.drawable.about)
+	    	.setAlphabeticShortcut('B');
     	
         super.onCreateOptionsMenu(menu);        
         return true;
@@ -455,6 +465,10 @@ public class ARBase extends ARActivity{
     		Intent i = new Intent(this, ARPreferences.class);
     		startActivityForResult(i, ACTIVITY_PREFERENCES);
     		break;
+    		
+    	case MENU_ABOUT:
+			showDialog(DIALOG_ABOUT);
+			break;
     	}
 
     	return super.onOptionsItemSelected(item);
@@ -467,6 +481,30 @@ public class ARBase extends ARActivity{
     		return diag;
     	
     	switch (id) {
+    	case DIALOG_ABOUT:
+    		String message = getString(R.string.app_name) + " " + getString(R.string.version_arviewer) +
+					getString(R.string.revision_arviewer) + "\n" + getString(R.string.about_message);
+    		return new AlertDialog.Builder(this)
+    		.setIcon(R.drawable.real_view)
+    		.setTitle(R.string.about_title)
+    		.setMessage(message)
+    		.setPositiveButton(R.string.ok, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					
+				}
+			})
+			.setNeutralButton(R.string.about_web, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent myIntent = new Intent(Intent.ACTION_VIEW, 
+		 					 Uri.parse("http://www.libregeosocial.org/node/24"));
+	    			startActivity(myIntent);
+				}
+			})
+    		.create();
     	case DIALOG_PBAR:
     		ProgressDialog dialog = new ProgressDialog(this);
     		dialog.setMessage("Loading...");

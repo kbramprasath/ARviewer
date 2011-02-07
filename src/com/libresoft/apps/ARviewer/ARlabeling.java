@@ -124,7 +124,7 @@ public class ARlabeling extends ARBase{
     				((Video)simple_node).clearBitmapPhotoThumb();
     			else if(User.class.isInstance(simple_node))
     				((User)simple_node).clearBitmapAvatarThumb();
-    			nodes_list.add(node.getGeoNode());
+    			nodes_list.add(simple_node);
     		}
     		
     		Intent resultIntent = new Intent();

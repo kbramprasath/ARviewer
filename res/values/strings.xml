@@ -4,6 +4,13 @@
     
 	<string name="map_key">0Tp7WsIDiyqoDmSF9LMprvDzte-hj_A6r-qxbow</string>
 	
+	<!-- About dialog -->
+	<string name="version_arviewer">1.0</string>
+	<string name="revision_arviewer"></string>
+	<string name="about_title">About</string>
+	<string name="about_web">Go to website!</string>
+	<string name="about_message">Copyright (C) GSyC/LibreSoft \n\nThis software is under GPL v3.0 license!\n\nAuthors: \n  The developers of LibreGeoSocial.\n\nE-mail: lgs-contact@libresoft.es \nWeb: http://www.libregeosocial.org/node/24 </string>
+	
 	<!-- Location preferences -->
 	<string name="pref_location_title">Location</string>
 	<string name="pref_location_summary">Configure the location preferences</string>
