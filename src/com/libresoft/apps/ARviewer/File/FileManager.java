@@ -37,8 +37,8 @@ public class FileManager{
 	private static final String SD_DIRECTORY = "/sdcard/arviewer/";
 	private static final String SCREENSHOT_DIRECTORY = "screenshots/";
 	private static final String STATS_DIRECTORY = "stats/";
-	private static final String TMP_DIRECTORY = "tmp/";
-	private static final String AUDIO_DIRECTORY = "audio/";
+	public static final String PHOTO_DIRECTORY = SD_DIRECTORY + "photo/";
+	public static final String AUDIO_DIRECTORY = SD_DIRECTORY + "audio/";
 	private static final String SCREENSHOT = "screenshot_";
 	private static final String STATS_FPS = "fps_";
 	private static final String STATS_OPENCV = "opencv_";
@@ -49,10 +49,10 @@ public class FileManager{
 		File dir = new File(SD_DIRECTORY);
 		if (!dir.exists())
 			dir.mkdir();
-		dir = new File(SD_DIRECTORY + TMP_DIRECTORY);
+		dir = new File(PHOTO_DIRECTORY);
 		if (!dir.exists())
 			dir.mkdir();
-		dir = new File(SD_DIRECTORY + AUDIO_DIRECTORY);
+		dir = new File(AUDIO_DIRECTORY);
 		if (!dir.exists())
 			dir.mkdir();
 	}

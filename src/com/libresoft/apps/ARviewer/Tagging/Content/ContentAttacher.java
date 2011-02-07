@@ -48,7 +48,6 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -79,7 +78,6 @@ public class ContentAttacher{
 	public static final int DIALOG_RECORD_AUDIO = 10003;
 	public static final int DIALOG_PBAR = 10004;
 	
-	public static final String PHOTO_TMP = "/sdcard/arviewer/tmp/";
 	public static final String AUDIO_TMP = "audio_tmp_";
 	
 	private Activity mActivity;
@@ -227,7 +225,7 @@ public class ContentAttacher{
 	            	if(Photo.class.isInstance(resource)){
 	            		FileManager.getInstance();
 	            		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	            		path = PHOTO_TMP + "data_" + Long.toString(System.currentTimeMillis()) + ".jpg";
+	            		path = FileManager.PHOTO_DIRECTORY + "data_" + Long.toString(System.currentTimeMillis()) + ".jpg";
 	            		if(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)
 	            			path = "/mnt" + path;
 	            		Uri outputFile = Uri.fromFile(new File(path));
@@ -257,7 +255,7 @@ public class ContentAttacher{
 	        									MediaStore.Audio.Media.CONTENT_TYPE) ;
 	        			}else{
 	        				i2 = new Intent(mActivity, ContentPick.class) ;
-	        				i2.putExtra("MAIN_PATH", "/sdcard/arviewer/audio/");
+	        				i2.putExtra("MAIN_PATH", FileManager.AUDIO_DIRECTORY);
 	        				i2.putExtra("MIME_TYPE", "audio/3gpp");
 	        			}
 	        	    	

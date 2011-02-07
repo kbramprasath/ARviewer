@@ -29,6 +29,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.libresoft.apps.ARviewer.File.FileManager;
+
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.media.MediaPlayer;
@@ -40,8 +42,6 @@ import android.util.Log;
 public class AudioManager extends ContextWrapper {
 	 
 	private String mFileName = "tmpaudio.3gpp";
-	
-	private static final String AUDIO_DIR = "/sdcard/arviewer/audio/";
 	
 	private MediaRecorder mRecorder;
 	
@@ -55,7 +55,7 @@ public class AudioManager extends ContextWrapper {
 		mRecorder = new MediaRecorder();
 		mPlayer = new MediaPlayer();
 		
-		File dirHandler = new File(AUDIO_DIR); 
+		File dirHandler = new File(FileManager.AUDIO_DIRECTORY); 
 		
 		if (!dirHandler.exists())
 			dirHandler.mkdir();
@@ -71,7 +71,7 @@ public class AudioManager extends ContextWrapper {
 	
 	public String getPath ()
 	{
-		return AUDIO_DIR + mFileName;
+		return FileManager.AUDIO_DIRECTORY + mFileName;
 	}
 	
 	public boolean saveAudio (InputStream is, String file)
@@ -110,7 +110,7 @@ public class AudioManager extends ContextWrapper {
 		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		mRecorder.setOutputFile(AUDIO_DIR + mFileName);
+		mRecorder.setOutputFile(FileManager.AUDIO_DIRECTORY + mFileName);
 		
 		Log.e("AudioManager","Starting recording " + mFileName);
 		
@@ -152,7 +152,7 @@ public class AudioManager extends ContextWrapper {
 	{
 		try {			
 			
-			mPlayer.setDataSource(AUDIO_DIR + mFileName);
+			mPlayer.setDataSource(FileManager.AUDIO_DIRECTORY + mFileName);
 			mPlayer.prepare();
 			
 		} catch (IllegalArgumentException e) {
