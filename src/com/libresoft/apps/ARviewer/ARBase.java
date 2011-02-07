@@ -53,6 +53,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -84,6 +85,7 @@ public class ARBase extends ARActivity{
 	
 	private static final int DIALOG_PBAR = 0;
 	private static final int DIALOG_ABOUT = DIALOG_PBAR + 1;
+	private static final int DIALOG_EMPTY = DIALOG_ABOUT + 1;
 	
 	private static ARBase pointerObject = null;
 	
@@ -316,10 +318,12 @@ public class ARBase extends ARActivity{
     	}
     	
     	if(res_list == null){
-    		Toast.makeText(getBaseContext(), 
-    				"No resources available", 
-    				Toast.LENGTH_SHORT).show();
-    		Log.e("ARView", "No resources available");
+//    		Toast.makeText(getBaseContext(), 
+//    				"No resources available", 
+//    				Toast.LENGTH_SHORT).show();
+//    		Log.e("ARView", "No resources available");
+    		showDialog(DIALOG_EMPTY);
+    		new getDemoNodes().execute();
     		return;
     	}
 
@@ -505,6 +509,39 @@ public class ARBase extends ARActivity{
 				}
 			})
     		.create();
+    		
+    	case DIALOG_EMPTY:
+    		return new AlertDialog.Builder(this)
+    		.setTitle(R.string.empty_title)
+    		.setMessage(R.string.empty_message)
+    		.setPositiveButton(R.string.ok, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			})
+			.setNeutralButton(R.string.empty_places, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent i = new Intent(Intent.ACTION_VIEW);
+			    	i.setData(Uri.parse("market://search?q=pname:com.libresoft.apps.ARviewerPlaces"));
+			    	
+			    	startActivity(i);
+			    	finish();
+				}
+			})
+			.setNegativeButton(R.string.about_web, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent myIntent = new Intent(Intent.ACTION_VIEW, 
+		 					 Uri.parse("http://www.libregeosocial.org/node/24"));
+	    			startActivity(myIntent);
+				}
+			})
+    		.create();
+    		
     	case DIALOG_PBAR:
     		ProgressDialog dialog = new ProgressDialog(this);
     		dialog.setMessage("Loading...");
@@ -622,6 +659,25 @@ public class ARBase extends ARActivity{
 			}
 		}.start();
 	}
+	
+	private class getDemoNodes extends AsyncTask<Void, Void, Void>{
+		
+		protected void onPreExecute() {
+			setResourcesList(new ArrayList<ARGeoNode>());
+		}  
+
+		@Override
+		protected Void doInBackground(Void... unused){
+			//TODO download layers
+			return null;
+		}
+		
+		protected void onPostExecute(Void unused) {
+			showResources();
+		}    
+	
+	}
+
 	
 
 	public static void GestureNext ()

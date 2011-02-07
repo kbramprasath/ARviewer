@@ -11,6 +11,11 @@
 	<string name="about_web">Go to website!</string>
 	<string name="about_message">Copyright (C) GSyC/LibreSoft \n\nThis software is under GPL v3.0 license!\n\nAuthors: \n  The developers of LibreGeoSocial.\n\nE-mail: lgs-contact@libresoft.es \nWeb: http://www.libregeosocial.org/node/24 </string>
 	
+	<!-- Empty dialog -->
+	<string name="empty_places">AR-viewer Places</string>
+	<string name="empty_title">Warning</string>
+	<string name="empty_message">This application is a tool to be used by another application that needs or desires an augmented reality browser or labeler interface. By default, the public geolocated nodes from the social-core of LibreGeoSocial, 11870.com and Youtube will be shown in a \"browser\" mode.\n\nMaybe you are interested on trying our demo applications, \"AR-viewer Places\" and \"AR-viewer Tagging\", in order to experience this tool combined with other different applications.\n\nFor further information, please visit our website at http://www.libregeosocial.org/node/24</string>
+	
 	<!-- Location preferences -->
 	<string name="pref_location_title">Location</string>
 	<string name="pref_location_summary">Configure the location preferences</string>
