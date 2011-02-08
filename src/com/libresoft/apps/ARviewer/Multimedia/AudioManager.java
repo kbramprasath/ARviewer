@@ -36,7 +36,6 @@ import android.content.ContextWrapper;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.os.Environment;
 import android.util.Log;
 
 public class AudioManager extends ContextWrapper {
