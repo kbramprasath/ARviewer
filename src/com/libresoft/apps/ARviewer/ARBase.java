@@ -37,7 +37,11 @@ import com.libresoft.apps.ARviewer.Overlays.DrawResource;
 import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
 import com.libresoft.apps.ARviewer.ScreenCapture.ScreenshotManager;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
+import com.libresoft.apps.ARviewer.Utils.AsyncTasks.AsyncLGSNodes;
+import com.libresoft.apps.ARviewer.Utils.AsyncTasks.AsyncLGSNodes.OnExecutionFinishedListener;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
+import com.libresoft.sdk.ARviewer.Types.GenericLayer;
+import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,7 +57,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -233,7 +236,7 @@ public class ARBase extends ARActivity{
 //			showResources();
 		} catch (Exception e) {
 			Toast.makeText(getBaseContext(), 
-					"There was an error loading the AR environment elements", 
+					R.string.error_environment, 
 					Toast.LENGTH_LONG).show();
 			Log.e("ARView", "", e);
 		}
@@ -318,24 +321,36 @@ public class ARBase extends ARActivity{
     	}
     	
     	if(res_list == null){
-//    		Toast.makeText(getBaseContext(), 
-//    				"No resources available", 
-//    				Toast.LENGTH_SHORT).show();
-//    		Log.e("ARView", "No resources available");
+    		Log.e("ARBase", "Demo mode");
+    		setMyLayer(new GenericLayer(0, "", "Demo Layer", "A demo layer to show AR-viewer functions", null, null, null, null, null, null));
+    		getMyLayer().setNodes(new ArrayList<GeoNode>());
+    		new AsyncLGSNodes(this, getMyLayer(), new OnExecutionFinishedListener() {
+				@Override
+				public void onFinish() {
+					if(!isFinishing())
+						showResources();
+				}
+			}).execute();
     		showDialog(DIALOG_EMPTY);
-    		new getDemoNodes().execute();
+    		return;
+    	}else if(res_list.isEmpty()){
+    		Log.e("ARView", getString(R.string.error_no_nodes));
+    		Toast.makeText(getBaseContext(), 
+    				R.string.error_no_nodes, 
+    				Toast.LENGTH_LONG).show();
     		return;
     	}
 
     	if (res_list.size() > 50){
-    		ArrayList<ARGeoNode> list = (ArrayList<ARGeoNode>) res_list.clone();
-    		res_list.clear();
+    		ArrayList<ARGeoNode> list = new ArrayList<ARGeoNode>();
     		for(int i = 0; i < 50; i++)
-    			res_list.add(list.get(i));
+    			list.add(res_list.get(i));
+    		res_list.clear();
+    		res_list.addAll(list);
     		Toast.makeText(getBaseContext(), 
-    				"Too many objects, showing the first 50 ones", 
+    				R.string.error_too_much_nodes, 
     				Toast.LENGTH_LONG).show();
-    		Log.e("ARView", "Too many objects, showing the first 50 ones");
+    		Log.e("ARView", getString(R.string.error_too_much_nodes));
     	}
 
     	ARGeoNodeAzimuthComparator comparator = new ARGeoNodeAzimuthComparator();
@@ -450,7 +465,7 @@ public class ARBase extends ARActivity{
 
     		if (!isBarcode){
     			Toast.makeText(getBaseContext(), 
-    					"Please, install Barcode Scanner from Market",
+    					R.string.error_barcode,
     					Toast.LENGTH_LONG).show();
     			break;
     		}
@@ -531,20 +546,22 @@ public class ARBase extends ARActivity{
 			    	finish();
 				}
 			})
-			.setNegativeButton(R.string.about_web, new OnClickListener() {
+			.setNegativeButton(R.string.empty_tagging, new OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					Intent myIntent = new Intent(Intent.ACTION_VIEW, 
-		 					 Uri.parse("http://www.libregeosocial.org/node/24"));
-	    			startActivity(myIntent);
+					Intent i = new Intent(Intent.ACTION_VIEW);
+			    	i.setData(Uri.parse("market://search?q=pname:com.libresoft.apps.ARviewerTagging"));
+			    	
+			    	startActivity(i);
+			    	finish();
 				}
 			})
     		.create();
     		
     	case DIALOG_PBAR:
     		ProgressDialog dialog = new ProgressDialog(this);
-    		dialog.setMessage("Loading...");
+    		dialog.setMessage(getString(R.string.loading));
     		dialog.setIndeterminate(true);
     		dialog.setCancelable(true);
     		return dialog;
@@ -592,12 +609,12 @@ public class ARBase extends ARActivity{
 //	        			loadResources();
 	    			}catch(Exception e){
 	    				Toast.makeText(getBaseContext(), 
-	    						"There was an error with BIDI location", 
+	    						R.string.error_bidi, 
 	    						Toast.LENGTH_LONG).show();
 	    			}
 	    		}else
-	    			Toast.makeText(getBaseContext(), 
-	    					"There was an error with BIDI location", 
+	    			Toast.makeText(getBaseContext(),  
+    						R.string.error_bidi, 
 	    					Toast.LENGTH_LONG).show();
 	    		
 	    		break;
@@ -659,26 +676,6 @@ public class ARBase extends ARActivity{
 			}
 		}.start();
 	}
-	
-	private class getDemoNodes extends AsyncTask<Void, Void, Void>{
-		
-		protected void onPreExecute() {
-			setResourcesList(new ArrayList<ARGeoNode>());
-		}  
-
-		@Override
-		protected Void doInBackground(Void... unused){
-			//TODO download layers
-			return null;
-		}
-		
-		protected void onPostExecute(Void unused) {
-			showResources();
-		}    
-	
-	}
-
-	
 
 	public static void GestureNext ()
 	{		
