@@ -23,12 +23,12 @@ package com.libresoft.sdk.ARviewer.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.jar.Attributes;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -51,7 +51,7 @@ import com.libresoft.sdk.ARviewer.Types.Note;
  *
  */
 public class Parsers{
-    public static final String TAG = "Parser";
+    public static final String TAG = "Parsers";
 
     /**
      * Getting a KML file from a given URL, it is parsed to an
@@ -71,7 +71,7 @@ public class Parsers{
     	try{
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser sp = spf.newSAXParser();
-            LibraryXMLReader reader = new LibraryXMLReader();
+            KMLReader reader = new KMLReader();
            	sp.parse(url, reader);
            	result = reader.getArrayGeoNode();
         }catch(ParserConfigurationException pcex){
@@ -87,7 +87,30 @@ public class Parsers{
         return result;
     }
     
-    private class LibraryXMLReader extends DefaultHandler {
+    public ArrayList<GeoNode> parseGPX2Note(String url) throws
+    		ParserConfigurationException, SAXException, IOException{
+    	
+    	ArrayList<GeoNode> result = null;
+    	try{
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser sp = spf.newSAXParser();
+            GPXReader reader = new GPXReader();
+           	sp.parse(url, reader);
+           	result = reader.getArrayGeoNode();
+        }catch(ParserConfigurationException pcex){
+        	//Log.w(TAG, pcex.toString());
+        	throw pcex;
+        }catch(SAXException saxex){
+        	//Log.w(TAG, saxex.toString());
+        	throw saxex;
+        } catch (IOException ioex) {
+        	//Log.w(TAG, ioex.toString());
+        	throw ioex;
+        }
+        return result;
+    }
+    
+    private class KMLReader extends DefaultHandler {
     	private String content = ""; // This variable stores the tag's content.
     	private ArrayList<GeoNode> arrayGeoNode = new ArrayList<GeoNode>();
     	
@@ -146,6 +169,107 @@ public class Parsers{
     								latitude, longitude, altitude,
     									null, null,	null, null));
     		}
+    	}
+    }
+    
+    private class GPXReader extends DefaultHandler {
+    	private StringBuilder contentBuffer; // This variable stores the tag's content.
+    	private ArrayList<GeoNode> arrayGeoNode = new ArrayList<GeoNode>();
+    	
+    	private String name = null;
+    	private String description = null;
+    	private double latitude = -1.0;
+    	private double longitude = -1.0;
+    	private double altitude = -1.0;
+    	private String since = null;
+    	   
+    	public GPXReader() {
+    		clear();
+    	}
+    	   
+    	public void clear() {
+    		arrayGeoNode.clear();
+    		contentBuffer = new StringBuilder();
+    	}
+    	
+    	/**
+    	 * Returns an ArrayList of GeoNode objects as result of parsing a document.
+    	 * 
+    	 * @return An ArrayList of GeoNode objects as result of parsing a document.
+    	 */
+    	public ArrayList<GeoNode> getArrayGeoNode(){
+    		return arrayGeoNode;
+    	}
+    	
+    	/*
+    	 * DefaultHandler::startElement() fires whenever an XML start tag is encountered
+    	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+    	 */
+    	public void startElement(String uri, String localName, 
+    							String qName, Attributes attributes) 
+    							throws SAXException {
+    		// the <bounds> element has attributes which specify min & max latitude and longitude
+    		/*if (localName.compareToIgnoreCase("bounds") == 0) {
+    	         minLat = new Float(attributes.getValue("minlat")).floatValue();
+    	         maxLat = new Float(attributes.getValue("maxlat")).floatValue();
+    	         minLon = new Float(attributes.getValue("minlon")).floatValue();
+    	         maxLon = new Float(attributes.getValue("maxlon")).floatValue();
+    	      } else {
+			*/
+    		// the <wpt> element has attributes which specify latitude and longitude (it has child elements that specify the time and elevation)
+    		if (localName.compareToIgnoreCase("wpt") == 0) {
+    			latitude = Double.parseDouble(attributes.getValue("lat"));
+    			longitude = Double.parseDouble(attributes.getValue("lon"));
+    		}
+    	      
+    		// Clear content buffer
+    		contentBuffer.delete(0, contentBuffer.length());
+    	}
+    	   
+    	/*
+    	 * the DefaultHandler::characters() function fires 1 or more times for each text node encountered
+    	 *
+    	 */
+    	public void characters(char[] ch, int start, int length) 
+    			throws SAXException {
+    		contentBuffer.append(String.copyValueOf(ch, start, length));
+    	}
+    	   
+    	/*
+    	 * the DefaultHandler::endElement() function fires for each end tag
+    	 *
+    	 */
+    	public void endElement(String uri, String localName, String qName) 
+    							throws SAXException {
+    		
+    		// <WPT> WAYPOINT GPX
+    		// Required Information:
+    		// <lat> Latitude of the waypoint.
+    		// <lon> Longitude of the waypoint.
+    		
+    		// Optional Position Information:
+    		// <ele> Elevation of the waypoint.
+    		// <time> Creation date/time of the waypoint.
+    		
+    		// Optional Description Information:
+    		// <name> GPS waypoint name of the waypoint.
+    		// <desc> Descriptive description of the waypoint.
+    		
+    		// More parameters: http://www.topografix.com/gpx_manual.asp#gpx_req
+    		
+    		if("name".equals(localName)){	
+    			name = contentBuffer.toString();
+    		}else if("desc".equals(localName)){
+    			description = contentBuffer.toString(); 	    	  
+    		}else if("ele".equals(localName)){
+       			altitude = new Float(contentBuffer.toString()); 	    	  
+       		}else if("time".equals(localName)){
+       			since = contentBuffer.toString(); 	    	  
+       		}else if ("wpt".equals(localName)){
+       			arrayGeoNode.add(new Note(null, name, description,
+       						latitude, longitude, altitude,
+							null, since, null, null));
+       		}
     	}
     }
 }
