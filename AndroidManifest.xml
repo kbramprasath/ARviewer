@@ -5,10 +5,9 @@
       android:versionName="1.0">
     <application android:icon="@drawable/real_view" android:label="@string/app_name">
     	<uses-library android:name="com.google.android.maps" /> 
-        <activity android:name=".ARviewer"
+        <activity android:name=".SplashViewer"
                   android:label="@string/app_name"
-                  android:screenOrientation="landscape" 
-                  android:theme="@android:style/Theme.NoTitleBar">
+                  android:theme="@style/TransparentTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -19,15 +18,20 @@
       		</intent-filter>
         </activity>
         
-        <activity android:name=".ARlabeling"
-                  android:screenOrientation="landscape" 
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".SplashLabeler"
+                  android:theme="@style/TransparentTheme">
             <intent-filter>
         		<action android:name="com.libresoft.apps.ARviewer.LABELER"/>
         		<category android:name="android.intent.category.DEFAULT"/>
       		</intent-filter>
         </activity>
-
+        
+		<activity android:name=".ARviewer"
+                  android:screenOrientation="landscape" 
+                  android:theme="@android:style/Theme.NoTitleBar"></activity>
+        <activity android:name=".ARlabeling"
+                  android:screenOrientation="landscape" 
+                  android:theme="@android:style/Theme.NoTitleBar"></activity>
 		<activity android:name=".ARPreferences"></activity>
 		<activity android:name=".Location.LocationPreferences"></activity> 
 		<activity android:name=".Location.LocationWays"></activity> 
