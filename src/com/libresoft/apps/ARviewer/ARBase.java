@@ -63,11 +63,14 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ARBase extends ARActivity{ 
@@ -501,12 +504,16 @@ public class ARBase extends ARActivity{
     	
     	switch (id) {
     	case DIALOG_ABOUT:
-    		String message = getString(R.string.app_name) + " " + getString(R.string.version_arviewer) +
-					getString(R.string.revision_arviewer) + "\n" + getString(R.string.about_message);
+    		LayoutInflater factory2 = LayoutInflater.from(this);
+    		View textEntryView2 = factory2.inflate(R.layout.custom_dialog, null);
+    		
+    		TextView text2 = (TextView) textEntryView2.findViewById (R.id.dialog_text);
+    		text2.setText(getString(R.string.app_name) + " " + getString(R.string.version_arviewer) +
+					getString(R.string.revision_arviewer) + "\n" + getString(R.string.about_message));
     		return new AlertDialog.Builder(this)
     		.setIcon(R.drawable.real_view)
     		.setTitle(R.string.about_title)
-    		.setMessage(message)
+    		.setView(textEntryView2)
     		.setPositiveButton(R.string.ok, new OnClickListener() {
 				
 				@Override
@@ -526,9 +533,15 @@ public class ARBase extends ARActivity{
     		.create();
     		
     	case DIALOG_EMPTY:
+    		LayoutInflater factory = LayoutInflater.from(this);
+    		View textEntryView = factory.inflate(R.layout.custom_dialog, null);
+    		
+    		TextView text = (TextView) textEntryView.findViewById (R.id.dialog_text);
+    		text.setText(R.string.empty_message);
+    		
     		return new AlertDialog.Builder(this)
     		.setTitle(R.string.empty_title)
-    		.setMessage(R.string.empty_message)
+    		.setView(textEntryView)
     		.setPositiveButton(R.string.ok, new OnClickListener() {
 				
 				@Override
