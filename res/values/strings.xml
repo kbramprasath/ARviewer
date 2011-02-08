@@ -3,6 +3,7 @@
     <string name="app_name">ARviewer</string>
     
 	<string name="map_key">0Tp7WsIDiyqoDmSF9LMprvDzte-hj_A6r-qxbow</string>
+    <string name="urlServer">rest.libregeosocial.org/social/</string>
 	
 	<!-- About dialog -->
 	<string name="version_arviewer">1.0</string>
@@ -13,6 +14,7 @@
 	
 	<!-- Empty dialog -->
 	<string name="empty_places">AR-viewer Places</string>
+	<string name="empty_tagging">AR-viewer Tagging</string>
 	<string name="empty_title">Warning</string>
 	<string name="empty_message">This application is a tool to be used by another application that needs or desires an augmented reality browser or labeler interface. By default, the public geolocated nodes from the social-core of LibreGeoSocial, 11870.com and Youtube will be shown in a \"browser\" mode.\n\nMaybe you are interested on trying our demo applications, \"AR-viewer Places\" and \"AR-viewer Tagging\", in order to experience this tool combined with other different applications.\n\nFor further information, please visit our website at http://www.libregeosocial.org/node/24</string>
 	
@@ -97,8 +99,14 @@
 	<string name="done">Done</string>
 	<string name="cancel">Cancel</string>
 	<string name="search">Search</string>
-	<string name="error">Error</string>
 	<string name="no_layer">No layer introduced</string>
 	<string name="remove">Remove</string>
 	<string name="sure">Are you sure?</string>
+	<string name="error">Error</string>
+	<string name="error_too_much_nodes">Too many objects, showing the first 50 ones</string>
+	<string name="error_environment">There was an error loading the AR environment elements</string>
+	<string name="error_barcode">Please, install Barcode Scanner from Market</string>
+	<string name="error_bidi">There was an error with BIDI location</string>
+	<string name="error_no_nodes">There aren\'t nodes to show</string>
+	<string name="loading">Loading...</string>
 </resources>
