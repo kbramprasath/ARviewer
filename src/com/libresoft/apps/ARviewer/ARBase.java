@@ -336,12 +336,6 @@ public class ARBase extends ARActivity{
 			}).execute();
     		showDialog(DIALOG_EMPTY);
     		return;
-    	}else if(res_list.isEmpty()){
-    		Log.e("ARView", getString(R.string.error_no_nodes));
-    		Toast.makeText(getBaseContext(), 
-    				R.string.error_no_nodes, 
-    				Toast.LENGTH_LONG).show();
-    		return;
     	}
 
     	if (res_list.size() > 50){
