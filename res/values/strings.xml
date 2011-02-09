@@ -16,7 +16,7 @@
 	<string name="empty_places">AR-viewer Places</string>
 	<string name="empty_tagging">AR-viewer Tagging</string>
 	<string name="empty_title">Warning</string>
-	<string name="empty_message">This application is a tool to be used by another application that needs or desires an augmented reality browser or labeler interface. By default, the public geolocated nodes from the social-core of LibreGeoSocial, 11870.com and Youtube will be shown in a \"browser\" mode.\n\nMaybe you are interested on trying our demo applications, \"AR-viewer Places\" and \"AR-viewer Tagging\", in order to experience this tool combined with other different applications.\n\nFor further information, please visit our website at:\n\n http://www.libregeosocial.org/node/24</string>
+	<string name="empty_message">This FLOSS application is a tool which provides an augmented reality BROWSER or LABELER interface to external apps. By default, By default, a DEMO layer, containing nodes from LibreGeoSocial, 11870.com and Youtube, will be shown in a BROWSER mode.\n\nMaybe you are interested on trying our DEMO applications, AR-viewer Places and AR-viewer Tagging, to see the power of combining this tool with other applications.\n\nFor further information, please visit our website at:\n\n http://www.libregeosocial.org/node/24</string>
 	
 	<!-- Location preferences -->
 	<string name="pref_location_title">Location</string>
@@ -93,6 +93,9 @@
 	<string name="label_attach_content">Attach content</string>
 	<string name="label_create">Create</string>
 	<string name="label_create_resource">Create resource</string>
+	
+	<!-- Menu entries -->
+	<string name="menu_distance">Distance filter</string>
 	
 	<!-- GUI messages -->
 	<string name="ok">Ok</string>
