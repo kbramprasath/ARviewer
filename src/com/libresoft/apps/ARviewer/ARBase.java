@@ -505,7 +505,7 @@ public class ARBase extends ARActivity{
     		text2.setText(getString(R.string.app_name) + " " + getString(R.string.version_arviewer) +
 					getString(R.string.revision_arviewer) + "\n" + getString(R.string.about_message));
     		return new AlertDialog.Builder(this)
-    		.setIcon(R.drawable.real_view)
+    		.setIcon(R.drawable.arviewer_32)
     		.setTitle(R.string.about_title)
     		.setView(textEntryView2)
     		.setPositiveButton(R.string.ok, new OnClickListener() {
