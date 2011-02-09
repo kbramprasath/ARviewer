@@ -36,23 +36,37 @@ import com.libresoft.sdk.ARviewer.Types.GeoNode;
 import com.libresoft.sdk.ARviewer.Types.Note;
 
 /**
- * The Parser class provides a set of parsers from standard formats
- * KML and GPX to the data model (GeoNode) that the ARViewer
- * manages.
+ * The GPXParser class provides a set of methods to parse
+ * standard format GPX to the data model (GeoNode) that the
+ * ARViewer manages.
  * 
  * @author Jorge Fernández González <jfernandez@libresoft.es>
  * @version 1.0
+ * 
+ * @see com.libresoft.sdk.ARviewer.Utils.KMLParser
  * @see com.libresoft.apps.ARviewer.ARviewer
  * @see com.libresoft.sdk.ARviewer.Types.GeoNode
  * @see com.libresoft.sdk.ARviewer.Types.Note
  * @see com.libresoft.sdk.ARviewer.Types.Photo
  * @see com.libresoft.sdk.ARviewer.Types.Audio
  * @see com.libresoft.sdk.ARviewer.Types.Video
- *
+ * 
  */
 public class GPXParser{
     public static final String TAG = "GPXParser";
     
+    /**
+     * Getting a GPX file that contains a sequence of waypoints (or points of
+     * interest) from a given URL, it is parsed to an ArrayList of objects 
+     * type GeoNode, using a SAX parser for it.
+     * 
+     * @param url The URL where you want request a GPX file.
+     * @return An ArrayList containing the objects GeoNode that have been parsed.
+     * 
+     * @throws ParserConfigurationException If there are problem with the SAX parser.
+     * @throws SAXException If there are problems while parsing the GPX file (document malformed).
+     * @throws IOException If there are connections problems.
+     */
     public ArrayList<GeoNode> parseGPX2Note(String url) throws
     		ParserConfigurationException, SAXException, IOException{
     	
@@ -76,6 +90,10 @@ public class GPXParser{
         return result;
     }
     
+    /**
+     * GPXReader extends the DefaultHandler for a SAX parser, implementing
+     * the specific parsing of labels for a GPX document.  
+     */
     private class GPXReader extends DefaultHandler {
     	private StringBuilder contentBuffer; // This variable stores the tag's content.
     	private ArrayList<GeoNode> arrayGeoNode = new ArrayList<GeoNode>();
@@ -97,17 +115,20 @@ public class GPXParser{
     	}
     	
     	/**
-    	 * Returns an ArrayList of GeoNode objects as result of parsing a document.
+    	 * Returns an ArrayList of GeoNode objects as result of parsing a GPX document.
     	 * 
-    	 * @return An ArrayList of GeoNode objects as result of parsing a document.
+    	 * @return An ArrayList of GeoNode objects as result of parsing a GPX document.
     	 */
     	public ArrayList<GeoNode> getArrayGeoNode(){
     		return arrayGeoNode;
     	}
     	
-    	/*
-    	 * DefaultHandler::startElement() fires whenever an XML start tag is encountered
+    	/**
+    	 * DefaultHandler::startElement() fires whenever an XML start 
+    	 * tag is encountered.
+    	 * 
     	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+    	 * @throws SAXException If there are problems while parsing the KML file (document malformed).
     	 */
     	public void startElement(String uri, String localName, 
     							String qName, Attributes attributes) 
@@ -130,18 +151,23 @@ public class GPXParser{
     		contentBuffer.delete(0, contentBuffer.length());
     	}
     	   
-    	/*
-    	 * the DefaultHandler::characters() function fires 1 or more times for each text node encountered
-    	 *
+    	/**
+    	 * The DefaultHandler::characters() function fires one or more times 
+    	 * for each text node encountered.
+    	 * 
+    	 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+    	 * @throws SAXException If there are problems while parsing the KML file (document malformed).
     	 */
     	public void characters(char[] ch, int start, int length) 
     			throws SAXException {
     		contentBuffer.append(String.copyValueOf(ch, start, length));
     	}
     	   
-    	/*
-    	 * the DefaultHandler::endElement() function fires for each end tag
+    	/**
+    	 * The DefaultHandler::endElement() function fires for each end tag.
     	 *
+    	 * @see org.xml.sax.helpers.DefaultHandler#endElement(String, String, String)
+    	 * @throws SAXException If there are problems while parsing the KML file (document malformed).
     	 */
     	public void endElement(String uri, String localName, String qName) 
     							throws SAXException {
