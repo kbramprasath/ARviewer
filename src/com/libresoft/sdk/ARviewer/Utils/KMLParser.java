@@ -65,7 +65,7 @@ public class KMLParser{
      * @exception SAXException If there are problems while parsing the KML file (document malformed).
      * @exception IOException If there are connections problems.
      */
-    public ArrayList<GeoNode> parseKML2Note(String url) throws
+    public ArrayList<GeoNode> parseKML2GeoNode(String url) throws
     		ParserConfigurationException, SAXException, IOException{
     	
     	ArrayList<GeoNode> result = null;

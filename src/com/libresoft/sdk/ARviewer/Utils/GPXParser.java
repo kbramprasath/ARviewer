@@ -65,7 +65,7 @@ public class GPXParser{
      * @throws SAXException If there are problems while parsing the GPX file (document malformed).
      * @throws IOException If there are connections problems.
      */
-    public ArrayList<GeoNode> parseGPX2Note(String url) throws
+    public ArrayList<GeoNode> parseGPX2GeoNode(String url) throws
     		ParserConfigurationException, SAXException, IOException{
     	
     	ArrayList<GeoNode> result = null;
