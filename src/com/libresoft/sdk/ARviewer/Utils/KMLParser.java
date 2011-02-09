@@ -93,7 +93,7 @@ public class KMLParser{
      * the specific parsing of labels for a GPX document.  
      */
     private class KMLReader extends DefaultHandler {
-    	private String content = ""; // This variable stores the tag's content.
+    	private StringBuilder contentBuffer; // This variable stores the tag's content.
     	private ArrayList<GeoNode> arrayGeoNode = new ArrayList<GeoNode>();
     	
     	private String name = null;
@@ -101,6 +101,15 @@ public class KMLParser{
     	private double latitude = -1.0;
     	private double longitude = -1.0;
     	private double altitude = -1.0;
+    	
+    	public KMLReader() {
+    		clear();
+    	}
+    	   
+    	public void clear() {
+    		arrayGeoNode.clear();
+    		contentBuffer = new StringBuilder();
+    	}
     	
     	/**
     	 * Returns an ArrayList of GeoNode objects as result of parsing a KML document.
@@ -125,6 +134,8 @@ public class KMLParser{
     	 */
     	public void startElement(String uri, String localName, 
     							String qName, Attributes attributes){
+    		// Clear content buffer
+    		contentBuffer.delete(0, contentBuffer.length());
     	}
 
     	/**
@@ -135,7 +146,7 @@ public class KMLParser{
     	 * @throws SAXException If there are problems while parsing the KML file (document malformed).
     	 */
     	public void characters(char buf[], int offset, int len) throws SAXException{
-    		content = new String(buf, offset, len);
+    		contentBuffer.append(String.copyValueOf(buf, offset, len));
     	}
         
     	/**
@@ -145,16 +156,26 @@ public class KMLParser{
     	 */
     	public void endElement(String uri, String localName, String qName) {    		
     		if("name".equals(localName)){	
-    			name = content;
+    			name = contentBuffer.toString();
     		}else if("description".equals(localName)) {
-    			description = content; 	    	  
+    			description = contentBuffer.toString(); 	    	  
     		}else if("coordinates".equals(localName)) {
-    			System.out.println(content.substring(0, content.indexOf(",")));
-    			System.out.println(content.substring(content.indexOf(",")+1));
-    			System.out.println(content.substring(content.lastIndexOf(",")+1));
-    			latitude = new Double(content.substring(0, content.indexOf(","))).doubleValue(); 
-    			longitude = new Double(content.substring(content.indexOf(",")+1, content.lastIndexOf(","))).doubleValue();
-    			altitude = new Double(content.substring(content.lastIndexOf(",")+1)).doubleValue();
+    			System.out.println(contentBuffer.toString().substring(0, contentBuffer.toString().indexOf(",")));
+    			System.out.println(contentBuffer.toString().substring(contentBuffer.toString().indexOf(",")+1));
+    			System.out.println(contentBuffer.toString().substring(contentBuffer.toString().lastIndexOf(",")+1));
+    			latitude = new Double(
+    						contentBuffer.toString().substring(0, 
+    						contentBuffer.toString().indexOf(","))).
+    						doubleValue(); 
+    			longitude = new Double(
+    						contentBuffer.toString().substring(
+    						contentBuffer.toString().indexOf(",")+1, 
+    						contentBuffer.toString().lastIndexOf(","))).
+    						doubleValue();
+    			altitude = new Double(
+    						contentBuffer.toString().substring(
+    						contentBuffer.toString().lastIndexOf(",")+1)).
+    						doubleValue();
     		}else if("Placemark".equals(localName)) {
     			arrayGeoNode.add(new Note(null, name, description,
     								latitude, longitude, altitude,
