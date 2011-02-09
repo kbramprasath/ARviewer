@@ -21,6 +21,15 @@
 
 package com.libresoft.apps.ARviewer;
 
+/*
+ * 
+ * Intent extras:
+ * LAYER: The layer that must contain the AR nodes (GenericLayer). Mandatory.
+ * LATITUDE: User's latitude coordinate (double). Optional.
+ * LONGITUDE: User's longitude coordinate (double). Optional.
+ * 
+ */
+
 import android.content.Intent;
 import android.os.Bundle;
 

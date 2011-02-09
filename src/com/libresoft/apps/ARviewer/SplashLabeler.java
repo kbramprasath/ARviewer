@@ -21,6 +21,15 @@
 
 package com.libresoft.apps.ARviewer;
 
+/*
+ * Intent extras:
+ * LATITUDE: User's latitude coordinate (double). Optional.
+ * LONGITUDE: User's longitude coordinate (double). Optional.
+ * 
+ * Return extra:
+ * LABELED_NODES_LIST: ArrayList containing the GeoNode objects labeled.
+ */
+
 import android.content.Intent;
 import android.os.Bundle;
 
