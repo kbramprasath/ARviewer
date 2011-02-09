@@ -37,11 +37,7 @@ import com.libresoft.apps.ARviewer.Overlays.DrawResource;
 import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
 import com.libresoft.apps.ARviewer.ScreenCapture.ScreenshotManager;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
-import com.libresoft.apps.ARviewer.Utils.AsyncTasks.AsyncLGSNodes;
-import com.libresoft.apps.ARviewer.Utils.AsyncTasks.AsyncLGSNodes.OnExecutionFinishedListener;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
-import com.libresoft.sdk.ARviewer.Types.GenericLayer;
-import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -91,7 +87,6 @@ public class ARBase extends ARActivity{
 	
 	private static final int DIALOG_PBAR = 0;
 	private static final int DIALOG_ABOUT = DIALOG_PBAR + 1;
-	private static final int DIALOG_EMPTY = DIALOG_ABOUT + 1;
 	
 	private static ARBase pointerObject = null;
 	
@@ -324,17 +319,6 @@ public class ARBase extends ARActivity{
     	}
     	
     	if(res_list == null){
-    		Log.e("ARBase", "Demo mode");
-    		setMyLayer(new GenericLayer(0, "", "Demo Layer", "A demo layer to show AR-viewer functions", null, null, null, null, null, null));
-    		getMyLayer().setNodes(new ArrayList<GeoNode>());
-    		new AsyncLGSNodes(this, getMyLayer(), new OnExecutionFinishedListener() {
-				@Override
-				public void onFinish() {
-					if(!isFinishing())
-						showResources();
-				}
-			}).execute();
-    		showDialog(DIALOG_EMPTY);
     		return;
     	}
 
@@ -522,46 +506,6 @@ public class ARBase extends ARActivity{
 					Intent myIntent = new Intent(Intent.ACTION_VIEW, 
 		 					 Uri.parse("http://www.libregeosocial.org/node/24"));
 	    			startActivity(myIntent);
-				}
-			})
-    		.create();
-    		
-    	case DIALOG_EMPTY:
-    		LayoutInflater factory = LayoutInflater.from(this);
-    		View textEntryView = factory.inflate(R.layout.custom_dialog, null);
-    		
-    		TextView text = (TextView) textEntryView.findViewById (R.id.dialog_text);
-    		text.setText(R.string.empty_message);
-    		
-    		return new AlertDialog.Builder(this)
-    		.setTitle(R.string.empty_title)
-    		.setView(textEntryView)
-    		.setPositiveButton(R.string.ok, new OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-				}
-			})
-			.setNeutralButton(R.string.empty_places, new OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					Intent i = new Intent(Intent.ACTION_VIEW);
-			    	i.setData(Uri.parse("market://search?q=pname:com.libresoft.apps.ARviewerPlaces"));
-			    	
-			    	startActivity(i);
-			    	finish();
-				}
-			})
-			.setNegativeButton(R.string.empty_tagging, new OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					Intent i = new Intent(Intent.ACTION_VIEW);
-			    	i.setData(Uri.parse("market://search?q=pname:com.libresoft.apps.ARviewerTagging"));
-			    	
-			    	startActivity(i);
-			    	finish();
 				}
 			})
     		.create();

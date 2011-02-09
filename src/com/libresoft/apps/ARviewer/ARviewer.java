@@ -21,29 +21,34 @@
 
 package com.libresoft.apps.ARviewer;
 
-/*
- * 
- * Intent extras:
- * LAYER: The layer that must contain the AR nodes (GenericLayer). Mandatory.
- * LATITUDE: User's latitude coordinate (double). Optional.
- * LONGITUDE: User's longitude coordinate (double). Optional.
- * 
- */
+import java.util.ArrayList;
 
 import com.libresoft.apps.ARviewer.Overlays.CustomViews;
+import com.libresoft.apps.ARviewer.Utils.AsyncTasks.AsyncLGSNodes;
+import com.libresoft.apps.ARviewer.Utils.AsyncTasks.AsyncLGSNodes.OnExecutionFinishedListener;
 import com.libresoft.sdk.ARviewer.Types.GenericLayer;
+import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ARviewer extends ARBase{ 
 
 	private static final int MENU_DISTANCE_FILTER = 101;
+	private static final int DIALOG_EMPTY = 101;
 
 	OnClickListener distFiltClickListener = new OnClickListener() {
 		
@@ -80,11 +85,30 @@ public class ARviewer extends ARBase{
 	}
     
     @Override
+    public void showResources(){
+    	super.showResources();
+    	if(getResourcesList() == null){
+    		Log.e("ARviewer", "Demo mode");
+    		setMyLayer(new GenericLayer(0, "", "Demo Layer", "A demo layer to show AR-viewer functions", null, null, null, null, null, null));
+    		getMyLayer().setNodes(new ArrayList<GeoNode>());
+    		new AsyncLGSNodes(this, getMyLayer(), new OnExecutionFinishedListener() {
+				@Override
+				public void onFinish() {
+					if(!isFinishing())
+						showResources();
+				}
+			}).execute();
+    		showDialog(DIALOG_EMPTY);
+    		return;
+    	}
+    }
+    
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
     	menu.clear();
     	
     	if(showMenu){
-    		menu.add(0, MENU_DISTANCE_FILTER, 0, "Distance filter")
+    		menu.add(0, MENU_DISTANCE_FILTER, 0, R.string.menu_distance)
     		.setIcon(R.drawable.meter);
     	}
     	
@@ -107,4 +131,53 @@ public class ARviewer extends ARBase{
 
     	return super.onOptionsItemSelected(item);
     }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {  
+    	
+    	switch (id) {
+    		
+    	case DIALOG_EMPTY:
+    		LayoutInflater factory = LayoutInflater.from(this);
+    		View textEntryView = factory.inflate(R.layout.custom_dialog, null);
+    		
+    		TextView text = (TextView) textEntryView.findViewById (R.id.dialog_text);
+    		text.setText(R.string.empty_message);
+    		
+    		return new AlertDialog.Builder(this)
+    		.setTitle(R.string.empty_title)
+    		.setView(textEntryView)
+    		.setPositiveButton(R.string.ok, new Dialog.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			})
+			.setNeutralButton(R.string.empty_places, new Dialog.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent i = new Intent(Intent.ACTION_VIEW);
+			    	i.setData(Uri.parse("market://search?q=pname:com.libresoft.apps.ARviewerPlaces"));
+			    	
+			    	startActivity(i);
+			    	finish();
+				}
+			})
+			.setNegativeButton(R.string.empty_tagging, new Dialog.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent i = new Intent(Intent.ACTION_VIEW);
+			    	i.setData(Uri.parse("market://search?q=pname:com.libresoft.apps.ARviewerTagging"));
+			    	
+			    	startActivity(i);
+			    	finish();
+				}
+			})
+    		.create();
+    	}
+		return super.onCreateDialog(id);
+    
+	}
 }
