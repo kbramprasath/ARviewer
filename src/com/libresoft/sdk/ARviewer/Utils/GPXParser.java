@@ -52,9 +52,7 @@ import com.libresoft.sdk.ARviewer.Types.Note;
  * @see com.libresoft.sdk.ARviewer.Types.Video
  * 
  */
-public class GPXParser{
-    public static final String TAG = "GPXParser";
-    
+public class GPXParser{    
     /**
      * Getting a GPX file that contains a sequence of waypoints (or points of
      * interest) from a given URL, it is parsed to an ArrayList of objects 

@@ -53,8 +53,6 @@ import com.libresoft.sdk.ARviewer.Types.Note;
  *
  */
 public class KMLParser{
-    public static final String TAG = "KMLParser";
-
     /**
      * Getting a KML file that contains a sequence of waypoints (or points of
      * interest) from a given URL, it is parsed to an ArrayList of objects 
