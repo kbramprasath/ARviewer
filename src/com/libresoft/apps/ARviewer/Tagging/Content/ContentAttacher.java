@@ -48,6 +48,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -225,11 +226,10 @@ public class ContentAttacher{
 	            	if(Photo.class.isInstance(resource)){
 	            		FileManager.getInstance();
 	            		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	            		path = FileManager.PHOTO_DIRECTORY + "data_" + Long.toString(System.currentTimeMillis()) + ".jpg";
-	            		if(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)
-	            			path = "/mnt" + path;
-	            		Uri outputFile = Uri.fromFile(new File(path));
-	            		i.putExtra(MediaStore.EXTRA_OUTPUT, outputFile);
+	            		File file = new File(FileManager.PHOTO_DIRECTORY, "data_" + Long.toString(System.currentTimeMillis()) + ".jpg");
+	            		path = file.getAbsolutePath();
+	            		Uri outputFileUri = Uri.fromFile(file);
+	            		i.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 	        			mActivity.startActivityForResult(i, ACTIVITY_PHOTO);
 	            	}else if(Audio.class.isInstance(resource)){
 	            		FileManager.getInstance();

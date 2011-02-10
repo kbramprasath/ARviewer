@@ -34,11 +34,11 @@ public class FileManager{
 	public static final int STAT_FPS = 0;
 	public static final int STAT_OPENCV = 1;
 	
-	private static final String SD_DIRECTORY = "/sdcard/arviewer/";
-	private static final String SCREENSHOT_DIRECTORY = "screenshots/";
-	private static final String STATS_DIRECTORY = "stats/";
-	public static final String PHOTO_DIRECTORY = SD_DIRECTORY + "photo/";
-	public static final String AUDIO_DIRECTORY = SD_DIRECTORY + "audio/";
+	private static final String SD_DIRECTORY = Environment.getExternalStorageDirectory() + "/arviewer/";
+	private static final String SCREENSHOT_DIRECTORY = "/screenshots/";
+	private static final String STATS_DIRECTORY = "/stats/";
+	public static final String PHOTO_DIRECTORY = SD_DIRECTORY + "/photo/";
+	public static final String AUDIO_DIRECTORY = SD_DIRECTORY + "/audio/";
 	private static final String SCREENSHOT = "screenshot_";
 	private static final String STATS_FPS = "fps_";
 	private static final String STATS_OPENCV = "opencv_";
