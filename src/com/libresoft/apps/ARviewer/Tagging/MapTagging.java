@@ -45,6 +45,7 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
 import com.libresoft.apps.ARviewer.ARUtils;
+import com.libresoft.apps.ARviewer.Constants;
 import com.libresoft.apps.ARviewer.R;
 import com.libresoft.apps.ARviewer.Maps.Overlays.ResourceOverlay;
 import com.libresoft.apps.ARviewer.Utils.MapUtils;
@@ -157,12 +158,12 @@ public class MapTagging extends MapActivity {
 				setPositionInMap();
 				
 				Toast.makeText(getBaseContext(), 
-                        "Resource updated", 
+                        R.string.map_resource_updated, 
                         Toast.LENGTH_SHORT).show();
 				break;
 				
 			default:
-				if(Build.VERSION.SDK_INT > Build.VERSION_CODES.DONUT)
+				if(Build.VERSION.SDK_INT > Constants.ANDROID_DONUT)
 					capture = false;
 				break;
 			}
@@ -256,11 +257,11 @@ public class MapTagging extends MapActivity {
     	
         super.onCreateOptionsMenu(menu);
 		
-        menu.add(0, MENU_SATELLITE, 0, "Toggle satellite view")
+        menu.add(0, MENU_SATELLITE, 0, R.string.map_toggle_sat)
 				.setIcon(R.drawable.eye)
 				.setAlphabeticShortcut('S');
         
-        menu.add(0, MENU_END, 0, "Done")
+        menu.add(0, MENU_END, 0, R.string.done)
         		.setIcon(R.drawable.done);
         
         return true;
@@ -300,10 +301,11 @@ public class MapTagging extends MapActivity {
     	
 	    	case DIALOG_CHARGE:
 	    		
-		        return new AlertDialog.Builder(this)	        
-		        .setTitle("Press OK to continue")
+		        return new AlertDialog.Builder(this)	
+		        .setTitle(R.string.map_tagging_charge_title)
+		        .setMessage(R.string.map_tagging_charge_message)
 		        .setCancelable(false)
-		        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 		            public void onClick(DialogInterface dialog, int whichButton) {
 		            	
 		                /* User clicked OK so do some stuff */ 

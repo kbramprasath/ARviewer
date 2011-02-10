@@ -99,7 +99,7 @@ public class LocationWays extends MapActivity {
         }
         
         init();
-        
+        Toast.makeText(this, R.string.map_location_start, Toast.LENGTH_LONG).show();
     }
     
     @Override
