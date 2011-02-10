@@ -18,6 +18,13 @@
 	<string name="empty_title">Warning</string>
 	<string name="empty_message">This FLOSS application is a tool which provides an augmented reality BROWSER or LABELER interface to external apps. By default, By default, a DEMO layer, containing nodes from LibreGeoSocial, 11870.com and Youtube, will be shown in a BROWSER mode.\n\nMaybe you are interested on trying our DEMO applications, AR-viewer Places and AR-viewer Tagging, to see the power of combining this tool with other applications.\n\nFor further information, please visit our website at:\n\n http://www.libregeosocial.org/node/24</string>
 	
+	<!-- Maps -->
+	<string name="map_resource_updated">Resource updated</string>
+	<string name="map_toggle_sat">Toggle satellite view</string>
+	<string name="map_location_start">Tap over your location</string>
+	<string name="map_tagging_charge_title">Instructions</string>
+	<string name="map_tagging_charge_message">1. Tap the map over the target location.\n\n2. Press \"Done\" in the options menu.</string>
+	
 	<!-- Location preferences -->
 	<string name="pref_location_title">Location</string>
 	<string name="pref_location_summary">Configure the location preferences</string>
