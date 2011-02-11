@@ -37,7 +37,7 @@
     	<item>All_names</item>
     </string-array>
     
-        <string-array name="height_options">
+    <string-array name="height_options">
     	<item>No heights</item>
     	<item>Existing heights</item>
     	<item>All heights</item>
@@ -47,6 +47,13 @@
     	<item>No_heights</item>
     	<item>Existing_heights</item>
     	<item>All_heights</item>
+    </string-array>
+    
+    <string-array name="attaching_modes">
+    	<item>Note</item>
+    	<item>Photo</item>
+    	<item>Audio note</item>
+    	<item>QR code</item>
     </string-array>
     
 </resources>
