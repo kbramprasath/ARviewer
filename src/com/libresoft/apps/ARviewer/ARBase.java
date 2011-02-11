@@ -390,19 +390,19 @@ public class ARBase extends ARActivity{
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
     	if(showMenu){
-    		SubMenu sub1 = menu.addSubMenu(0, MENU_LOCATION, 0, "Location")
+    		SubMenu sub1 = menu.addSubMenu(0, MENU_LOCATION, 0, R.string.menu_location)
     		.setIcon(R.drawable.mundo);
-    		sub1.add(0,MENU_INDOOR_LOCATION, 0, "BIDI Location");
-    		sub1.add(0,MENU_SERVICE_LOCATION, 0, "Location service");
-    		sub1.add(0,MENU_LOCATION_WAYS, 0, "Manual");
+    		sub1.add(0,MENU_INDOOR_LOCATION, 0, R.string.menu_location_bidi);
+    		sub1.add(0,MENU_LOCATION_WAYS, 0, R.string.menu_location_manual);
+    		sub1.add(0,MENU_SERVICE_LOCATION, 0, R.string.menu_location_service);
     	}
     	
     	screenshotManager.onCreateOptionsMenu(menu);
     	
     	if(showMenu)
-    		menu.add(0, MENU_PREFERENCES, 0, "Settings")
+    		menu.add(0, MENU_PREFERENCES, 0, R.string.menu_settings)
     			.setIcon(R.drawable.spanner_48);
-    	menu.add(0, MENU_ABOUT, 0, "About")
+    	menu.add(0, MENU_ABOUT, 0, R.string.menu_about)
 	    	.setIcon(R.drawable.about)
 	    	.setAlphabeticShortcut('B');
     	
