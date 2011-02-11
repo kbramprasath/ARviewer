@@ -105,8 +105,8 @@
 	<string name="label_method_immediate">Immediate</string>
 	<string name="label_method_fast">Fast</string>
 	<string name="label_method_map">Map</string>
-	<string name="label_method_accurate_side">Accurate line</string>
-	<string name="label_method_accurate_line">Accurate side</string>
+	<string name="label_method_accurate_side">Accurate side</string>
+	<string name="label_method_accurate_line">Accurate line</string>
 	
 	<!-- Menu entries -->
 	<string name="menu_distance">Distance filter</string>
