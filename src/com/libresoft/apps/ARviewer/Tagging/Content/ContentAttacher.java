@@ -42,21 +42,19 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -66,18 +64,18 @@ public class ContentAttacher{
 	public static final int ACTIVITY_PICK_GALLERY = 10000;
 	public static final int ACTIVITY_PICK_QRCODE = 10001;
 	public static final int ACTIVITY_PHOTO = 10002;
-	
-	public static final int MENU = 10000;
-	public static final int MENU_NOTE = 10001;
-	public static final int MENU_PHOTO = 10002;
-	public static final int MENU_AUDIO = 10003;
-	public static final int MENU_QRCODE = 10004;
+
+	public static final int NOTE = 0;
+	public static final int PHOTO = 1;
+	public static final int AUDIO = 2;
+	public static final int QRCODE = 3;
 	
 	public static final int DIALOG_UPLOAD = 10000;
 	public static final int DIALOG_SELECT = 10001;
 	public static final int DIALOG_SURE = 10002;
 	public static final int DIALOG_RECORD_AUDIO = 10003;
 	public static final int DIALOG_PBAR = 10004;
+	public static final int DIALOG_ATTACH = 10005;
 	
 	public static final String AUDIO_TMP = "audio_tmp_";
 	
@@ -137,23 +135,158 @@ public class ContentAttacher{
 		}
 	}
 	
-	public void onCreateOptionsMenu(Menu menu){
-		SubMenu sub = menu.addSubMenu(0, MENU, 0, R.string.label_attach_content)
-		.setIcon(R.drawable.media_add);
+	public Dialog onCreateDialog(int id){
 		
-		sub.add(0,MENU_NOTE, 0, "Note");
-		sub.add(0,MENU_PHOTO, 0, "Photo");
-		sub.add(0,MENU_AUDIO, 0, "Audio");
-		sub.add(0,MENU_QRCODE, 0, "QRCode");
+		switch(id){
+    		
+		case DIALOG_SELECT:
+			return new AlertDialog.Builder(mActivity)	        
+	        .setTitle("Select source")
+	        .setOnCancelListener(new OnCancelListener() {
+				
+				@Override
+				public void onCancel(DialogInterface dialog) {
+	            	if(onAttachListener != null)
+	            		onAttachListener.onReady(null);
+					mActivity.removeDialog(DIALOG_SELECT);
+				}
+			})
+	        .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+	            public void onClick(DialogInterface dialog, int whichButton) {
+					mActivity.removeDialog(DIALOG_SELECT);
+	            	if(Photo.class.isInstance(resource)){
+	            		FileManager.getInstance();
+	            		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+	            		File file = new File(FileManager.PHOTO_DIRECTORY, "data_" + Long.toString(System.currentTimeMillis()) + ".jpg");
+	            		path = file.getAbsolutePath();
+	            		Uri outputFileUri = Uri.fromFile(file);
+	            		i.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+	        			mActivity.startActivityForResult(i, ACTIVITY_PHOTO);
+	            	}else if(Audio.class.isInstance(resource)){
+	            		FileManager.getInstance();
+	            		audio_recorder = new AudioRecorder(mActivity);
+	            		audio_recorder.doRecording(AUDIO_TMP + Long.toString(System.currentTimeMillis()), DIALOG_RECORD_AUDIO);
+	            	}
+	            }
+	        })
+	        .setNeutralButton("Pick", new DialogInterface.OnClickListener() {
+	            public void onClick(DialogInterface dialog, int whichButton) {
+					mActivity.removeDialog(DIALOG_SELECT);
+	            	if(Photo.class.isInstance(resource)){
+	        			Intent i = new Intent(Intent.ACTION_PICK) ;
+	        	    	i.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
+	        	    					 MediaStore.Images.Media.CONTENT_TYPE) ;
+	        	    	
+	        	    	mActivity.startActivityForResult(i,ACTIVITY_PICK_GALLERY) ;
+	            	}else if(Audio.class.isInstance(resource)){
+	        			Intent i2;
+	        			if((Build.VERSION.SDK_INT < Constants.ANDROID_ECLAIR) || 
+	        					(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)){
+	        				i2 = new Intent(Intent.ACTION_PICK) ;
+	        				i2.setDataAndType(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, 
+	        									MediaStore.Audio.Media.CONTENT_TYPE) ;
+	        			}else{
+	        				i2 = new Intent(mActivity, ContentPick.class) ;
+	        				i2.putExtra("MAIN_PATH", FileManager.AUDIO_DIRECTORY);
+	        				i2.putExtra("MIME_TYPE", "audio/3gpp");
+	        			}
+	        	    	
+	        	    	mActivity.startActivityForResult(i2,ACTIVITY_PICK_GALLERY) ;
+	            	}
+	            }
+	        })
+	        .create();
+			
+		case DIALOG_RECORD_AUDIO:
+			return audio_recorder.getRecordDialog(DIALOG_RECORD_AUDIO, finishRecordingListener);
+		
+		case DIALOG_UPLOAD:
+			
+			LayoutInflater factory = LayoutInflater.from(mActivity);
+    		final View textEntryView = factory.inflate(R.layout.note, null);
+    		
+    		final EditText title = (EditText) textEntryView.findViewById (R.id.txtTitle);
+    		final EditText body = (EditText) textEntryView.findViewById (R.id.txtBody);
+            
+            if(Note.class.isInstance(resource)) {
+            	Note note = (Note) resource;
+            	title.setText(note.getTitle());
+            	body.setText(note.getBody());
+            }
+            
+	        return new AlertDialog.Builder(mActivity)	        
+	        .setTitle(R.string.label_create_resource)
+	        .setView(textEntryView)
+	        .setOnCancelListener(new OnCancelListener() {
+				
+				@Override
+				public void onCancel(DialogInterface dialog) {
+	            	if(onAttachListener != null)
+	            		onAttachListener.onReady(null);
+					mActivity.removeDialog(DIALOG_UPLOAD);
+				}
+			})
+	        .setPositiveButton(R.string.label_create, new DialogInterface.OnClickListener() {
+	            public void onClick(DialogInterface dialog, int whichButton) {
+
+	            	GeoNode result = null;
+	            	if(Note.class.isInstance(resource)){	    	            		
+	            		Note note = (Note) resource;
+	            		note.setTitle(title.getText().toString());
+	            		note.setBody(body.getText().toString());
+	            		result = note;
+	            	}else if(Photo.class.isInstance(resource)){
+	            		Photo photo = (Photo) resource;
+	            		photo.setName(title.getText().toString());
+	            		photo.setDescription(body.getText().toString());
+	            		photo.setPhotoPath(path);
+	            		result = photo;
+	            	}else if(Audio.class.isInstance(resource)){
+	            		Audio audio = (Audio) resource;
+	            		audio.setName(title.getText().toString());
+	            		audio.setDescription(body.getText().toString());
+	            		audio.setPath(path);
+	            		
+	            		result = audio;
+	            	}
+					mActivity.removeDialog(DIALOG_UPLOAD);
+	            	if(onAttachListener != null)
+	            		onAttachListener.onReady(result);
+	            }
+	        })
+	        .create();
+			
+		case DIALOG_ATTACH:
+			return new AlertDialog.Builder(mActivity)
+			.setTitle(R.string.label_create_resource)
+			.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+	            	if(onAttachListener != null)
+	            		onAttachListener.onReady(null);
+					mActivity.removeDialog(DIALOG_ATTACH);
+				}
+			})
+			.setItems(R.array.attaching_modes, new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					if(!onOptionsItemSelected(which) && (onAttachListener != null))
+						onAttachListener.onReady(null);
+					mActivity.removeDialog(DIALOG_ATTACH);
+				}
+			})
+			.create();
+	        
+		}
+		return null;
+		
 	}
 	
-	public boolean onOptionsItemSelected (MenuItem item){
+	private boolean onOptionsItemSelected (int choice){
 		
-		switch(item.getItemId()){
-		case MENU:
-			break;
+		switch(choice){
 			
-		case MENU_NOTE:
+		case NOTE:
 			resource = new Note (null, "", "",
 					  resource_location.getLatitude(),
 					  resource_location.getLongitude(),
@@ -162,7 +295,7 @@ public class ContentAttacher{
 			mActivity.showDialog(DIALOG_UPLOAD);
 			break;
 			
-		case MENU_PHOTO:
+		case PHOTO:
 			resource = new Photo(0, 
 					resource_location.getLatitude(),
 					resource_location.getLongitude(), 
@@ -172,7 +305,7 @@ public class ContentAttacher{
 			mActivity.showDialog(DIALOG_SELECT);
 			break;
 			
-		case MENU_AUDIO:
+		case AUDIO:
 			resource = new Audio  (null, 
 					  "", 
 					  "",
@@ -185,7 +318,7 @@ public class ContentAttacher{
 			mActivity.showDialog(DIALOG_SELECT);
 			break;
 			
-		case MENU_QRCODE:
+		case QRCODE:
 	  		PackageManager pm = mActivity.getPackageManager();
 			List<ApplicationInfo> list = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 			boolean isBarcode = false;
@@ -212,123 +345,6 @@ public class ContentAttacher{
 			return false;
 		}
 		return true;
-	}
-	
-	public Dialog onCreateDialog(int id){
-		
-		switch(id){
-    		
-		case DIALOG_SELECT:
-			return new AlertDialog.Builder(mActivity)	        
-	        .setTitle("Select source")
-	        .setPositiveButton("Create", new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int whichButton) {
-	            	if(Photo.class.isInstance(resource)){
-	            		FileManager.getInstance();
-	            		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	            		File file = new File(FileManager.PHOTO_DIRECTORY, "data_" + Long.toString(System.currentTimeMillis()) + ".jpg");
-	            		path = file.getAbsolutePath();
-	            		Uri outputFileUri = Uri.fromFile(file);
-	            		i.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-	        			mActivity.startActivityForResult(i, ACTIVITY_PHOTO);
-	            	}else if(Audio.class.isInstance(resource)){
-	            		FileManager.getInstance();
-	            		audio_recorder = new AudioRecorder(mActivity);
-	            		audio_recorder.doRecording(AUDIO_TMP + Long.toString(System.currentTimeMillis()), DIALOG_RECORD_AUDIO);
-	            	}
-	            }
-	        })
-	        .setNeutralButton("Pick", new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int whichButton) {
-	            	if(Photo.class.isInstance(resource)){
-	        			Intent i = new Intent(Intent.ACTION_PICK) ;
-	        	    	i.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
-	        	    					 MediaStore.Images.Media.CONTENT_TYPE) ;
-	        	    	
-	        	    	mActivity.startActivityForResult(i,ACTIVITY_PICK_GALLERY) ;
-	            	}else if(Audio.class.isInstance(resource)){
-	        			Intent i2;
-	        			if((Build.VERSION.SDK_INT < Constants.ANDROID_ECLAIR) || 
-	        					(Build.VERSION.SDK_INT > Constants.ANDROID_ECLAIR_MR1)){
-	        				i2 = new Intent(Intent.ACTION_PICK) ;
-	        				i2.setDataAndType(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, 
-	        									MediaStore.Audio.Media.CONTENT_TYPE) ;
-	        			}else{
-	        				i2 = new Intent(mActivity, ContentPick.class) ;
-	        				i2.putExtra("MAIN_PATH", FileManager.AUDIO_DIRECTORY);
-	        				i2.putExtra("MIME_TYPE", "audio/3gpp");
-	        			}
-	        	    	
-	        	    	mActivity.startActivityForResult(i2,ACTIVITY_PICK_GALLERY) ;
-	            	}
-	            }
-	        })
-	        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int whichButton) {
-	
-	                /* User clicked cancel so do some stuff */
-	            }
-	        })
-	        .create();
-			
-		case DIALOG_RECORD_AUDIO:
-			return audio_recorder.getRecordDialog(DIALOG_RECORD_AUDIO, finishRecordingListener);
-		
-		case DIALOG_UPLOAD:
-			
-			LayoutInflater factory = LayoutInflater.from(mActivity);
-    		final View textEntryView = factory.inflate(R.layout.note, null);
-    		
-    		final EditText title = (EditText) textEntryView.findViewById (R.id.txtTitle);
-    		final EditText body = (EditText) textEntryView.findViewById (R.id.txtBody);
-            
-            if(Note.class.isInstance(resource)) {
-            	Note note = (Note) resource;
-            	title.setText(note.getTitle());
-            	body.setText(note.getBody());
-            }
-            
-	        return new AlertDialog.Builder(mActivity)	        
-	        .setTitle(R.string.label_create_resource)
-	        .setView(textEntryView)
-	        .setPositiveButton(R.string.label_create, new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int whichButton) {
-
-	            	GeoNode result = null;
-	            	if(Note.class.isInstance(resource)){	    	            		
-	            		Note note = (Note) resource;
-	            		note.setTitle(title.getText().toString());
-	            		note.setBody(body.getText().toString());
-	            		result = note;
-	            	}else if(Photo.class.isInstance(resource)){
-	            		Photo photo = (Photo) resource;
-	            		photo.setName(title.getText().toString());
-	            		photo.setDescription(body.getText().toString());
-	            		photo.setPhotoPath(path);
-	            		result = photo;
-	            	}else if(Audio.class.isInstance(resource)){
-	            		Audio audio = (Audio) resource;
-	            		audio.setName(title.getText().toString());
-	            		audio.setDescription(body.getText().toString());
-	            		audio.setPath(path);
-	            		
-	            		result = audio;
-	            	}
-	            	if(onAttachListener != null)
-	            		onAttachListener.onReady(result);
-	            }
-	        })
-	        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int whichButton) {
-	
-	                /* User clicked cancel so do some stuff */
-	            }
-	        })
-	        .create();
-			
-		}
-		return null;
-		
 	}
 	
 	public boolean onActivityResult(int requestCode, int resultCode, Intent data){

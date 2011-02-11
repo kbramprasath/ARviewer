@@ -60,7 +60,7 @@ public class ARlabeling extends ARBase{
 				Toast.makeText(getBaseContext(), R.string.ok, Toast.LENGTH_SHORT).show();
 				showResources();
 			}else
-				Toast.makeText(getBaseContext(), R.string.error, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), R.string.label_cancel, Toast.LENGTH_SHORT).show();
 		}
 	};
 	
@@ -69,7 +69,7 @@ public class ARlabeling extends ARBase{
 		loadParameters();
 		loadConfig(false);
 		ARSummaryBox.setShowRemoveButton(true);
-		tagManager = new ARTagManager(this, getLayers(), getResourcesList(), getLocation(), cam_altitude);
+		tagManager = new ARTagManager(this, getLayers(), getResourcesList(), getLocation());
 		tagManager.setOnLocationChangeListener(onTaggingLocationListener);
 		tagManager.setOnTaggingFinishedListener(onTaggingFinishedListener);
 		showResources();

@@ -171,10 +171,9 @@ public class ARBase extends ARActivity{
 			}else
 				if((tagManager == null) || (tagManager.getSavingType() == -1))
 					requestAltitudeInfo();
-			if(tagManager != null){
+			if(tagManager != null)
 				tagManager.setUserLocation(location);
-				tagManager.setCamAltitude(cam_altitude);
-			}
+			
 		}
     	
     };

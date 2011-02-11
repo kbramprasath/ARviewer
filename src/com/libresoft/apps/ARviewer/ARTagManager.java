@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import com.libresoft.apps.ARviewer.Overlays.CustomViews;
 import com.libresoft.apps.ARviewer.Tagging.AccurateTag;
 import com.libresoft.apps.ARviewer.Tagging.MapTagging;
-import com.libresoft.apps.ARviewer.Tagging.TagResult;
+import com.libresoft.apps.ARviewer.Tagging.Content.ContentAttacher;
+import com.libresoft.apps.ARviewer.Tagging.Content.ContentAttacher.OnAttachListener;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
@@ -56,7 +57,6 @@ public class ARTagManager{
 	private static final int MENU_TAGGING_MAP = MENU_TAGGING_FAST + 1;
 	private static final int MENU_TAGGING_ACCURATE_SIDE = MENU_TAGGING_MAP + 1;
 	private static final int MENU_TAGGING_ACCURATE_LINE = MENU_TAGGING_ACCURATE_SIDE + 1;
-//	private static final int MENU_TAGGING_ANGLE = MENU_TAGGING_ACCURATE_LINE + 1;
 	
 	public static final int DIALOG_MOVE = MODULE_BASE + 1;
 	
@@ -69,7 +69,6 @@ public class ARTagManager{
 	public static final int TAG_MAP = 2;
 	public static final int TAG_ACCURATE_SIDE = 3;
 	public static final int TAG_ACCURATE_LINE = 4;
-//	public static final int TAG_ANGLE = 5;
 	
 	private OnLocationChangeListener onLocationChangeListener = null;
 	private OnTaggingFinishedListener onTaggingFinishedListener = null;
@@ -81,12 +80,9 @@ public class ARTagManager{
 	private int savingType;
 	private float[] user_location = new float[3];
 	private float[] user_location_fixed = new float[3];
-	private float cam_altitude_inst;
-	private float cam_altitude;
 
 	private float[] resource_location = new float[3];
     private static AccurateTag accurateTag;
-//    private static AngleTag angleTag;
     private float[] angles = new float[3];
     private float[] res_angles = new float[3];
     private double distance = 0;
@@ -94,6 +90,23 @@ public class ARTagManager{
 	private Activity mActivity;
 	private ARLayerManager layers;
 	private ArrayList<ARGeoNode> res_list;
+	
+	private ContentAttacher content_attacher = null;
+	
+	private OnAttachListener onAttachListener = new OnAttachListener() {
+		
+		@Override
+		public void onReady(GeoNode node) {
+			if(node != null){
+				if((node != null) && (res_list != null))
+						res_list.add(new ARGeoNode((ARBase) mActivity, node, layers.getInfoLayer()));
+				onTaggingFinishedListener.onFinish(true);	    		
+			} else{
+				onTaggingFinishedListener.onFinish(false);
+			}
+			layers.removeExtraElement(tagIFContainer);
+		}
+	};
 	
 	OnClickListener fast_click = new OnClickListener() {
 		
@@ -110,13 +123,12 @@ public class ARTagManager{
 		}
 	};
 	
-	public ARTagManager(Activity mActivity, ARLayerManager layers, ArrayList<ARGeoNode> res_list, float[] user_location, float cam_altitude){
+	public ARTagManager(Activity mActivity, ARLayerManager layers, ArrayList<ARGeoNode> res_list, float[] user_location){
 		this.mActivity = mActivity;
 		this.layers = layers;
 		this.res_list = res_list;
 		setSavingType(TAG_NONE);
 		setUserLocation(user_location);
-		setCamAltitude(cam_altitude);
 	}
 	
 	public void setLocationServiceOn(int isLocationServiceOn){
@@ -142,9 +154,6 @@ public class ARTagManager{
 		case TAG_ACCURATE_SIDE:
 			accurateTag = new AccurateTag();
 			break;
-//		case TAG_ANGLE:
-//			angleTag = new AngleTag();
-//			break;
 		default:
 			return;
 		}
@@ -168,10 +177,6 @@ public class ARTagManager{
 	
 	public void setAngles(float[] angles){
 		this.angles = angles.clone();
-	}
-	
-	public void setCamAltitude(float cam_altitude_inst){
-		this.cam_altitude_inst = cam_altitude_inst;
 	}
 	
 	public int getSavingType(){
@@ -199,20 +204,11 @@ public class ARTagManager{
 					"Error",
 					Toast.LENGTH_LONG).show();
 		else{
+			content_attacher = new ContentAttacher(mActivity);
+	        content_attacher.setOnAttachListener(onAttachListener);
+	        content_attacher.setResourceLocation(loc, false);
 			
-			Location myLoc = new Location("");
-			myLoc.setLatitude(user_location_fixed[0]);
-			myLoc.setLongitude(user_location_fixed[1]);
-
-			Intent i = new Intent(mActivity, TagResult.class);
-			i.putExtra("LATITUDE", loc.getLatitude());
-			i.putExtra("LONGITUDE", loc.getLongitude());
-			i.putExtra("ALTITUDE", loc.getAltitude());
-			i.putExtra("DISTANCE", Double.toString((double) myLoc.distanceTo(loc)));
-			i.putExtra("HEIGHT", Double.toString((double)loc.getAltitude()- cam_altitude));
-			
-			mActivity.startActivityForResult(i, ACTIVITY_RESULT);
-			
+	        mActivity.showDialog(ContentAttacher.DIALOG_ATTACH);
 		}
     	
     }
@@ -266,7 +262,6 @@ public class ARTagManager{
     public boolean tagAction(){
     	user_location_fixed = user_location.clone();
     	res_angles = angles.clone();
-    	cam_altitude = cam_altitude_inst;
 		
     	switch(savingType){
 
@@ -286,8 +281,6 @@ public class ARTagManager{
     		i.putExtra("AZIMUTH", ARCompassManager.getAzimuth(res_angles));
     		mActivity.startActivityForResult(i, ACTIVITY_MAP);
 
-//    		is_resource_clickable=true;
-
     		break;
 
     	case TAG_ACCURATE_SIDE:
@@ -300,7 +293,7 @@ public class ARTagManager{
     			mActivity.showDialog(DIALOG_MOVE);
     			Toast.makeText(mActivity, 
     					"Saved", 
-    					Toast.LENGTH_LONG).show();
+    					Toast.LENGTH_SHORT).show();
     			return false;
     		}
     		break;
@@ -315,7 +308,7 @@ public class ARTagManager{
     			mActivity.showDialog(DIALOG_MOVE);
     			Toast.makeText(mActivity, 
     					"Saved", 
-    					Toast.LENGTH_LONG).show();
+    					Toast.LENGTH_SHORT).show();
     			return false;
     		}
     		break;
@@ -326,13 +319,13 @@ public class ARTagManager{
     
     public void onCreateOptionsMenu(Menu menu) {
     	
-    	SubMenu sub0 = menu.addSubMenu(0, MENU_TAGGING, 0, "Tag resource")
+    	SubMenu sub0 = menu.addSubMenu(0, MENU_TAGGING, 0, R.string.label_method_title)
     	.setIcon(R.drawable.tag);
-    	sub0.add(0,MENU_TAGGING_IMMEDIATE, 0, "Immediate");
-    	sub0.add(0,MENU_TAGGING_FAST, 0, "Fast");
-    	sub0.add(0,MENU_TAGGING_MAP, 0, "Map");
-    	sub0.add(0,MENU_TAGGING_ACCURATE_SIDE, 0, "Accurate side");
-    	sub0.add(0,MENU_TAGGING_ACCURATE_LINE, 0, "Accurate line");
+    	sub0.add(0,MENU_TAGGING_IMMEDIATE, 0, R.string.label_method_immediate);
+    	sub0.add(0,MENU_TAGGING_FAST, 0, R.string.label_method_fast);
+    	sub0.add(0,MENU_TAGGING_MAP, 0, R.string.label_method_map);
+    	sub0.add(0,MENU_TAGGING_ACCURATE_SIDE, 0, R.string.label_method_accurate_side);
+    	sub0.add(0,MENU_TAGGING_ACCURATE_LINE, 0, R.string.label_method_accurate_line);
     		
     }
     
@@ -366,7 +359,12 @@ public class ARTagManager{
         return true;
     }
     
-    public Dialog onCreateDialog(int id) {    
+    public Dialog onCreateDialog(int id) {
+    	  
+    	Dialog diag = content_attacher.onCreateDialog(id);
+    	if(diag != null)
+    		return diag;
+    	
     	switch (id) {
     	case DIALOG_MOVE:
 
@@ -475,7 +473,7 @@ public class ARTagManager{
 
     		return new AlertDialog.Builder(mActivity)	      
     		.setCancelable(false)
-    		.setTitle("Move for tagging")
+    		.setTitle("Move yourself")
     		.setView(textEntryView1)
     		.setPositiveButton("Done", new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int whichButton) {
@@ -513,6 +511,10 @@ public class ARTagManager{
     }
     
     public boolean onActivityResult (int requestCode, int resultCode, Intent data) { 
+    	
+    	if(content_attacher.onActivityResult(requestCode, resultCode, data))
+    		return true;
+    	
 		switch (requestCode) { 
 		case ACTIVITY_MAP:
 
@@ -528,18 +530,18 @@ public class ARTagManager{
 			}
 			return true;
 
-		case ACTIVITY_RESULT:
-
-			if( resultCode != Activity.RESULT_CANCELED ) {
-				GeoNode node = (GeoNode) data.getSerializableExtra("RES_NODE");
-				if((node != null) && (res_list != null))
-						res_list.add(new ARGeoNode((ARBase) mActivity, node, layers.getInfoLayer()));
-				onTaggingFinishedListener.onFinish(true);	    		
-			} else{
-				onTaggingFinishedListener.onFinish(false);
-			}
-			layers.removeExtraElement(tagIFContainer);
-			return true;
+//		case ACTIVITY_RESULT:
+//
+//			if( resultCode != Activity.RESULT_CANCELED ) {
+//				GeoNode node = (GeoNode) data.getSerializableExtra("RES_NODE");
+//				if((node != null) && (res_list != null))
+//						res_list.add(new ARGeoNode((ARBase) mActivity, node, layers.getInfoLayer()));
+//				onTaggingFinishedListener.onFinish(true);	    		
+//			} else{
+//				onTaggingFinishedListener.onFinish(false);
+//			}
+//			layers.removeExtraElement(tagIFContainer);
+//			return true;
     	default:
     		break;
 		}

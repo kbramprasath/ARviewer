@@ -28,8 +28,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
@@ -114,18 +112,18 @@ public class TagResult extends MapActivity{
     	setMap();
     }
 	
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-    	content_attacher.onCreateOptionsMenu(menu);
-        super.onCreateOptionsMenu(menu);        
-        return true;
-    }
-
-    public boolean onOptionsItemSelected (MenuItem item) {
-    	if(content_attacher.onOptionsItemSelected(item))
-    		return true;
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//    	content_attacher.onCreateOptionsMenu(menu);
+//        super.onCreateOptionsMenu(menu);        
+//        return true;
+//    }
+//
+//    public boolean onOptionsItemSelected (MenuItem item) {
+//    	if(content_attacher.onOptionsItemSelected(item))
+//    		return true;
+//        return super.onOptionsItemSelected(item);
+//    }
 	
     @Override
     protected Dialog onCreateDialog(int id) {       
