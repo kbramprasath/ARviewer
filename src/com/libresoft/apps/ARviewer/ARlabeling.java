@@ -35,6 +35,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -103,25 +104,8 @@ public class ARlabeling extends ARBase{
     	
     	switch (item.getItemId()) {
     	case MENU_DONE:
-    		ArrayList<GeoNode> nodes_list = new ArrayList<GeoNode>();
-    		ArrayList<ARGeoNode> source_nodes_list = getResourcesList();
-    		
-    		for(ARGeoNode node: source_nodes_list){
-    			GeoNode simple_node = node.getGeoNode();
-    			if(Photo.class.isInstance(simple_node))
-    				((Photo)simple_node).clearBitmapPhotoThumb();
-    			else if(Video.class.isInstance(simple_node))
-    				((Video)simple_node).clearBitmapPhotoThumb();
-    			else if(User.class.isInstance(simple_node))
-    				((User)simple_node).clearBitmapAvatarThumb();
-    			nodes_list.add(simple_node);
-    		}
-    		
-    		Intent resultIntent = new Intent();
-    		resultIntent.putExtra("LABELED_NODES_LIST", nodes_list);
-    		setResult(Activity.RESULT_OK, resultIntent);
-    		finish();
-    		break;
+    		returnTaggedNodes();
+    		return true;
     	}
 
     	return super.onOptionsItemSelected(item);
@@ -147,5 +131,37 @@ public class ARlabeling extends ARBase{
     	if (tagManager.onActivityResult(requestCode, resultCode, data))
     		return;
     	super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK){
+			returnTaggedNodes();
+			return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
+	}
+
+	
+	private void returnTaggedNodes(){
+		ArrayList<GeoNode> nodes_list = new ArrayList<GeoNode>();
+		ArrayList<ARGeoNode> source_nodes_list = getResourcesList();
+		
+		for(ARGeoNode node: source_nodes_list){
+			GeoNode simple_node = node.getGeoNode();
+			if(Photo.class.isInstance(simple_node))
+				((Photo)simple_node).clearBitmapPhotoThumb();
+			else if(Video.class.isInstance(simple_node))
+				((Video)simple_node).clearBitmapPhotoThumb();
+			else if(User.class.isInstance(simple_node))
+				((User)simple_node).clearBitmapAvatarThumb();
+			nodes_list.add(simple_node);
+		}
+		
+		Intent resultIntent = new Intent();
+		resultIntent.putExtra("LABELED_NODES_LIST", nodes_list);
+		setResult(Activity.RESULT_OK, resultIntent);
+		finish();
 	}
 }

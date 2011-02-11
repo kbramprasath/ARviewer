@@ -67,8 +67,8 @@ public class ARTagManager{
 	public static final int TAG_IMMEDIATE = 0;
 	public static final int TAG_FAST = 1;
 	public static final int TAG_MAP = 2;
-	public static final int TAG_ACCURATE_SIDE = 3;
-	public static final int TAG_ACCURATE_LINE = 4;
+	public static final int TAG_ACCURATE_LINE = 3;
+	public static final int TAG_ACCURATE_SIDE = 4;
 	
 	private OnLocationChangeListener onLocationChangeListener = null;
 	private OnTaggingFinishedListener onTaggingFinishedListener = null;
@@ -360,10 +360,11 @@ public class ARTagManager{
     }
     
     public Dialog onCreateDialog(int id) {
-    	  
-    	Dialog diag = content_attacher.onCreateDialog(id);
-    	if(diag != null)
-    		return diag;
+    	if(content_attacher != null){
+    		Dialog diag = content_attacher.onCreateDialog(id);
+    		if(diag != null)
+    			return diag;
+    	}
     	
     	switch (id) {
     	case DIALOG_MOVE:
@@ -512,7 +513,7 @@ public class ARTagManager{
     
     public boolean onActivityResult (int requestCode, int resultCode, Intent data) { 
     	
-    	if(content_attacher.onActivityResult(requestCode, resultCode, data))
+    	if((content_attacher != null) && content_attacher.onActivityResult(requestCode, resultCode, data))
     		return true;
     	
 		switch (requestCode) { 

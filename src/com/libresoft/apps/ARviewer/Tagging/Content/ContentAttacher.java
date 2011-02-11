@@ -91,9 +91,14 @@ public class ContentAttacher{
 	private OnFinishListener finishRecordingListener = new OnFinishListener() {
 		
 		@Override
-		public void onFinish() {
-			path = audio_recorder.getPath();
-			mActivity.showDialog(DIALOG_UPLOAD);
+		public void onFinish(boolean isFinish) {
+			if(isFinish){
+				path = audio_recorder.getPath();
+				mActivity.showDialog(DIALOG_UPLOAD);
+			}else{
+            	if(onAttachListener != null)
+            		onAttachListener.onReady(null);
+			}
 		}
 	};
 	

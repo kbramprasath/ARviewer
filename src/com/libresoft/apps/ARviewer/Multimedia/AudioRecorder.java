@@ -209,7 +209,7 @@ public class AudioRecorder{
 					aManager.stopPlayer();
 				}
 				mActivity.removeDialog(id);
-				listener.onFinish();
+				listener.onFinish(true);
 			}
 		})
 		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -220,6 +220,7 @@ public class AudioRecorder{
 					aManager.stopPlayer();
 				}
 				mActivity.removeDialog(id);
+				listener.onFinish(false);
 			}
 		})
 		.create();
@@ -251,6 +252,6 @@ public class AudioRecorder{
 	
 	
 	public interface OnFinishListener {
-		public abstract void onFinish();
+		public abstract void onFinish(boolean isFinished);
 	}
 }
