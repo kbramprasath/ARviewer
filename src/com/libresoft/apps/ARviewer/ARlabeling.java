@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import com.libresoft.apps.ARviewer.ARTagManager.OnLocationChangeListener;
 import com.libresoft.apps.ARviewer.ARTagManager.OnTaggingFinishedListener;
 import com.libresoft.apps.ARviewer.Overlays.ARSummaryBox;
+import com.libresoft.apps.ARviewer.Tips.ARTipManager;
 import com.libresoft.sdk.ARviewer.Types.GeoNode;
 import com.libresoft.sdk.ARviewer.Types.Photo;
 import com.libresoft.sdk.ARviewer.Types.User;
@@ -74,6 +75,8 @@ public class ARlabeling extends ARBase{
 		tagManager.setOnLocationChangeListener(onTaggingLocationListener);
 		tagManager.setOnTaggingFinishedListener(onTaggingFinishedListener);
 		showResources();
+		
+		ARTipManager.getInstance().showTipLong(this, R.string.label_tip_main);
     }
 	
 	@Override
