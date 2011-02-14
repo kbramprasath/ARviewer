@@ -48,6 +48,7 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.libresoft.apps.ARviewer.R;
 import com.libresoft.apps.ARviewer.Maps.Overlays.PositionOverlay;
+import com.libresoft.apps.ARviewer.Tips.ARTipManager;
 import com.libresoft.apps.ARviewer.Utils.MapUtils;
 
 public class LocationWays extends MapActivity {
@@ -99,7 +100,7 @@ public class LocationWays extends MapActivity {
         }
         
         init();
-        Toast.makeText(this, R.string.map_location_start, Toast.LENGTH_LONG).show();
+        ARTipManager.getInstance().showTipLong(this, R.string.map_location_start);
     }
     
     @Override

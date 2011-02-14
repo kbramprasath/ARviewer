@@ -108,11 +108,20 @@
 	<string name="label_method_immediate">Immediate</string>
 	<string name="label_method_fast">Fast</string>
 	<string name="label_method_map">Map</string>
+	<string name="label_method_accurate_title">Move yourself</string>
 	<string name="label_method_accurate_side">Accurate side</string>
 	<string name="label_method_accurate_line">Accurate line</string>
 	
 	<!-- Labeling tips -->
-	<string name="label_tip_main">Press \"Tag resource\" menu option and select a method to start tagging</string>
+	<string name="label_tip_main">Press \"Menu/Tag resource\" and select a method to start tagging.</string>
+	<string name="label_tip_finish">Done. Press \"Menu/Return\" or the back button to return the nodes.</string>
+	<string name="label_tip_focus">Focus the target and press \"Ok\".</string>
+	<string name="label_tip_fast">Select the target distance, focus it and press \"Ok\".</string>
+	<string name="label_tip_accurate_buttons">Press Finish when you have finished (be sure you have stored at least 2 samples).</string>
+	<string name="label_tip_accurate_buttons_side_gps">Move aside (the distance you consider) and press Skip.\n</string>
+	<string name="label_tip_accurate_buttons_side_nogps">Move yourself 1 meter aside and press the corresponding arrow button.\n</string>
+	<string name="label_tip_accurate_buttons_line_gps">Move forward/backward (the distance you consider) and press Skip.\n</string>
+	<string name="label_tip_accurate_buttons_line_nogps">Move yourself 1 meter forward/backward and press the corresponding arrow button.\n</string>
 	
 	<!-- Menu entries -->
 	<string name="menu_distance">Distance filter</string>
@@ -120,12 +129,15 @@
 	<string name="menu_settings">Settings</string>
 	<string name="menu_location">My location</string>
 	<string name="menu_location_bidi">BIDI location</string>
-	<string name="menu_location_manual">BIDI location</string>
+	<string name="menu_location_manual">Manual location</string>
 	<string name="menu_location_service">Built-in location system</string>
 	
 	<!-- GUI messages -->
 	<string name="ok">Ok</string>
 	<string name="done">Done</string>
+	<string name="finish">Finish</string>
+	<string name="return_">Return</string>
+	<string name="skip">Skip</string>
 	<string name="cancel">Cancel</string>
 	<string name="search">Search</string>
 	<string name="no_layer">No layer introduced</string>

@@ -59,7 +59,7 @@ public class ARlabeling extends ARBase{
 		public void onFinish(boolean success) {
 			showMenu = true;
 			if(success){
-				Toast.makeText(getBaseContext(), R.string.ok, Toast.LENGTH_SHORT).show();
+				ARTipManager.getInstance().showTipLong(getBaseContext(), R.string.label_tip_finish);
 				showResources();
 			}else
 				Toast.makeText(getBaseContext(), R.string.label_cancel, Toast.LENGTH_SHORT).show();
@@ -92,7 +92,7 @@ public class ARlabeling extends ARBase{
     	menu.clear();
     	
     	if(showMenu){
-    		menu.add(0, MENU_DONE, 0, R.string.done)
+    		menu.add(0, MENU_DONE, 0, R.string.return_)
     			.setIcon(R.drawable.done);
     		tagManager.onCreateOptionsMenu(menu);
     	}

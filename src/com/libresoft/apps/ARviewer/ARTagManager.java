@@ -28,6 +28,7 @@ import com.libresoft.apps.ARviewer.Tagging.AccurateTag;
 import com.libresoft.apps.ARviewer.Tagging.MapTagging;
 import com.libresoft.apps.ARviewer.Tagging.Content.ContentAttacher;
 import com.libresoft.apps.ARviewer.Tagging.Content.ContentAttacher.OnAttachListener;
+import com.libresoft.apps.ARviewer.Tips.ARTipManager;
 import com.libresoft.apps.ARviewer.Utils.LocationUtils;
 import com.libresoft.sdk.ARviewer.Types.GeoNode;
 
@@ -46,6 +47,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ARTagManager{
@@ -145,6 +147,7 @@ public class ARTagManager{
 			tagIFContainer = new RelativeLayout(mActivity);
 			tagIFContainer.addView(CustomViews.createSeekBars(mActivity, 1, 500, " m.", 1, 1, fast_click));
 			layers.addExtraElement(tagIFContainer, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+			ARTipManager.getInstance().showTipLong(mActivity, R.string.label_tip_fast);
 			return;
 		case TAG_MAP:
 			break;
@@ -160,6 +163,7 @@ public class ARTagManager{
 		tagIFContainer = new RelativeLayout(mActivity);
 		tagIFContainer.addView(CustomViews.createButton(mActivity, ok_click));
 		layers.addExtraElement(tagIFContainer, new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+		ARTipManager.getInstance().showTipLong(mActivity, R.string.label_tip_focus);
 		
 	}
 	
@@ -456,45 +460,50 @@ public class ARTagManager{
     		btnRight.setClickable(true);
     		btnRight.setOnClickListener(moveRightListener);
 
+    		String explaination = "";
+    		
     		if(isLocationServiceOn!=-1){
-    			btnLeft.setVisibility(View.INVISIBLE);
-    			btnRight.setVisibility(View.INVISIBLE);
-    			btnStraight.setVisibility(View.INVISIBLE);
-    			btnBack.setVisibility(View.INVISIBLE);
-    		}
-
-    		if(getSavingType() == ARTagManager.TAG_ACCURATE_LINE){
-    			btnLeft.setVisibility(View.INVISIBLE);
-    			btnRight.setVisibility(View.INVISIBLE);
-
+    			btnLeft.setVisibility(View.GONE);
+    			btnRight.setVisibility(View.GONE);
+    			btnStraight.setVisibility(View.GONE);
+    			btnBack.setVisibility(View.GONE);
+    			if(getSavingType() == ARTagManager.TAG_ACCURATE_LINE)
+    				explaination += mActivity.getString(R.string.label_tip_accurate_buttons_line_gps);
+    			else
+    				explaination += mActivity.getString(R.string.label_tip_accurate_buttons_side_gps);
     		}else{
-    			btnStraight.setVisibility(View.INVISIBLE);
-    			btnBack.setVisibility(View.INVISIBLE);
+
+    			if(getSavingType() == ARTagManager.TAG_ACCURATE_LINE){
+    				btnLeft.setVisibility(View.INVISIBLE);
+    				btnRight.setVisibility(View.INVISIBLE);
+    				explaination += mActivity.getString(R.string.label_tip_accurate_buttons_line_nogps);
+
+    			}else{
+    				btnStraight.setVisibility(View.INVISIBLE);
+    				btnBack.setVisibility(View.INVISIBLE);
+    				explaination += mActivity.getString(R.string.label_tip_accurate_buttons_side_nogps);
+    			}
     		}
 
-    		return new AlertDialog.Builder(mActivity)	      
+			explaination += mActivity.getString(R.string.label_tip_accurate_buttons);
+    		TextView tv_explain = (TextView)textEntryView1.findViewById(R.id.tvMoveExplain);
+    		tv_explain.setText(explaination);
+    		
+    		AlertDialog.Builder d = new AlertDialog.Builder(mActivity)
     		.setCancelable(false)
-    		.setTitle("Move yourself")
+    		.setTitle(R.string.label_method_accurate_title)
     		.setView(textEntryView1)
-    		.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+    		.setPositiveButton(R.string.finish, new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int whichButton) {
 
     				/* User clicked OK so do some stuff */ 
-    				onTaggingFinishedListener.onFinish(true);
     				layers.removeExtraElement(tagIFContainer);
     				launchResult();
     				mActivity.removeDialog(DIALOG_MOVE);
 
     			}
     		})
-    		.setNeutralButton("Skip", new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int whichButton) {
-
-    				/* User clicked OK so do some stuff */ 
-
-    			}
-    		})
-    		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    		.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int whichButton) {
 
     				/* User clicked OK so do some stuff */ 
@@ -505,8 +514,14 @@ public class ARTagManager{
     				layers.removeExtraElement(tagIFContainer);
     				mActivity.removeDialog(DIALOG_MOVE);
     			}
-    		})
-    		.create();
+    		});
+    		
+    		if(isLocationServiceOn!=-1)
+    			d.setNeutralButton(R.string.skip, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {}
+        		});
+    		
+    		return d.create();
     	}
     	return null;
     }
