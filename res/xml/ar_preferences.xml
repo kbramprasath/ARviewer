@@ -48,6 +48,12 @@
     		android:summaryOn="@string/pref_ar_tools_searchSystem_summary_on" 
     		android:summaryOff="@string/pref_ar_tools_searchSystem_summary_off" 
     		android:defaultValue="true"/>
+    	<CheckBoxPreference
+    		android:key="enableTips"
+    		android:title="@string/pref_ar_tools_tips_title"
+    		android:summaryOn="@string/pref_ar_tools_tips_summary_on" 
+    		android:summaryOff="@string/pref_ar_tools_tips_summary_off" 
+    		android:defaultValue="true"/>
 	</PreferenceCategory>
 	<PreferenceCategory
     	android:title="@string/pref_ar_labels_title">

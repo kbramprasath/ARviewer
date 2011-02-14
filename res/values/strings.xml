@@ -58,6 +58,9 @@
 	<string name="pref_ar_tools_searchSystem_title">Search system</string>
 	<string name="pref_ar_tools_searchSystem_summary_on">Clicked node search system enabled</string>
 	<string name="pref_ar_tools_searchSystem_summary_off">Clicked node search system disabled</string>
+	<string name="pref_ar_tools_tips_title">Enable tips</string>
+	<string name="pref_ar_tools_tips_summary_on">Tips enabled</string>
+	<string name="pref_ar_tools_tips_summary_off">Tips disabled</string>
 	<string name="pref_ar_labels_title">Labels</string>
 	<string name="pref_ar_labels_moveLabels_title">Dynamic summary</string>
 	<string name="pref_ar_labels_moveLabels_summary_on">Dynamic summary box enabled</string>
@@ -108,6 +111,9 @@
 	<string name="label_method_accurate_side">Accurate side</string>
 	<string name="label_method_accurate_line">Accurate line</string>
 	
+	<!-- Labeling tips -->
+	<string name="label_tip_main">Press \"Tag resource\" menu option and select a method to start tagging</string>
+	
 	<!-- Menu entries -->
 	<string name="menu_distance">Distance filter</string>
 	<string name="menu_about">About</string>
@@ -132,4 +138,5 @@
 	<string name="error_bidi">There was an error with BIDI location</string>
 	<string name="error_no_nodes">There aren\'t nodes to show</string>
 	<string name="loading">Loading...</string>
+	
 </resources>

@@ -23,6 +23,7 @@ package com.libresoft.apps.ARviewer;
 
 
 import com.libresoft.apps.ARviewer.Location.LocationPreferences;
+import com.libresoft.apps.ARviewer.Tips.ARTipManager;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudeManager;
 import com.libresoft.apps.ARviewer.Utils.GeoNames.AltitudePreferences;
 
@@ -60,6 +61,7 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 	public static final String KEY_ROTATING_COMPASS		= "rotatingCompass";
 	public static final String KEY_LOCATION_INTENT		= "locationIntent";
 	public static final String KEY_ALTITUDE_INTENT		= "altitudeIntent";
+	public static final String KEY_TIPS					= "enableTips";
 	
 	
 	EditTextPreference userTestPref;
@@ -103,6 +105,10 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 		}else if(key.equals(KEY_HEIGHT)){
 
 			blockVisibility(sharedPreferences);
+			
+		}else if(key.equals(KEY_TIPS)){
+
+			ARTipManager.enableTips(sharedPreferences.getBoolean(key, true));
 			
 		}
 	    
