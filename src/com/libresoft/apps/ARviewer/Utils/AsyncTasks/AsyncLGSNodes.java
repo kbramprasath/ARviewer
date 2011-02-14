@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.libresoft.apps.ARviewer.R;
 import com.libresoft.apps.ARviewer.Location.ARLocationManager;
@@ -50,6 +51,7 @@ public class AsyncLGSNodes extends AsyncTask<Void, Void, Void>{
 	
 	@Override
 	protected Void doInBackground(Void... unused){
+		try{
 		ArrayList<GeoNode> mNodeList = mLayer.getNodes();
 		if(mNodeList != null)
 			mNodeList.clear();
@@ -64,6 +66,10 @@ public class AsyncLGSNodes extends AsyncTask<Void, Void, Void>{
         			10.0, 
         			0, 
         			5));	     
+		}catch(Exception e){
+			Log.e("AsyncLGSNodes", "", e);
+		}
+		
         
 		return null;
 	}
