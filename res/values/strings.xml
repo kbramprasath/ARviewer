@@ -105,7 +105,7 @@
 	<string name="label_create_resource">Create resource</string>
 	<string name="label_cancel">Tagging canceled</string>
 	<string name="label_method_title">Tag resource</string>
-	<string name="label_method_immediate">Immediate</string>
+	<string name="label_method_immediate">Use your location</string>
 	<string name="label_method_fast">Fast</string>
 	<string name="label_method_map">Map</string>
 	<string name="label_method_accurate_title">Move yourself</string>
