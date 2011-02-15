@@ -78,9 +78,13 @@ public class AsyncLGSNodes extends AsyncTask<Void, Void, Void>{
 	}
 
 	protected void onPostExecute(Void unused) {
-		pd.dismiss();
-		if(onExecutionFinishedListener != null)
-			onExecutionFinishedListener.onFinish();
+		try{
+			pd.dismiss();
+			if(onExecutionFinishedListener != null)
+				onExecutionFinishedListener.onFinish();
+		}catch(Exception e){
+			Log.e("AsyncLGSNodes", "", e);
+		}
 	}    
 	
 	
