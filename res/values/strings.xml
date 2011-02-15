@@ -13,10 +13,10 @@
 	<string name="about_message">Copyright (C) GSyC/LibreSoft \n\nThis software is under GPL v3.0 license!\n\nAuthors: \n  The developers of LibreGeoSocial.\n  Collaboration with Andago-URJC Chair.\n\nE-mail: lgs-contact@libresoft.es \nWeb: http://www.libregeosocial.org/node/24 </string>
 	
 	<!-- Empty dialog -->
-	<string name="empty_places">AR-viewer Places</string>
-	<string name="empty_tagging">AR-viewer Tagging</string>
-	<string name="empty_title">Warning</string>
-	<string name="empty_message">This FLOSS application is a tool which provides an augmented reality BROWSER or LABELER interface to external apps. By default, a DEMO layer, containing nodes from LibreGeoSocial, 11870.com and Youtube, will be shown in a BROWSER mode.\n\nMaybe you are interested on trying our DEMO applications, AR-viewer Places and AR-viewer Tagging, to see the power of combining this tool with other applications.\n\nFor further information, please visit our website at:\n\n http://www.libregeosocial.org/node/24</string>
+	<string name="empty_places">ARviewer Places</string>
+	<string name="empty_tagging">ARviewer Tagging</string>
+	<string name="empty_title">ARviewer v1.0</string>
+	<string name="empty_message">This FLOSS application is a tool which provides an augmented reality BROWSER or LABELER interface to external apps. By default, a DEMO layer, containing nodes from LibreGeoSocial, 11870.com and Youtube, will be shown in a BROWSER mode.\n\nMaybe you are interested on trying our DEMO applications, ARviewer Places and ARviewer Tagging, to see the power of combining this tool with other applications.\n\nFor further information, please visit our website at:\n\n http://www.libregeosocial.org/node/24</string>
 	
 	<!-- Maps -->
 	<string name="map_resource_updated">Resource updated</string>

@@ -89,7 +89,7 @@ public class ARviewer extends ARBase{
     	super.showResources();
     	if(getResourcesList() == null){
     		Log.e("ARviewer", "Demo mode");
-    		setMyLayer(new GenericLayer(0, "", "Demo Layer", "A demo layer to show AR-viewer functions", null, null, null, null, null, null));
+    		setMyLayer(new GenericLayer(0, "", "Demo Layer", "A demo layer to show ARviewer functions", null, null, null, null, null, null));
     		getMyLayer().setNodes(new ArrayList<GeoNode>());
     		new AsyncLGSNodes(this, getMyLayer(), new OnExecutionFinishedListener() {
 				@Override
