@@ -140,7 +140,7 @@
 	<string name="skip">Skip</string>
 	<string name="cancel">Cancel</string>
 	<string name="search">Search</string>
-	<string name="no_layer">No layer introduced</string>
+	<string name="no_layer">Showing default layer</string>
 	<string name="remove">Remove</string>
 	<string name="sure">Are you sure?</string>
 	<string name="error">Error</string>
