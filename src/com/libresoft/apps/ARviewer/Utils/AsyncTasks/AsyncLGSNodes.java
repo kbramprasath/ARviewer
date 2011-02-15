@@ -22,6 +22,7 @@ package com.libresoft.apps.ARviewer.Utils.AsyncTasks;
 
 import java.util.ArrayList;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -37,6 +38,7 @@ public class AsyncLGSNodes extends AsyncTask<Void, Void, Void>{
 	private GenericLayer mLayer = null;
 	private OnExecutionFinishedListener onExecutionFinishedListener = null;
 	private Context mContext;
+	private ProgressDialog pd;
 	
 	public AsyncLGSNodes(Context mContext, GenericLayer mLayer, OnExecutionFinishedListener onExecutionFinishedListener){
 		this.mLayer = mLayer;
@@ -47,34 +49,36 @@ public class AsyncLGSNodes extends AsyncTask<Void, Void, Void>{
 	protected void onPreExecute(){
 		LibreGeoSocial.getInstance().setUrl(mContext.getString(R.string.urlServer));
 		LibreGeoSocial.getInstance().setFormat("JSON");
+		pd = ProgressDialog.show(mContext,"", mContext.getString(R.string.loading), true, true); 
 	}
 	
 	@Override
 	protected Void doInBackground(Void... unused){
 		try{
-		ArrayList<GeoNode> mNodeList = mLayer.getNodes();
-		if(mNodeList != null)
-			mNodeList.clear();
-		ArrayList<GenericLayer> mLayers = LibreGeoSocial.getInstance().getLayerList();
-        
-        for (int i=0; i<mLayers.size(); i ++)
-        	mNodeList.addAll (LibreGeoSocial.getInstance().getLayerNodes(mLayers.get(i).getId(), 
-        			"", 
-        			"0", 
-        			ARLocationManager.getInstance(mContext).getLocation().getLatitude(), 
-        			ARLocationManager.getInstance(mContext).getLocation().getLongitude(), 
-        			10.0, 
-        			0, 
-        			5));	     
+			ArrayList<GeoNode> mNodeList = mLayer.getNodes();
+			if(mNodeList != null)
+				mNodeList.clear();
+			ArrayList<GenericLayer> mLayers = LibreGeoSocial.getInstance().getLayerList();
+
+			for (int i=0; i<mLayers.size(); i ++)
+				mNodeList.addAll (LibreGeoSocial.getInstance().getLayerNodes(mLayers.get(i).getId(), 
+						"", 
+						"0", 
+						ARLocationManager.getInstance(mContext).getLocation().getLatitude(), 
+						ARLocationManager.getInstance(mContext).getLocation().getLongitude(), 
+						10.0, 
+						0, 
+						5));	     
 		}catch(Exception e){
 			Log.e("AsyncLGSNodes", "", e);
 		}
-		
-        
+
+
 		return null;
 	}
 
 	protected void onPostExecute(Void unused) {
+		pd.dismiss();
 		if(onExecutionFinishedListener != null)
 			onExecutionFinishedListener.onFinish();
 	}    
