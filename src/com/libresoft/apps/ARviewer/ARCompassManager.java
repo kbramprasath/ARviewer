@@ -22,7 +22,13 @@ package com.libresoft.apps.ARviewer;
 import java.util.List;
 
 import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
+import com.libresoft.apps.ARviewer.Utils.ButterworthFilter;
 import com.libresoft.apps.ARviewer.Utils.CompassController;
+import com.libresoft.apps.ARviewer.Utils.GaussianFilter;
+import com.libresoft.apps.ARviewer.Utils.GyroController;
+import com.libresoft.apps.ARviewer.Utils.GyroFilter;
+import com.libresoft.apps.ARviewer.Utils.KalmanFilter;
+import com.libresoft.apps.ARviewer.Utils.MotionAverageLPF;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -40,9 +46,15 @@ public class ARCompassManager implements SensorEventListener{
 	
     private float[] acc_values = new float[3];
     private float[] mag_values = new float[3];
-    private float correction;
-//    private float[] or_values = new float[3];
-    private CompassController azimuthPID = new CompassController(0.8f, true);
+    private float[] gyro_values = new float[3];
+
+    private GaussianFilter gaussianFilter = null;
+    private GyroController gyroController = null;
+    private GyroFilter gyroFilter = null;
+//    private ButterworthFilter butterFilter = new ButterworthFilter();
+//    private KalmanFilter kalmanFilter = new KalmanFilter();
+//    private MotionAverageLPF motionAverageLPF = new MotionAverageLPF();
+//    private CompassController azimuthPID = new CompassController(0.8f, true);
     private CompassController elevationPID = new CompassController(0.5f, false);
     
     private DrawUserStatus drawUserStatus = null;
@@ -50,12 +62,6 @@ public class ARCompassManager implements SensorEventListener{
 	public ARCompassManager(Context mContext){
 		
 		sm = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-//		SharedPreferences sharedPreferences = 
-//			PreferenceManager.getDefaultSharedPreferences(mContext);
-		
-//		correction = Float.parseFloat(sharedPreferences.getString(ARPreferences.KEY_COMPASS_CORRECTION, "0"));
-		correction = 0;
-//		setSensors();
 	}
 	
     public static float getAzimuth(float[] values){
@@ -65,33 +71,41 @@ public class ARCompassManager implements SensorEventListener{
     public static float getElevation(float[] values){
     	return values[1];
     }
-//    
-//    public View getCorrectionSeekbar(Context mContext, OnClickListener listener){
-//    	return CustomViews.createSeekBars(mContext, Math.abs(correction), 180, " º", 1, 0, listener);
-//    }
-    
-//    public void setCorrection(Context mContext, float correction){
-//    	this.correction = correction;
-//    	SharedPreferences sharedPreferences = 
-//			PreferenceManager.getDefaultSharedPreferences(mContext);
-//    	if(sharedPreferences.getBoolean(ARPreferences.KEY_CORRECTION_SIGNUM, false))
-//    		this.correction *= -1;
-//    	
-//    	Editor editor = sharedPreferences.edit();
-//    	editor.putString(ARPreferences.KEY_COMPASS_CORRECTION, Float.toString(this.correction));
-//    	editor.commit();
-//    }
 	
     private void setSensors(){
     	//Setting a sensor listener for accelerometer and magnetic field sensors
     	
     	try {
-    		List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
-//    		
-//    		if(sensors.size()>0){
-//    			Sensor sensor = sensors.get(0);
-//    			sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-//    		}
+    		List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
+    		
+    		if(sensors.size()>0){
+//    			gyroFilter = new GyroFilter();
+    			gyroController = new GyroController();
+//    			gaussianFilter = new GaussianFilter();
+    			
+    			Sensor sensor = sensors.get(0);
+    			// This sensor ignores the delay param, so:
+    			sm.registerListener(new SensorEventListener() {
+					
+					@Override
+					public void onSensorChanged(SensorEvent event) {
+						// TODO Auto-generated method stub
+						switch(event.sensor.getType()){
+						case Sensor.TYPE_GYROSCOPE:
+							gyro_values = event.values.clone();
+							break;
+						}
+					}
+					
+					@Override
+					public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+				}, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+    		}else{
+    			gaussianFilter = new GaussianFilter();
+    		}
+
+    		sensors = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
+
     		if(sensors.size()>0){
     			Sensor sensor = sensors.get(0);
     			sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -149,10 +163,6 @@ public class ARCompassManager implements SensorEventListener{
     	values[2] = (float) Math.toDegrees(values[2]);
     	
     	// correction of the measures
-    	//azimuth
-    	values[0] += correction;
-    	if(values[0] < 0)
-    		values[0] += 360;
 		//elevation
     	values[1] = 90 - values[1];
 //    	float[] values = or_values.clone();
@@ -168,7 +178,19 @@ public class ARCompassManager implements SensorEventListener{
     	
     	// PID controller for azimuth and elevation
     	////////////////////////////////
-    	values[0] = azimuthPID.getValue(values[0]);
+//    	values[0] = azimuthPID.getValue(values[0]);
+//    	values[0] = motionAverageLPF.getValue(values[0]);
+//    	values[0] = gaussianFilter.getValue(values[0]);
+//    	values[0] = kalmanFilter.getValue(values[0]);
+//    	values[0] = butterFilter.getValue(values[0]);
+//    	values[0] = gyroFilter.getValue(values[0], gyro_values[0]);
+    	if(gyroController != null)
+    		values[0] = gyroController.getValue(values[0], gyro_values[0]);
+//    	if(gyroFilter != null)
+//    		values[0] = gyroFilter.getValue(values[0], gyro_values[0]);
+    	else if(gaussianFilter != null)
+    		values[0] = gaussianFilter.getValue(values[0]);
+    	
     	values[1] = elevationPID.getValue(values[1]);
     	
     	onCompassChangeListener.onChange(values);
@@ -193,9 +215,8 @@ public class ARCompassManager implements SensorEventListener{
 			mag_values = event.values.clone();
 			OnCompassMeasure();
 			break;
-//		case Sensor.TYPE_ORIENTATION:
-//			or_values = event.values.clone();
-//			OnCompassMeasure();
+//		case Sensor.TYPE_GYROSCOPE:
+//			gyro_values = event.values.clone();
 //			break;
 
 		}
