@@ -1,4 +1,22 @@
-
+/*
+ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see http://www.gnu.org/licenses/. 
+ *
+ *  Author : Raúl Román López <rroman@gsyc.es>
+ *
+ */
 package com.libresoft.apps.ARviewer.Utils;
 
 import java.util.ArrayList;
@@ -21,14 +39,6 @@ public class GyroController{
 	}
 	
 	public float getValue(float new_value, float new_gyro){
-		
-//		if(!initial_phase){
-//			initial_phase = doInitialPhase(new_value);
-//		}else if(stable_phase){
-//			stable_phase = doStablePhase(new_value, new_gyro);
-//		}else{
-//			stable_phase = doUnstablePhase(new_value);
-//		}
 
 		insertMeasure(new_value);
 		if(stable_phase){
@@ -44,12 +54,20 @@ public class GyroController{
 		float var = calculateVar(new_value);
 		int num = last_values.size();
 		if((num == MAX_VALUES) && (var < VAR_THRESHOLD)){
-			Log.e("GyroController", "EXIT InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
+//			Log.e("GyroController", "EXIT InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
 			X = calculateMean(new_value);
 			return true;
 		}
-		X = X + .5f*(new_value - X);
-		Log.e("GyroController", "InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
+		if((new_value - X) <= -180)
+			X += - 360;
+		else if((new_value - X) >= 180)
+			X += 360;
+		X = X + .8f*(new_value - X);
+		if(X > 360)
+			X += -360;
+		else if(X < 0)
+			X += 360;
+//		Log.e("GyroController", "InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
 		return false;
 	}
 	
@@ -72,7 +90,8 @@ public class GyroController{
 			error = 360 - error;
 		
 		if(error > ERROR_THRESHOLD){
-			Log.e("GyroController", "EXIT StablePhase: error=" + Float.toString(error));
+//			Log.e("GyroController", "EXIT StablePhase: error=" + Float.toString(error));
+			last_values.clear();
 			return false;
 		}
 		return true;
