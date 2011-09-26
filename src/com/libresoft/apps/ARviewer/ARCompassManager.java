@@ -33,8 +33,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-
-
 public class ARCompassManager implements SensorEventListener{
 	
 	OnCompassChangeListener onCompassChangeListener = null;
@@ -46,6 +44,12 @@ public class ARCompassManager implements SensorEventListener{
 
     private GaussianFilter gaussianFilter = null;
     private GyroController gyroController = null;
+    private CompassController elevationPID = new CompassController(0.5f, false);
+    
+//  private ButterworthFilter butterFilter = new ButterworthFilter();
+//  private KalmanFilter kalmanFilter = new KalmanFilter();
+//  private MotionAverageLPF motionAverageLPF = new MotionAverageLPF();
+//  private CompassController azimuthPID = new CompassController(0.8f, true);
     
     private SensorEventListener gyroEventListener = new SensorEventListener() {
 		
@@ -62,12 +66,6 @@ public class ARCompassManager implements SensorEventListener{
 		@Override
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 	};
-    
-//    private ButterworthFilter butterFilter = new ButterworthFilter();
-//    private KalmanFilter kalmanFilter = new KalmanFilter();
-//    private MotionAverageLPF motionAverageLPF = new MotionAverageLPF();
-//    private CompassController azimuthPID = new CompassController(0.8f, true);
-    private CompassController elevationPID = new CompassController(0.5f, false);
     
     private DrawUserStatus drawUserStatus = null;
 	
@@ -91,7 +89,6 @@ public class ARCompassManager implements SensorEventListener{
     		List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
     		
     		if(sensors.size()>0){
-//    			gyroFilter = new GyroFilter();
     			gyroController = new GyroController();
 //    			gaussianFilter = new GaussianFilter();
     			
