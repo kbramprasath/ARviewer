@@ -22,13 +22,9 @@ package com.libresoft.apps.ARviewer;
 import java.util.List;
 
 import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
-import com.libresoft.apps.ARviewer.Utils.ButterworthFilter;
 import com.libresoft.apps.ARviewer.Utils.CompassController;
 import com.libresoft.apps.ARviewer.Utils.GaussianFilter;
 import com.libresoft.apps.ARviewer.Utils.GyroController;
-import com.libresoft.apps.ARviewer.Utils.GyroFilter;
-import com.libresoft.apps.ARviewer.Utils.KalmanFilter;
-import com.libresoft.apps.ARviewer.Utils.MotionAverageLPF;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -50,7 +46,23 @@ public class ARCompassManager implements SensorEventListener{
 
     private GaussianFilter gaussianFilter = null;
     private GyroController gyroController = null;
-    private GyroFilter gyroFilter = null;
+    
+    private SensorEventListener gyroEventListener = new SensorEventListener() {
+		
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			// TODO Auto-generated method stub
+			switch(event.sensor.getType()){
+			case Sensor.TYPE_GYROSCOPE:
+				gyro_values = event.values.clone();
+				break;
+			}
+		}
+		
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+	};
+    
 //    private ButterworthFilter butterFilter = new ButterworthFilter();
 //    private KalmanFilter kalmanFilter = new KalmanFilter();
 //    private MotionAverageLPF motionAverageLPF = new MotionAverageLPF();
@@ -85,21 +97,7 @@ public class ARCompassManager implements SensorEventListener{
     			
     			Sensor sensor = sensors.get(0);
     			// This sensor ignores the delay param, so:
-    			sm.registerListener(new SensorEventListener() {
-					
-					@Override
-					public void onSensorChanged(SensorEvent event) {
-						// TODO Auto-generated method stub
-						switch(event.sensor.getType()){
-						case Sensor.TYPE_GYROSCOPE:
-							gyro_values = event.values.clone();
-							break;
-						}
-					}
-					
-					@Override
-					public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-				}, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+    			sm.registerListener(gyroEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     		}else{
     			gaussianFilter = new GaussianFilter();
     		}
@@ -135,6 +133,7 @@ public class ARCompassManager implements SensorEventListener{
     
     public void unregisterListeners(){
     	sm.unregisterListener(this);
+    	sm.unregisterListener(gyroEventListener);
     	onCompassChangeListener = null;
     }
     

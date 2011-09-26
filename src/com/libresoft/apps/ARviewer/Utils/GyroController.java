@@ -7,12 +7,11 @@ import android.util.Log;
 
 public class GyroController{
 	private static final int VAR_THRESHOLD = 10;
-	private static final float GYRO_THRESHOLD = 0.05f;
-	private static final int ERROR_THRESHOLD = 90;
+	private static final float GYRO_THRESHOLD = 0.04f;
+	private static final int ERROR_THRESHOLD = 45;
 	private static final int MAX_VALUES = 5;
 	
-	private boolean initial_phase = false;
-	private boolean stable_phase = true;
+	private boolean stable_phase = false;
 	
 	private float X = 0;
 	private ArrayList<Float> last_values = null;
@@ -23,9 +22,16 @@ public class GyroController{
 	
 	public float getValue(float new_value, float new_gyro){
 		
-		if(!initial_phase){
-			initial_phase = doInitialPhase(new_value);
-		}else if(stable_phase){
+//		if(!initial_phase){
+//			initial_phase = doInitialPhase(new_value);
+//		}else if(stable_phase){
+//			stable_phase = doStablePhase(new_value, new_gyro);
+//		}else{
+//			stable_phase = doUnstablePhase(new_value);
+//		}
+
+		insertMeasure(new_value);
+		if(stable_phase){
 			stable_phase = doStablePhase(new_value, new_gyro);
 		}else{
 			stable_phase = doUnstablePhase(new_value);
@@ -34,8 +40,7 @@ public class GyroController{
 		return X;
 	}
 	
-	private boolean doInitialPhase(float new_value){
-		insertMeasure(new_value);
+	private boolean doUnstablePhase(float new_value){
 		float var = calculateVar(new_value);
 		int num = last_values.size();
 		if((num == MAX_VALUES) && (var < VAR_THRESHOLD)){
@@ -43,13 +48,12 @@ public class GyroController{
 			X = calculateMean(new_value);
 			return true;
 		}
-		X = new_value;
+		X = X + .5f*(new_value - X);
 		Log.e("GyroController", "InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
 		return false;
 	}
 	
 	private boolean doStablePhase(float new_value, float new_gyro){
-		insertMeasure(new_value);
 		
 		if(Math.abs(new_gyro) < GYRO_THRESHOLD)
 			return true;
@@ -74,39 +78,39 @@ public class GyroController{
 		return true;
 	}
 	
-	private boolean doUnstablePhase(float new_value){
-		insertMeasure(new_value);
-		
-		// Calculate the variance of the last stored values
-		float var = calculateVar(new_value);
-		float mean = calculateMean(new_value);
-		
-		/* Transform signal */
-		if((mean - X) <= -180)
-			X += - 360;
-		else if((mean - X) >= 180)
-			X += 360;
-
-		/* Prediction phase: */
-		float X_pred = X;
-
-		/* Update phase: */
-		float error = mean - X_pred;
-		float gain = (1f/2f) *((float) -Math.exp(-Math.pow(error, 2)/(2*var)) + 1);
-		X = X_pred + gain * (error);
-		
-		if(X > 360)
-			X += -360;
-		else if(X < 0)
-			X += 360;
-		
-		if(Math.abs(error) < VAR_THRESHOLD){
-			Log.e("GyroController", "EXIT UnstablePhase: error=" + Float.toString(error));
-			return true;
-		}
-		Log.e("GyroController", "UnstablePhase: error=" + Float.toString(error));
-		return false;
-	}
+//	private boolean doUnstablePhase(float new_value){
+//		
+//		// Calculate the variance of the last stored values
+//		float var = calculateVar(new_value);
+//		float mean = calculateMean(new_value);
+//		
+//		/* Transform signal */
+//		if((mean - X) <= -180)
+//			X += - 360;
+//		else if((mean - X) >= 180)
+//			X += 360;
+//
+//		/* Prediction phase: */
+//		float X_pred = X;
+//
+//		/* Update phase: */
+//		float error = mean - X_pred;
+//		float gain = (1f/2f) *((float) -Math.exp(-Math.pow(error, 2)/(2*var)) + 1);
+//		X = X_pred + gain * (error);
+//		float new_error = mean - X;
+//		
+//		if(X > 360)
+//			X += -360;
+//		else if(X < 0)
+//			X += 360;
+//		
+//		if(Math.abs(new_error) < VAR_THRESHOLD){
+//			Log.e("GyroController", "EXIT UnstablePhase: error=" + Float.toString(error));
+//			return true;
+//		}
+//		Log.e("GyroController", "UnstablePhase: error=" + Float.toString(new_error));
+//		return false;
+//	}
 	
 	private void insertMeasure(float new_value){
 		if(last_values.size() < MAX_VALUES){
