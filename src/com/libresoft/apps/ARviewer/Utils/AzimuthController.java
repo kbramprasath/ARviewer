@@ -21,11 +21,10 @@ package com.libresoft.apps.ARviewer.Utils;
 
 import java.util.ArrayList;
 
-import android.util.Log;
-
-public class GyroController{
+public class AzimuthController{
 	private static final int VAR_THRESHOLD = 10;
 	private static final float GYRO_THRESHOLD = 0.04f;
+	private static final float GYRO_CORRECTION = 0.002f;
 	private static final int ERROR_THRESHOLD = 45;
 	private static final int MAX_VALUES = 5;
 	
@@ -34,7 +33,7 @@ public class GyroController{
 	private float X = 0;
 	private ArrayList<Float> last_values = null;
 	
-	public GyroController(){
+	public AzimuthController(){
 		last_values = new ArrayList<Float>();
 	}
 	
@@ -72,6 +71,7 @@ public class GyroController{
 	}
 	
 	private boolean doStablePhase(float new_value, float new_gyro){
+		new_gyro = new_gyro + GYRO_CORRECTION;
 		
 		if(Math.abs(new_gyro) < GYRO_THRESHOLD)
 			return true;
@@ -96,40 +96,6 @@ public class GyroController{
 		}
 		return true;
 	}
-	
-//	private boolean doUnstablePhase(float new_value){
-//		
-//		// Calculate the variance of the last stored values
-//		float var = calculateVar(new_value);
-//		float mean = calculateMean(new_value);
-//		
-//		/* Transform signal */
-//		if((mean - X) <= -180)
-//			X += - 360;
-//		else if((mean - X) >= 180)
-//			X += 360;
-//
-//		/* Prediction phase: */
-//		float X_pred = X;
-//
-//		/* Update phase: */
-//		float error = mean - X_pred;
-//		float gain = (1f/2f) *((float) -Math.exp(-Math.pow(error, 2)/(2*var)) + 1);
-//		X = X_pred + gain * (error);
-//		float new_error = mean - X;
-//		
-//		if(X > 360)
-//			X += -360;
-//		else if(X < 0)
-//			X += 360;
-//		
-//		if(Math.abs(new_error) < VAR_THRESHOLD){
-//			Log.e("GyroController", "EXIT UnstablePhase: error=" + Float.toString(error));
-//			return true;
-//		}
-//		Log.e("GyroController", "UnstablePhase: error=" + Float.toString(new_error));
-//		return false;
-//	}
 	
 	private void insertMeasure(float new_value){
 		if(last_values.size() < MAX_VALUES){
