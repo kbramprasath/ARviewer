@@ -23,8 +23,9 @@ import java.util.List;
 
 import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
 import com.libresoft.apps.ARviewer.Utils.CompassController;
+import com.libresoft.apps.ARviewer.Utils.ElevationController;
 import com.libresoft.apps.ARviewer.Utils.GaussianFilter;
-import com.libresoft.apps.ARviewer.Utils.GyroController;
+import com.libresoft.apps.ARviewer.Utils.AzimuthController;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -33,7 +34,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-public class ARCompassManager implements SensorEventListener{
+public class ARCompassManager{
 	
 	OnCompassChangeListener onCompassChangeListener = null;
 	private SensorManager sm;
@@ -43,8 +44,10 @@ public class ARCompassManager implements SensorEventListener{
     private float[] gyro_values = new float[3];
 
     private GaussianFilter gaussianFilter = null;
-    private GyroController gyroController = null;
-    private CompassController elevationPID = new CompassController(0.5f, false);
+    private CompassController elevationPID = null;
+    
+    private AzimuthController azimuthController = null;
+    private ElevationController elevationController = null;
     
 //  private ButterworthFilter butterFilter = new ButterworthFilter();
 //  private KalmanFilter kalmanFilter = new KalmanFilter();
@@ -65,6 +68,46 @@ public class ARCompassManager implements SensorEventListener{
 		
 		@Override
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+	};
+	
+    private SensorEventListener accelEventListener = new SensorEventListener() {
+		
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			// TODO Auto-generated method stub
+			switch(event.sensor.getType()){
+			case Sensor.TYPE_ACCELEROMETER:
+				acc_values = event.values.clone();
+				break;
+			}
+		}
+		
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+	};
+	
+    private SensorEventListener magEventListener = new SensorEventListener() {
+		
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			// TODO Auto-generated method stub
+			switch(event.sensor.getType()){
+			case Sensor.TYPE_MAGNETIC_FIELD:
+				mag_values = event.values.clone();
+				OnCompassMeasure();
+				break;
+			}
+		}
+
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+			switch(sensor.getType()){
+			case Sensor.TYPE_MAGNETIC_FIELD:
+				if(drawUserStatus != null)
+					drawUserStatus.setCompassAccurate(accuracy);
+				break;
+			}
+		}
 	};
     
     private DrawUserStatus drawUserStatus = null;
@@ -89,7 +132,8 @@ public class ARCompassManager implements SensorEventListener{
     		List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
     		
     		if(sensors.size()>0){
-    			gyroController = new GyroController();
+    			azimuthController = new AzimuthController();
+    			elevationController = new ElevationController();
 //    			gaussianFilter = new GaussianFilter();
     			
     			Sensor sensor = sensors.get(0);
@@ -97,20 +141,21 @@ public class ARCompassManager implements SensorEventListener{
     			sm.registerListener(gyroEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     		}else{
     			gaussianFilter = new GaussianFilter();
+    			elevationPID = new CompassController(0.5f, false);
     		}
 
     		sensors = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
 
     		if(sensors.size()>0){
     			Sensor sensor = sensors.get(0);
-    			sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+    			sm.registerListener(accelEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     		}
     		
     		sensors = sm.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
     		
     		if(sensors.size()>0){
     			Sensor sensor = sensors.get(0);
-    			sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+    			sm.registerListener(magEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     		}
 			
 		} catch (Exception e) {
@@ -129,7 +174,8 @@ public class ARCompassManager implements SensorEventListener{
     }
     
     public void unregisterListeners(){
-    	sm.unregisterListener(this);
+    	sm.unregisterListener(magEventListener);
+    	sm.unregisterListener(accelEventListener);
     	sm.unregisterListener(gyroEventListener);
     	onCompassChangeListener = null;
     }
@@ -180,46 +226,19 @@ public class ARCompassManager implements SensorEventListener{
 //    	values[0] = kalmanFilter.getValue(values[0]);
 //    	values[0] = butterFilter.getValue(values[0]);
 //    	values[0] = gyroFilter.getValue(values[0], gyro_values[0]);
-    	if(gyroController != null)
-    		values[0] = gyroController.getValue(values[0], gyro_values[0]);
-//    	if(gyroFilter != null)
-//    		values[0] = gyroFilter.getValue(values[0], gyro_values[0]);
-    	else if(gaussianFilter != null)
+    	if(azimuthController != null){
+    		values[0] = azimuthController.getValue(values[0], gyro_values[0]);
+    		values[1] = elevationController.getValue(values[1], gyro_values[1]);
+    	}else{
     		values[0] = gaussianFilter.getValue(values[0]);
-    	
-    	values[1] = elevationPID.getValue(values[1]);
+        	values[1] = elevationPID.getValue(values[1]);
+    	}
     	
     	onCompassChangeListener.onChange(values);
     }
-	
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		switch(sensor.getType()){
-		case Sensor.TYPE_MAGNETIC_FIELD:
-			if(drawUserStatus != null)
-				drawUserStatus.setCompassAccurate(accuracy);
-			break;
-		}
-	}
-
-	public void onSensorChanged(SensorEvent event) {
-		switch(event.sensor.getType()){
-		case Sensor.TYPE_ACCELEROMETER:
-			acc_values = event.values.clone();
-			break;
-
-		case Sensor.TYPE_MAGNETIC_FIELD:
-			mag_values = event.values.clone();
-			OnCompassMeasure();
-			break;
-//		case Sensor.TYPE_GYROSCOPE:
-//			gyro_values = event.values.clone();
-//			break;
-
-		}
-		
-	}
-	
-	
+    
+    
+    
 	
 	public interface OnCompassChangeListener {
 		public abstract void onChange(float[] values);
