@@ -56,4 +56,10 @@
     	<item>QR code</item>
     </string-array>
     
+    <string-array name="azimuth_control">
+    	<item>Gyroscope</item>
+    	<item>Gaussian</item>
+    	<item>Proportional</item>
+    </string-array>
+    
 </resources>

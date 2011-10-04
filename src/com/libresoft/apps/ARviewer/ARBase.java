@@ -270,6 +270,9 @@ public class ARBase extends ARActivity{
 		SharedPreferences sharedPreferences = 
 			PreferenceManager.getDefaultSharedPreferences(this);
 		
+		compassManager.setAzimuthControllerType(sharedPreferences.getString(ARPreferences.KEY_AZ_CONTROLLER, "Gaussian"));
+		compassManager.setElevationControllerType(sharedPreferences.getString(ARPreferences.KEY_EL_CONTROLLER, "Proportional"));
+		
 		altitude_status = sharedPreferences.getString(ARPreferences.KEY_HEIGHT, 
 				AltitudeManager.EXISTING_HEIGHTS);
 		useHeight((!altitude_status.equals(AltitudeManager.NO_HEIGHTS)));

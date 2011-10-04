@@ -62,6 +62,8 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 	public static final String KEY_LOCATION_INTENT		= "locationIntent";
 	public static final String KEY_ALTITUDE_INTENT		= "altitudeIntent";
 	public static final String KEY_TIPS					= "enableTips";
+	public static final String KEY_AZ_CONTROLLER		= "azimuthController";
+	public static final String KEY_EL_CONTROLLER		= "elevationController";
 	
 	
 	EditTextPreference userTestPref;
@@ -89,6 +91,9 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
         getPreferenceScreen().findPreference(KEY_ALTITUDE_INTENT).setOnPreferenceClickListener(this);
         getPreferenceScreen().findPreference(KEY_LOCATION_INTENT).setOnPreferenceClickListener(this);
         
+        getPreferenceScreen().findPreference(KEY_AZ_CONTROLLER).setSummary(sharedPreferences.getString(KEY_AZ_CONTROLLER, "Gaussian"));
+        getPreferenceScreen().findPreference(KEY_EL_CONTROLLER).setSummary(sharedPreferences.getString(KEY_EL_CONTROLLER, "Proportional"));
+        
         blockVisibility(sharedPreferences);
 	        
 	}
@@ -102,6 +107,20 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 				return;
 			
 			pref.setSummary(Integer.toString(sharedPreferences.getInt(key, 0)));
+		}else if(key.equals(KEY_AZ_CONTROLLER)) {
+
+			Preference pref = this.findPreference(key);
+			if(pref == null) 
+				return;
+			
+			pref.setSummary(sharedPreferences.getString(key, "Gaussian"));
+		}else if(key.equals(KEY_EL_CONTROLLER)) {
+
+			Preference pref = this.findPreference(key);
+			if(pref == null) 
+				return;
+			
+			pref.setSummary(sharedPreferences.getString(key, "Proportional"));
 		}else if(key.equals(KEY_HEIGHT)){
 
 			blockVisibility(sharedPreferences);

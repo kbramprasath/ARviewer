@@ -61,6 +61,9 @@
 	<string name="pref_ar_tools_tips_title">Enable tips</string>
 	<string name="pref_ar_tools_tips_summary_on">Tips enabled</string>
 	<string name="pref_ar_tools_tips_summary_off">Tips disabled</string>
+	<string name="pref_ar_tools_azimuth_control_title">Azimuth control</string>
+	<string name="pref_ar_tools_elevation_control_title">Elevation control</string>
+	<string name="pref_ar_tools_control_title">Select the controller you want to use</string>
 	<string name="pref_ar_labels_title">Labels</string>
 	<string name="pref_ar_labels_moveLabels_title">Dynamic summary</string>
 	<string name="pref_ar_labels_moveLabels_summary_on">Dynamic summary box enabled</string>

@@ -21,31 +21,33 @@ package com.libresoft.apps.ARviewer.Utils;
 
 import java.util.ArrayList;
 
-public class AzimuthController{
+
+public class AzimuthGaussianFilter{
+
 	private static final int VAR_THRESHOLD = 10;
-	private static final float GYRO_THRESHOLD = 0.04f;
-	private static final float GYRO_CORRECTION = 0.0035f;
-	private static final int ERROR_THRESHOLD = 45;
 	private static final int MAX_VALUES = 5;
+	private static final int ERROR_THRESHOLD = 20;
+	
+	private ArrayList<Float> last_values = null;
 	
 	private boolean stable_phase = false;
 	
-	private float X = 0;
-	private ArrayList<Float> last_values = null;
+	private static final float INIT_VALUE = 0;
 	
-	public AzimuthController(){
+	private float X = INIT_VALUE;
+	
+	public AzimuthGaussianFilter(){
 		last_values = new ArrayList<Float>();
 	}
 	
-	public float getValue(float new_value, float new_gyro){
-
+	public float getValue(float new_value){
 		insertMeasure(new_value);
 		if(stable_phase){
-			stable_phase = doStablePhase(new_value, new_gyro);
+			stable_phase = doStablePhase(new_value);
 		}else{
 			stable_phase = doUnstablePhase(new_value);
 		}
-			
+		
 		return X;
 	}
 	
@@ -53,7 +55,7 @@ public class AzimuthController{
 		float var = calculateVar(new_value);
 		int num = last_values.size();
 		if((num == MAX_VALUES) && (var < VAR_THRESHOLD)){
-//			Log.e("GyroController", "EXIT InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
+//			Log.e("GaussianFilter", "EXIT InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
 			X = calculateMean(new_value);
 			return true;
 		}
@@ -66,18 +68,27 @@ public class AzimuthController{
 			X += -360;
 		else if(X < 0)
 			X += 360;
-//		Log.e("GyroController", "InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
+//		Log.e("GaussianFilter", "InitialPhase: num_values=" + Integer.toString(num) + "; VAR=" + Float.toString(var));
 		return false;
 	}
 	
-	private boolean doStablePhase(float new_value, float new_gyro){
-		new_gyro = new_gyro + GYRO_CORRECTION;
+	private boolean doStablePhase(float new_value){
 		
-		if(Math.abs(new_gyro) < GYRO_THRESHOLD)
-			return true;
 		
-		// Predicted angle
-		X = (float) (X - Math.toDegrees(new_gyro)*0.125);
+		float var = calculateVar(new_value);
+
+		if((new_value - X) <= -180)
+			X += - 360;
+		else if((new_value - X) >= 180)
+			X += 360;
+		
+		/* Prediction phase: */
+		float X_pred = X;
+		
+		/* Update phase: */
+		float gain = (1f/2f) *((float) -Math.exp(-Math.pow(new_value - X_pred, 2)/(2*var)) + 1);
+		X = X_pred + gain * (new_value - X_pred);
+		
 		if(X > 360)
 			X += -360;
 		else if(X < 0)
@@ -90,7 +101,7 @@ public class AzimuthController{
 			error = 360 - error;
 		
 		if(error > ERROR_THRESHOLD){
-//			Log.e("GyroController", "EXIT StablePhase: error=" + Float.toString(error));
+//			Log.e("GaussianFilter", "EXIT StablePhase: error=" + Float.toString(error));
 			last_values.clear();
 			return false;
 		}
@@ -149,5 +160,4 @@ public class AzimuthController{
 		
 		return mean;
 	}
-	
 }

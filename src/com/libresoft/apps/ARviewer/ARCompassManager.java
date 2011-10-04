@@ -22,10 +22,12 @@ package com.libresoft.apps.ARviewer;
 import java.util.List;
 
 import com.libresoft.apps.ARviewer.Overlays.DrawUserStatus;
-import com.libresoft.apps.ARviewer.Utils.CompassController;
 import com.libresoft.apps.ARviewer.Utils.ElevationController;
-import com.libresoft.apps.ARviewer.Utils.GaussianFilter;
+import com.libresoft.apps.ARviewer.Utils.AzimuthGaussianFilter;
 import com.libresoft.apps.ARviewer.Utils.AzimuthController;
+import com.libresoft.apps.ARviewer.Utils.AzimuthMotionAverageLPF;
+import com.libresoft.apps.ARviewer.Utils.ElevationGaussianFilter;
+import com.libresoft.apps.ARviewer.Utils.ElevationMotionAverageLPF;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -35,6 +37,9 @@ import android.hardware.SensorManager;
 import android.util.Log;
 
 public class ARCompassManager{
+	public static final String CONTROLLER_GYRO = "Gyroscope";
+	public static final String CONTROLLER_GAUSS = "Gaussian";
+	public static final String CONTROLLER_PROP = "Proportional";
 	
 	OnCompassChangeListener onCompassChangeListener = null;
 	private SensorManager sm;
@@ -42,12 +47,14 @@ public class ARCompassManager{
     private float[] acc_values = new float[3];
     private float[] mag_values = new float[3];
     private float[] gyro_values = new float[3];
-
-    private GaussianFilter gaussianFilter = null;
-    private CompassController elevationPID = null;
     
     private AzimuthController azimuthController = null;
+    private AzimuthGaussianFilter azimuthGaussianController = null;
+    private AzimuthMotionAverageLPF azimuthMALPFController = null;
+    
     private ElevationController elevationController = null;
+    private ElevationGaussianFilter elevationGaussianController = null;
+    private ElevationMotionAverageLPF elevationMALPFController = null;
     
 //  private ButterworthFilter butterFilter = new ButterworthFilter();
 //  private KalmanFilter kalmanFilter = new KalmanFilter();
@@ -124,24 +131,58 @@ public class ARCompassManager{
     public static float getElevation(float[] values){
     	return values[1];
     }
+    
+    public void setAzimuthControllerType(String type){
+    	if(type.equals(CONTROLLER_GYRO)){
+    		azimuthMALPFController = null;
+    		if(sm.getSensorList(Sensor.TYPE_GYROSCOPE).size() > 0){
+    			azimuthGaussianController = null;
+    			azimuthController = new AzimuthController();
+    		}else{
+    			azimuthController = null;
+    			azimuthGaussianController = new AzimuthGaussianFilter();
+    		}
+    	}else if(type.equals(CONTROLLER_GAUSS)){
+    		azimuthMALPFController = null;
+    		azimuthController = null;
+    		azimuthGaussianController = new AzimuthGaussianFilter();
+    	}else if(type.equals(CONTROLLER_PROP)){
+    		azimuthController = null;
+    		azimuthGaussianController = null;
+    		azimuthMALPFController = new AzimuthMotionAverageLPF(.8f);
+    	}
+    }
+    
+    public void setElevationControllerType(String type){
+    	if(type.equals(CONTROLLER_GYRO)){
+    		elevationGaussianController = null;
+    		if(sm.getSensorList(Sensor.TYPE_GYROSCOPE).size() > 0){
+    			elevationMALPFController = null;
+    			elevationController = new ElevationController();
+    		}else{
+    			elevationController = null;
+    			elevationMALPFController = new ElevationMotionAverageLPF(.5f);
+    		}
+    	}else if(type.equals(CONTROLLER_GAUSS)){
+    		elevationMALPFController = null;
+    		elevationController = null;
+    		elevationGaussianController = new ElevationGaussianFilter();
+    	}else if(type.equals(CONTROLLER_PROP)){
+    		elevationGaussianController = null;
+    		elevationController = null;
+    		elevationMALPFController = new ElevationMotionAverageLPF(.5f);
+    	}
+    }
 	
     private void setSensors(){
-    	//Setting a sensor listener for accelerometer and magnetic field sensors
+    	//Setting a sensor listener for accelerometer, magnetic field and gyroscope sensors
     	
     	try {
     		List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
     		
     		if(sensors.size()>0){
-    			azimuthController = new AzimuthController();
-    			elevationController = new ElevationController();
-//    			gaussianFilter = new GaussianFilter();
-    			
     			Sensor sensor = sensors.get(0);
-    			// This sensor ignores the delay param, so:
     			sm.registerListener(gyroEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-    		}else{
-    			gaussianFilter = new GaussianFilter();
-    			elevationPID = new CompassController(0.5f, false);
     		}
 
     		sensors = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
@@ -226,13 +267,22 @@ public class ARCompassManager{
 //    	values[0] = kalmanFilter.getValue(values[0]);
 //    	values[0] = butterFilter.getValue(values[0]);
 //    	values[0] = gyroFilter.getValue(values[0], gyro_values[0]);
-    	if(azimuthController != null){
+    	
+    	if(azimuthController != null)
     		values[0] = azimuthController.getValue(values[0], gyro_values[0]);
+    	else if(azimuthGaussianController != null)
+    		values[0] = azimuthGaussianController.getValue(values[0]);
+    	else if(azimuthMALPFController != null)
+    		values[0] = azimuthMALPFController.getValue(values[0]);
+    	
+    	
+    	if(elevationController != null)
     		values[1] = elevationController.getValue(values[1], gyro_values[1]);
-    	}else{
-    		values[0] = gaussianFilter.getValue(values[0]);
-        	values[1] = elevationPID.getValue(values[1]);
-    	}
+    	else if(elevationMALPFController != null)
+    		values[1] = elevationMALPFController.getValue(values[1]);
+    	else if(elevationGaussianController != null)
+    		values[1] = elevationGaussianController.getValue(values[1]);
+    	
     	
     	onCompassChangeListener.onChange(values);
     }

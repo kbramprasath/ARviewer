@@ -22,10 +22,10 @@ package com.libresoft.apps.ARviewer.Utils;
 import java.util.ArrayList;
 
 public class ElevationController{
-	private static final int VAR_THRESHOLD = 10;
+	private static final int VAR_THRESHOLD = 2;
 	private static final float GYRO_THRESHOLD = 0.04f;
-	private static final float GYRO_CORRECTION = 0.0065f;
-	private static final int ERROR_THRESHOLD = 25;
+	private static final float GYRO_CORRECTION = 0.00625f;
+	private static final int ERROR_THRESHOLD = 20;
 	private static final int MAX_VALUES = 5;
 	
 	private boolean stable_phase = false;
