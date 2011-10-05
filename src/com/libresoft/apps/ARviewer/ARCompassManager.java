@@ -221,6 +221,10 @@ public class ARCompassManager{
     	onCompassChangeListener = null;
     }
     
+    public boolean isGyro(){
+    	return sm.getSensorList(Sensor.TYPE_GYROSCOPE).size() > 0;
+    }
+    
     private void OnCompassMeasure(){
     	if(onCompassChangeListener == null)
     		return;
