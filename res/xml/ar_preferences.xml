@@ -59,15 +59,13 @@
     		android:title="@string/pref_ar_tools_azimuth_control_title" 
     		android:dialogTitle="@string/pref_ar_tools_azimuth_control_title"
     		android:entries="@array/azimuth_control"
-    		android:entryValues="@array/azimuth_control"
-    		android:defaultValue="Gaussian"/>
+    		android:entryValues="@array/azimuth_control"/>
     	<ListPreference
     		android:key="elevationController"
     		android:title="@string/pref_ar_tools_elevation_control_title" 
     		android:dialogTitle="@string/pref_ar_tools_elevation_control_title"
     		android:entries="@array/azimuth_control"
-    		android:entryValues="@array/azimuth_control"
-    		android:defaultValue="Proportional"/>
+    		android:entryValues="@array/azimuth_control"/>
 	</PreferenceCategory>
 	<PreferenceCategory
     	android:title="@string/pref_ar_labels_title">

@@ -33,6 +33,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -44,6 +46,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class ARPreferences extends PreferenceActivity implements OnSharedPreferenceChangeListener, OnPreferenceClickListener {
@@ -91,8 +94,11 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
         getPreferenceScreen().findPreference(KEY_ALTITUDE_INTENT).setOnPreferenceClickListener(this);
         getPreferenceScreen().findPreference(KEY_LOCATION_INTENT).setOnPreferenceClickListener(this);
         
-        getPreferenceScreen().findPreference(KEY_AZ_CONTROLLER).setSummary(sharedPreferences.getString(KEY_AZ_CONTROLLER, "Gaussian"));
-        getPreferenceScreen().findPreference(KEY_EL_CONTROLLER).setSummary(sharedPreferences.getString(KEY_EL_CONTROLLER, "Proportional"));
+        String default_controller = "Gaussian";
+        if(((SensorManager)getSystemService(SENSOR_SERVICE)).getSensorList(Sensor.TYPE_GYROSCOPE).size() > 0)
+        	default_controller = "Gyroscope";
+        getPreferenceScreen().findPreference(KEY_AZ_CONTROLLER).setSummary(sharedPreferences.getString(KEY_AZ_CONTROLLER, default_controller));
+        getPreferenceScreen().findPreference(KEY_EL_CONTROLLER).setSummary(sharedPreferences.getString(KEY_EL_CONTROLLER, default_controller));
         
         blockVisibility(sharedPreferences);
 	        
@@ -112,15 +118,30 @@ public class ARPreferences extends PreferenceActivity implements OnSharedPrefere
 			Preference pref = this.findPreference(key);
 			if(pref == null) 
 				return;
-			
+
+	        if((sharedPreferences.getString(key, "Gaussian").equals("Gyroscope")) &&
+	        		(((SensorManager)getSystemService(SENSOR_SERVICE)).getSensorList(Sensor.TYPE_GYROSCOPE).size() == 0)){
+	        	Toast.makeText(this, R.string.pref_ar_tools_control_error, Toast.LENGTH_LONG).show();
+	        	Editor editor = sharedPreferences.edit();
+	        	editor.putString(key, "Gaussian");
+	        	editor.commit();
+	        }
 			pref.setSummary(sharedPreferences.getString(key, "Gaussian"));
 		}else if(key.equals(KEY_EL_CONTROLLER)) {
 
 			Preference pref = this.findPreference(key);
 			if(pref == null) 
 				return;
+
+	        if((sharedPreferences.getString(key, "Gaussian").equals("Gyroscope")) &&
+	        		(((SensorManager)getSystemService(SENSOR_SERVICE)).getSensorList(Sensor.TYPE_GYROSCOPE).size() == 0)){
+	        	Toast.makeText(this, R.string.pref_ar_tools_control_error, Toast.LENGTH_LONG).show();
+	        	Editor editor = sharedPreferences.edit();
+	        	editor.putString(key, "Gaussian");
+	        	editor.commit();
+	        }
 			
-			pref.setSummary(sharedPreferences.getString(key, "Proportional"));
+			pref.setSummary(sharedPreferences.getString(key, "Gaussian"));
 		}else if(key.equals(KEY_HEIGHT)){
 
 			blockVisibility(sharedPreferences);

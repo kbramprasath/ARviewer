@@ -64,6 +64,7 @@
 	<string name="pref_ar_tools_azimuth_control_title">Azimuth control</string>
 	<string name="pref_ar_tools_elevation_control_title">Elevation control</string>
 	<string name="pref_ar_tools_control_title">Select the controller you want to use</string>
+	<string name="pref_ar_tools_control_error">It seems that the selected sensor is not available in your device</string>
 	<string name="pref_ar_labels_title">Labels</string>
 	<string name="pref_ar_labels_moveLabels_title">Dynamic summary</string>
 	<string name="pref_ar_labels_moveLabels_summary_on">Dynamic summary box enabled</string>
