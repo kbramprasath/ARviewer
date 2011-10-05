@@ -44,6 +44,7 @@ public class ARLayerManager{
 	
 	public void setBaseLayer(){
 		baseLayer = new RelativeLayout(mContext);
+		baseLayer.setKeepScreenOn(true);
 		activity.setContentView(baseLayer);
 	}
 	

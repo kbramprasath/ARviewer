@@ -90,8 +90,6 @@ public class ARBase extends ARActivity{
 	
 	private static ARBase pointerObject = null;
 	
-	protected PowerManager.WakeLock mWakeLock;
-	
     private CamPreview mPreview;
     private DrawParameters mParameters;
     private DrawFocus mFocus;
@@ -194,10 +192,6 @@ public class ARBase extends ARActivity{
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			
-			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-			this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-			this.mWakeLock.acquire();
 			
 			// Create our Preview view and set it as the content of our activity.
 			mPreview = new CamPreview(this);
@@ -385,7 +379,6 @@ public class ARBase extends ARActivity{
     	ARGeoNode.clearBox();
     	ARLocationManager.getInstance(this).stopUpdates();
     	ARLocationManager.getInstance(this).resetLocation();
-    	this.mWakeLock.release();
     	super.onDestroy();
     }
     
