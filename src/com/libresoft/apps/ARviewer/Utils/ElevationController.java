@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class ElevationController{
 	private static final int VAR_THRESHOLD = 2;
 	private static final float GYRO_THRESHOLD = 0.04f;
-	private static final float GYRO_CORRECTION = 0.00625f;
+	private static final float GYRO_CORRECTION = 0.00622f;
 	private static final int ERROR_THRESHOLD = 20;
 	private static final int MAX_VALUES = 5;
 	
@@ -65,8 +65,8 @@ public class ElevationController{
 	private boolean doStablePhase(float new_value, float new_gyro){
 		new_gyro = new_gyro - GYRO_CORRECTION;
 		
-		if(Math.abs(new_gyro) < GYRO_THRESHOLD)
-			return true;
+//		if(Math.abs(new_gyro) < GYRO_THRESHOLD)
+//			return true;
 		
 		// Predicted angle
 		X = (float) (X - Math.toDegrees(new_gyro)*0.125);

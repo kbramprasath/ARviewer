@@ -73,8 +73,8 @@ public class AzimuthController{
 	private boolean doStablePhase(float new_value, float new_gyro){
 		new_gyro = new_gyro + GYRO_CORRECTION;
 		
-		if(Math.abs(new_gyro) < GYRO_THRESHOLD)
-			return true;
+//		if(Math.abs(new_gyro) < GYRO_THRESHOLD)
+//			return true;
 		
 		// Predicted angle
 		X = (float) (X - Math.toDegrees(new_gyro)*0.125);
