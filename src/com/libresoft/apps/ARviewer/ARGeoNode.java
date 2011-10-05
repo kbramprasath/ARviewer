@@ -47,6 +47,7 @@ import android.graphics.Point;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
@@ -226,18 +227,22 @@ public class ARGeoNode implements ARNodeDrawingIF{
 	}
 	
 	public static void setRefreshIcon(ArrayList<ARGeoNode> list_nodes, boolean refreshIcon){
-		ARGeoNode.refreshIcon = refreshIcon;
-		if(list_nodes != null){
-			int max = list_nodes.size();
-			ARGeoNode node;
-			for(int i = max-1; i > -1; i--){
-				node = list_nodes.get(i);
-				if(Photo.class.isInstance(node.getGeoNode()))
-					node.getDrawn().setIcon(null);
-				else if(Video.class.isInstance(node.getGeoNode()))
-					node.getDrawn().setIcon(null);
+		try{
+			ARGeoNode.refreshIcon = refreshIcon;
+			if(list_nodes != null){
+				int max = list_nodes.size();
+				ARGeoNode node;
+				for(int i = max-1; i > -1; i--){
+					node = list_nodes.get(i);
+					if(Photo.class.isInstance(node.getGeoNode()))
+						node.getDrawn().setIcon(null);
+					else if(Video.class.isInstance(node.getGeoNode()))
+						node.getDrawn().setIcon(null);
+				}
+
 			}
-				
+		}catch(Exception e){
+			Log.e("ARGeoNode", "", e);
 		}
 	}
 	
